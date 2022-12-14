@@ -1,23 +1,53 @@
-use bevy::prelude::*;
-use bevy_egui::{
-    egui,
-    EguiContext, EguiPlugin,
-};
+use bevy::{asset::SourceMeta, prelude::*, render::texture::PixelInfo};
+use bevy_egui::{egui, EguiContext, EguiPlugin};
+
+#[derive(Component)]
+struct Material {
+    name_type: String,
+    flamability: f32,
+    color: Color,
+    width: f32,
+    height: f32,
+    position_x: f32,
+    position_y: f32,
+}
+
+fn print_sistem(query: Query<&Material>) {
+    for material in &query {
+        println!("{}", material.name_type);
+    }
+}
 
 fn main() {
     App::new()
         .init_resource::<UiState>()
         .add_plugins(DefaultPlugins)
         .add_plugin(EguiPlugin)
+        .add_startup_system(start_system)
         .add_startup_system(configure_visuals)
         .add_startup_system(configure_ui_state)
         .add_system(ui)
+        // .add_system(print_sistem)
         .run();
 }
 
 #[derive(Default, Resource)]
 struct UiState {
     is_window_open: bool,
+}
+
+fn start_system(mut commands: Commands) {
+    commands.spawn(
+        (Material {
+            name_type: String::from("Wood"),
+            flamability: 0.23,
+            color: Color::rgb(0.4, 0.4, 0.4),
+            width: 0.5,
+            height: 0.5,
+            position_x: 0.5,
+            position_y: 0.5,
+        }),
+    );
 }
 
 fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
