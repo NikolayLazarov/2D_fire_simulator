@@ -62,11 +62,30 @@ fn configure_ui_state(mut ui_state: ResMut<UiState>) {
 }
 
 fn ui(mut egui_ctx: ResMut<EguiContext>) {
+    let mut but1 = false;
+    let mut but2 = false;
+    let mut but3 = false;
+
     egui::SidePanel::right("side_panel")
         .default_width(200.0)
         .resizable(true)
         .show(egui_ctx.ctx_mut(), |ui| {
             ui.heading("Side Panel");
+
+            ui.horizontal(|ui| {
+                ui.label("Wood");
+                but1 = ui.button("Wood").clicked();
+            });
+
+            ui.horizontal(|ui| {
+                ui.label("Metall");
+                but2 = ui.button("Invert").clicked();
+            });
+
+            ui.horizontal(|ui| {
+                ui.label("Other");
+                but3 = ui.button("Other").clicked();
+            });
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                 ui.allocate_space(ui.available_size());
@@ -84,4 +103,12 @@ fn ui(mut egui_ctx: ResMut<EguiContext>) {
     egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
         ui.label("Scene");
     });
+
+    if but1 || but2 || but3 {
+        // egui_ctx.ctx_mut();
+
+        println!("button is clicked");
+        but1 = false;
+        // egui_ctx.data
+    }
 }
