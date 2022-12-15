@@ -1,17 +1,6 @@
 use bevy::{asset::SourceMeta, prelude::*, render::texture::PixelInfo};
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 
-#[derive(Component)]
-struct Material {
-    name_type: String,
-    flamability: f32,
-    color: Color,
-    width: f32,
-    height: f32,
-    position_x: f32,
-    position_y: f32,
-}
-
 fn print_sistem(query: Query<&Material>) {
     for material in &query {
         println!("{}", material.name_type);
@@ -26,7 +15,7 @@ fn main() {
         .add_startup_system(start_system)
         .add_startup_system(configure_visuals)
         .add_startup_system(configure_ui_state)
-        .add_system(ui)
+        .add_system(ui_state)
         // .add_system(print_sistem)
         .run();
 }
@@ -34,6 +23,8 @@ fn main() {
 #[derive(Default, Resource)]
 struct UiState {
     is_window_open: bool,
+    label: String,
+    material: Material,
 }
 
 fn start_system(mut commands: Commands) {
@@ -61,7 +52,11 @@ fn configure_ui_state(mut ui_state: ResMut<UiState>) {
     ui_state.is_window_open = true;
 }
 
-fn ui(mut egui_ctx: ResMut<EguiContext>) {
+fn ui_state(
+    mut egui_ctx: ResMut<EguiContext>,
+    mut ui_state: ResMut<UiState>,
+    mut commands: Commands,
+) {
     let mut but1 = false;
     let mut but2 = false;
     let mut but3 = false;
@@ -87,6 +82,12 @@ fn ui(mut egui_ctx: ResMut<EguiContext>) {
                 but3 = ui.button("Other").clicked();
             });
 
+            ui.horizontal(|ui| {
+                ui.label("Write something: ");
+                ui.text_edit_singleline(&mut ui_state.label);
+
+                //new material parameters 
+            });
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                 ui.allocate_space(ui.available_size());
             });
@@ -102,13 +103,53 @@ fn ui(mut egui_ctx: ResMut<EguiContext>) {
 
     egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
         ui.label("Scene");
+
+        if but1 {
+            egui::Area::new("Central Area").show(ui.ctx(), |ui|{
+                ui_state.material.ui_content(ui);
+            });
+            
+        }
     });
 
-    if but1 || but2 || but3 {
+    if but2 || but3 {
         // egui_ctx.ctx_mut();
 
         println!("button is clicked");
-        but1 = false;
+        println!("Label is {}", ui_state.label);
         // egui_ctx.data
     }
+}
+
+#[derive(Component)]
+struct Material {
+    name_type: String,
+    flamability: f32,
+    color: Color,
+    width: f32,
+    height: f32,
+    position_x: f32,
+    position_y: f32,
+}
+
+impl Default for Material {
+    fn default() -> Self {
+        Self {
+            name_type: String::from("Material"),
+            flamability: 0.5,
+            color: Color::BEIGE,
+            width: 4.5,
+            height: 4.5,
+            position_x: 4.5,
+            position_y: 4.5,
+        }
+    }
+}
+
+impl Material {
+    fn ui_content(&mut self, ui: &mut egui::Ui) {
+
+
+        ui.label("This is text");
+       }
 }
