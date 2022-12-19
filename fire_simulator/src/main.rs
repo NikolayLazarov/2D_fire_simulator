@@ -1,4 +1,4 @@
-use bevy::{asset::SourceMeta, prelude::*, render::texture::PixelInfo};
+use bevy::{asset::SourceMeta, prelude::{*, system_adapter::new}, render::texture::PixelInfo};
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 
 fn print_sistem(query: Query<&Material>) {
@@ -9,6 +9,8 @@ fn print_sistem(query: Query<&Material>) {
 
 fn main() {
     App::new()
+        // .init_resource:: <Materials>()
+        // .init_resource::<Material>()
         .init_resource::<UiState>()
         .add_plugins(DefaultPlugins)
         .add_plugin(EguiPlugin)
@@ -24,7 +26,11 @@ fn main() {
 struct UiState {
     is_window_open: bool,
     label: String,
-    material: Material,
+    // material: Materials,
+    material:Material,
+    //probe
+    button: bool,
+    vector: Vec<u32>
 }
 
 fn start_system(mut commands: Commands) {
@@ -38,6 +44,7 @@ fn start_system(mut commands: Commands) {
             position_x: 0.5,
             position_y: 0.5,
         }),
+
     );
 }
 
@@ -50,16 +57,24 @@ fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
 
 fn configure_ui_state(mut ui_state: ResMut<UiState>) {
     ui_state.is_window_open = true;
+    ui_state.button = false;
+    ui_state.vector = vec![1,2,3];
 }
 
 fn ui_state(
     mut egui_ctx: ResMut<EguiContext>,
     mut ui_state: ResMut<UiState>,
     mut commands: Commands,
+    // mut materials: Vec<Material>
 ) {
+
+    // let mut materials: Vec<Material> = Vec::new();
+    
     let mut but1 = false;
     let mut but2 = false;
     let mut but3 = false;
+
+    
 
     egui::SidePanel::right("side_panel")
         .default_width(200.0)
@@ -104,24 +119,51 @@ fn ui_state(
     egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
         ui.label("Scene");
 
+        egui::Area::new("Central Area").show(ui.ctx(), |ui|{
+           
+            for i in &ui_state.vector{
+                // ui_state.material.ui_content(ui,*i);
+                ui.label(i.to_string());
+            }
+
+        });
+
         if but1 {
-            egui::Area::new("Central Area").show(ui.ctx(), |ui|{
-                ui_state.material.ui_content(ui);
-            });
-            
+            ui_state.button = !ui_state.button;
         }
+        
+        if ui_state.button{
+            ui_state.vector.push(4);
+            ui_state.button = false;
+        }
+        
     });
 
     if but2 || but3 {
         // egui_ctx.ctx_mut();
 
+        // let mut new_material = Material{ 
+        //     name_type: String::from("Wood"),
+        //     flamability: 0.23,
+        //     color: Color::rgb(0.4, 0.4, 0.4),
+        //     width: 0.5,
+        //     height: 0.5,
+        //     position_x: 0.5,
+        //     position_y: 0.5 };
+
+        // materials.push(new_material );
+
         println!("button is clicked");
         println!("Label is {}", ui_state.label);
         // egui_ctx.data
+
+        // for i in materials{
+        //     println!("{:?}",i);
+        // }
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 struct Material {
     name_type: String,
     flamability: f32,
@@ -147,9 +189,25 @@ impl Default for Material {
 }
 
 impl Material {
-    fn ui_content(&mut self, ui: &mut egui::Ui) {
-
+    fn ui_content(&mut self,  ui: &mut egui::Ui) {
+    //use self 
+        // for element in ui {
+        //     ui.label(element.to_string());    
+        // }
 
         ui.label("This is text");
+        
        }
+}
+#[derive(Component)]
+struct Materials{
+    materials: Vec<Material>
+}
+
+impl Default for Materials{
+    fn default() -> Self {
+      Self { 
+        materials: Vec::new()
+     }
+    }
 }
