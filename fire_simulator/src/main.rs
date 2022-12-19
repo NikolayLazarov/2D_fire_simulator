@@ -18,8 +18,6 @@ struct UiState {
     label: String,
     materials: Vec<Material>,
     button: bool,
-    button2: bool,
-    vector: Vec<u32>,
 }
 
 impl UiState {
@@ -40,8 +38,6 @@ fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
 fn configure_ui_state(mut ui_state: ResMut<UiState>) {
     ui_state.is_window_open = true;
     ui_state.button = false;
-    ui_state.button2 = false;
-    ui_state.vector = vec![1, 2, 3];
 }
 
 fn ui_state(mut egui_ctx: ResMut<EguiContext>, mut ui_state: ResMut<UiState>) {
@@ -93,38 +89,15 @@ fn ui_state(mut egui_ctx: ResMut<EguiContext>, mut ui_state: ResMut<UiState>) {
         ui.label("Scene");
 
         egui::Area::new("Central Area").show(ui.ctx(), |ui| {
-            for i in &ui_state.vector {
-                // ui_state.material.ui_content(ui,*i);
-                ui.label(i.to_string());
-            }
-        });
-
-        ui.separator();
-
-        ui.label("Scene2");
-
-        egui::Area::new("Central Area2").show(ui.ctx(), |ui| {
             ui_state.all_materials(ui);
         });
-
-        if but1 {
-            ui_state.button = !ui_state.button;
-        }
-
-        if ui_state.button {
-            ui_state.vector.push(4);
-            ui_state.button = false;
-        }
     });
 
-    if but2 || but3 {
-        println!("button is clicked");
-        println!("Label is {}", ui_state.label);
-
-        ui_state.button2 = !ui_state.button2;
+    if but1 || but2 || but3 {
+        ui_state.button = !ui_state.button;
     }
 
-    if ui_state.button2 {
+    if ui_state.button {
         ui_state.materials.push(Material {
             name_type: String::from("Wood"),
             flamability: 0.23,
@@ -135,7 +108,7 @@ fn ui_state(mut egui_ctx: ResMut<EguiContext>, mut ui_state: ResMut<UiState>) {
             position_y: 0.5,
         });
 
-        ui_state.button2 = false;
+        ui_state.button = false;
     }
 }
 
