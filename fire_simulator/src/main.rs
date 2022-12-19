@@ -44,11 +44,7 @@ fn configure_ui_state(mut ui_state: ResMut<UiState>) {
     ui_state.vector = vec![1, 2, 3];
 }
 
-fn ui_state(
-    mut egui_ctx: ResMut<EguiContext>,
-    mut ui_state: ResMut<UiState>,
-    mut commands: Commands,
-) {
+fn ui_state(mut egui_ctx: ResMut<EguiContext>, mut ui_state: ResMut<UiState>) {
     let mut but1 = false;
     let mut but2 = false;
     let mut but3 = false;
@@ -171,17 +167,5 @@ impl Default for Material {
 impl Material {
     fn ui_content(&mut self, ui: &mut egui::Ui) {
         ui.label("This is text");
-    }
-}
-#[derive(Component)]
-struct Materials {
-    materials: Vec<Material>,
-}
-
-impl Default for Materials {
-    fn default() -> Self {
-        Self {
-            materials: Vec::new(),
-        }
     }
 }
