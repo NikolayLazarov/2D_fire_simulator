@@ -15,18 +15,20 @@ fn main() {
 #[derive(Default, Resource)]
 struct UiState {
     is_window_open: bool,
-    label: String,
-    materials: Vec<Material>,
-    button: bool,
+    // materials: Vec<Material>,
+    new_material: bool,
+    material: Material,
 }
 
-impl UiState {
-    fn all_materials(&mut self, ui: &mut egui::Ui) {
-        for element in &self.materials {
-            ui.label(&element.name_type);
-        }
-    }
-}
+// impl UiState {
+//     fn all_materials(&mut self, ui: &mut egui::Ui,) {
+//         // for element in &self.materials {
+//         //     ui.label(&element.name_type);
+//         //     ui.label(&element.width.to_string());
+//         //     ui.separator();
+//         // }
+//     }
+// }
 
 fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
     egui_ctx.ctx_mut().set_visuals(egui::Visuals {
@@ -37,13 +39,16 @@ fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
 
 fn configure_ui_state(mut ui_state: ResMut<UiState>) {
     ui_state.is_window_open = true;
-    ui_state.button = false;
+    ui_state.material = Material::default();
+    ui_state.new_material = false;
 }
 
-fn ui_state(mut egui_ctx: ResMut<EguiContext>, mut ui_state: ResMut<UiState>) {
-    let mut but1 = false;
-    let mut but2 = false;
-    let mut but3 = false;
+fn ui_state(
+    mut egui_ctx: ResMut<EguiContext>,
+    mut ui_state: ResMut<UiState>,
+    mut commands: Commands,
+) {
+    let mut new_button = false;
 
     egui::SidePanel::right("side_panel")
         .default_width(200.0)
@@ -51,27 +56,41 @@ fn ui_state(mut egui_ctx: ResMut<EguiContext>, mut ui_state: ResMut<UiState>) {
         .show(egui_ctx.ctx_mut(), |ui| {
             ui.heading("Side Panel");
 
-            ui.horizontal(|ui| {
-                ui.label("Wood");
-                but1 = ui.button("Wood").clicked();
-            });
+            ui.heading("Material");
 
             ui.horizontal(|ui| {
-                ui.label("Metall");
-                but2 = ui.button("Invert").clicked();
+                ui.label("Your material: ");
+                // ui.text_edit_singleline( &mut ui_state.name);
+                ui.text_edit_singleline(&mut ui_state.material.name_type);
             });
+
+            ui.add(egui::Slider::new(&mut ui_state.material.width, 0..=30).text("Width"));
+            if ui.button("Increment").clicked() {
+                ui_state.material.width += 1;
+            }
+
+            ui.add(egui::Slider::new(&mut ui_state.material.height, 0..=30).text("Height"));
+            if ui.button("Increment").clicked() {
+                ui_state.material.height += 1;
+            }
+
+            ui.add(egui::Slider::new(&mut ui_state.material.position_x, 0..=30).text("X axys"));
+            if ui.button("Increment").clicked() {
+                ui_state.material.position_x += 1;
+            }
+
+            ui.add(egui::Slider::new(&mut ui_state.material.position_y, 0..=30).text("Y axys"));
+            if ui.button("Increment").clicked() {
+                ui_state.material.position_y += 1;
+            }
+
+            ui.separator();
 
             ui.horizontal(|ui| {
-                ui.label("Other");
-                but3 = ui.button("Other").clicked();
+                ui.label("New");
+                new_button = ui.button("New").clicked();
             });
 
-            ui.horizontal(|ui| {
-                ui.label("Write something: ");
-                ui.text_edit_singleline(&mut ui_state.label);
-
-                //new material parameters
-            });
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                 ui.allocate_space(ui.available_size());
             });
@@ -89,38 +108,29 @@ fn ui_state(mut egui_ctx: ResMut<EguiContext>, mut ui_state: ResMut<UiState>) {
         ui.label("Scene");
 
         egui::Area::new("Central Area").show(ui.ctx(), |ui| {
-            ui_state.all_materials(ui);
+            // ui_state.all_materials(ui);
         });
     });
 
-    if but1 || but2 || but3 {
-        ui_state.button = !ui_state.button;
+    if new_button {
+        ui_state.new_material = !ui_state.new_material;
     }
 
-    if ui_state.button {
-        ui_state.materials.push(Material {
-            name_type: String::from("Wood"),
-            flamability: 0.23,
-            color: Color::rgb(0.4, 0.4, 0.4),
-            width: 0.5,
-            height: 0.5,
-            position_x: 0.5,
-            position_y: 0.5,
-        });
-
-        ui_state.button = false;
+    if ui_state.new_material {
+        commands.spawn(ui_state.material.clone());
+        ui_state.new_material = false;
     }
 }
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone)]
 struct Material {
     name_type: String,
     flamability: f32,
     color: Color,
-    width: f32,
-    height: f32,
-    position_x: f32,
-    position_y: f32,
+    width: u32,
+    height: u32,
+    position_x: u32,
+    position_y: u32,
 }
 
 impl Default for Material {
@@ -129,10 +139,10 @@ impl Default for Material {
             name_type: String::from("Material"),
             flamability: 0.5,
             color: Color::BEIGE,
-            width: 4.5,
-            height: 4.5,
-            position_x: 4.5,
-            position_y: 4.5,
+            width: 4,
+            height: 5,
+            position_x: 5,
+            position_y: 5,
         }
     }
 }
