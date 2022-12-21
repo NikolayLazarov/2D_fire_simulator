@@ -1,5 +1,23 @@
 use bevy::prelude::*;
-use bevy_egui::{egui, EguiContext, EguiPlugin};
+use bevy_egui::{
+    egui::{self, pos2},
+    EguiContext, EguiPlugin,
+};
+
+fn print_system(mut query: Query<(&Material)>, mut egui_ctx: ResMut<EguiContext>) {
+    egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
+        ui.label("Scene");
+
+        egui::Area::new("Central Area").show(ui.ctx(), |ui| {
+            for material in &mut query {
+                ui.label(format!(
+                    "Material = {}, width = {}, height = {} ",
+                    material.name_type, material.width, material.height
+                ));
+            }
+        });
+    });
+}
 
 fn main() {
     App::new()
@@ -9,26 +27,16 @@ fn main() {
         .add_startup_system(configure_visuals)
         .add_startup_system(configure_ui_state)
         .add_system(ui_state)
+        .add_system(print_system)
         .run();
 }
 
 #[derive(Default, Resource)]
 struct UiState {
     is_window_open: bool,
-    // materials: Vec<Material>,
     new_material: bool,
     material: Material,
 }
-
-// impl UiState {
-//     fn all_materials(&mut self, ui: &mut egui::Ui,) {
-//         // for element in &self.materials {
-//         //     ui.label(&element.name_type);
-//         //     ui.label(&element.width.to_string());
-//         //     ui.separator();
-//         // }
-//     }
-// }
 
 fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
     egui_ctx.ctx_mut().set_visuals(egui::Visuals {
@@ -60,7 +68,6 @@ fn ui_state(
 
             ui.horizontal(|ui| {
                 ui.label("Your material: ");
-                // ui.text_edit_singleline( &mut ui_state.name);
                 ui.text_edit_singleline(&mut ui_state.material.name_type);
             });
 
@@ -104,14 +111,6 @@ fn ui_state(
         ui.label("Bottom pannel");
     });
 
-    egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
-        ui.label("Scene");
-
-        egui::Area::new("Central Area").show(ui.ctx(), |ui| {
-            // ui_state.all_materials(ui);
-        });
-    });
-
     if new_button {
         ui_state.new_material = !ui_state.new_material;
     }
@@ -144,11 +143,5 @@ impl Default for Material {
             position_x: 5,
             position_y: 5,
         }
-    }
-}
-
-impl Material {
-    fn ui_content(&mut self, ui: &mut egui::Ui) {
-        ui.label("This is text");
     }
 }
