@@ -4,7 +4,7 @@ use bevy_egui::{
     EguiContext, EguiPlugin,
 };
 
-fn print_system(
+fn material_fetch_system(
     mut query: Query<&Material>,
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
@@ -34,7 +34,7 @@ fn main() {
         .add_startup_system(configure_ui_state)
         // .add_startup_system(setup)
         .add_system(ui_state)
-        .add_system(print_system)
+        .add_system(material_fetch_system)
         .run();
 }
 
