@@ -64,6 +64,7 @@ struct UiState {
     material_window: bool,
     fire_window: bool,
     new_material: bool,
+    new_fire: bool,
     material: Material,
     fire: Fire,
 }
@@ -80,6 +81,7 @@ fn configure_ui_state(mut ui_state: ResMut<UiState>) {
     ui_state.material = Material::default();
     ui_state.fire = Fire::default();
     ui_state.new_material = false;
+    ui_state.new_fire = false;
     ui_state.material_window = false;
     ui_state.fire_window = false;
 }
@@ -89,7 +91,8 @@ fn ui_state(
     mut ui_state: ResMut<UiState>,
     mut commands: Commands,
 ) {
-    let mut new_button = false;
+    let mut new_material_button = false;
+    let mut new_fire_button = false;
     let mut material_button = false;
     let mut fire_button = false;
     egui::SidePanel::right("side_panel")
@@ -133,9 +136,50 @@ fn ui_state(
 
                 ui.horizontal(|ui| {
                     ui.label("New");
-                    new_button = ui.button("New").clicked();
+                    new_material_button = ui.button("New").clicked();
                 });
             } else if ui_state.fire_window {
+                ui.horizontal(|ui| {
+                    ui.label("Your Fire: ");
+                    ui.text_edit_singleline(&mut ui_state.fire.name);
+                });
+
+                ui.add(egui::Slider::new(&mut ui_state.fire.width, 0..=30).text("Width"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fire.width += 1;
+                }
+
+                ui.add(egui::Slider::new(&mut ui_state.fire.height, 0..=30).text("Height"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fire.height += 1;
+                }
+
+                ui.add(egui::Slider::new(&mut ui_state.fire.position_x, 0..=30).text("X axys"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fire.position_x += 1;
+                }
+
+                ui.add(egui::Slider::new(&mut ui_state.fire.position_y, 0..=30).text("Y axys"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fire.position_y += 1;
+                }
+
+                ui.add(egui::Slider::new(&mut ui_state.fire.speed, 0..=30).text("Speed"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fire.speed += 1;
+                }
+
+                ui.add(egui::Slider::new(&mut ui_state.fire.range, 0..=30).text("Range"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fire.range += 1;
+                }
+
+                ui.separator();
+
+                ui.horizontal(|ui| {
+                    ui.label("New");
+                    new_fire_button = ui.button("New").clicked();
+                });
             }
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
@@ -151,8 +195,11 @@ fn ui_state(
         ui.label("Bottom pannel");
     });
 
-    if new_button {
+    if new_material_button {
         ui_state.new_material = !ui_state.new_material;
+    }
+    if new_fire_button {
+        ui_state.new_fire = !ui_state.new_fire;
     }
 
     if material_button {
@@ -168,6 +215,10 @@ fn ui_state(
     if ui_state.new_material {
         commands.spawn(ui_state.material.clone());
         ui_state.new_material = false;
+    }
+    if ui_state.new_fire {
+        commands.spawn(ui_state.fire.clone());
+        ui_state.new_fire = false;
     }
 }
 
