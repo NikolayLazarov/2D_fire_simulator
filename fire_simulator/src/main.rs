@@ -1,3 +1,5 @@
+use std::fmt::format;
+
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use bevy_egui::{
     egui::{self, pos2},
@@ -25,6 +27,20 @@ fn material_fetch_system(
     });
 }
 
+fn fire_fetch_system(
+    mut query: Query<&Fire>,
+    mut egui_ctx: ResMut<EguiContext>,
+    mut commands: Commands,
+){
+    egui::Area::new("Fires").show(egui_ctx.ctx_mut() ,|ui|{
+        for mut fire in &mut query{
+            let mut button = false;
+            ui.label(format!("Fire = {}, range = {}, speed{}", fire.name, fire.range, fire.speed));
+            button = ui.button(fire.name.to_string()).clicked();
+        }
+    } );
+}
+
 fn main() {
     App::new()
         .init_resource::<UiState>()
@@ -35,6 +51,7 @@ fn main() {
         // .add_startup_system(setup)
         .add_system(ui_state)
         .add_system(material_fetch_system)
+        .add_system(fire_fetch_system)
         .run();
 }
 
