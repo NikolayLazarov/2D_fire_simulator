@@ -41,6 +41,8 @@ fn main() {
 #[derive(Default, Resource)]
 struct UiState {
     is_window_open: bool,
+    material_window: bool,
+    fire_window: bool,
     new_material: bool,
     material: Material,
 }
@@ -56,6 +58,8 @@ fn configure_ui_state(mut ui_state: ResMut<UiState>) {
     ui_state.is_window_open = true;
     ui_state.material = Material::default();
     ui_state.new_material = false;
+    ui_state.material_window = false;
+    ui_state.fire_window = false;
 }
 
 fn ui_state(
@@ -64,46 +68,55 @@ fn ui_state(
     mut commands: Commands,
 ) {
     let mut new_button = false;
-
+    let mut material_button = false;
+    let mut fire_button = false;
     egui::SidePanel::right("side_panel")
         .default_width(200.0)
         .resizable(true)
         .show(egui_ctx.ctx_mut(), |ui| {
-            ui.heading("Side Panel");
-
-            ui.heading("Material");
-
             ui.horizontal(|ui| {
-                ui.label("Your material: ");
-                ui.text_edit_singleline(&mut ui_state.material.name_type);
+                material_button = ui.button("Material").clicked();
+                fire_button = ui.button("Fire").clicked();
             });
 
-            ui.add(egui::Slider::new(&mut ui_state.material.width, 0..=30).text("Width"));
-            if ui.button("Increment").clicked() {
-                ui_state.material.width += 1;
+            if ui_state.material_window {
+                ui.heading("Side Panel");
+                ui.heading("Material");
+
+                ui.horizontal(|ui| {
+                    ui.label("Your material: ");
+                    ui.text_edit_singleline(&mut ui_state.material.name_type);
+                });
+
+                ui.add(egui::Slider::new(&mut ui_state.material.width, 0..=30).text("Width"));
+                if ui.button("Increment").clicked() {
+                    ui_state.material.width += 1;
+                }
+
+                ui.add(egui::Slider::new(&mut ui_state.material.height, 0..=30).text("Height"));
+                if ui.button("Increment").clicked() {
+                    ui_state.material.height += 1;
+                }
+
+                ui.add(egui::Slider::new(&mut ui_state.material.position_x, 0..=30).text("X axys"));
+                if ui.button("Increment").clicked() {
+                    ui_state.material.position_x += 1;
+                }
+
+                ui.add(egui::Slider::new(&mut ui_state.material.position_y, 0..=30).text("Y axys"));
+                if ui.button("Increment").clicked() {
+                    ui_state.material.position_y += 1;
+                }
+
+                ui.separator();
+
+                ui.horizontal(|ui| {
+                    ui.label("New");
+                    new_button = ui.button("New").clicked();
+                });
+            } else if ui_state.fire_window {
+                ui.label("this is fire window");
             }
-
-            ui.add(egui::Slider::new(&mut ui_state.material.height, 0..=30).text("Height"));
-            if ui.button("Increment").clicked() {
-                ui_state.material.height += 1;
-            }
-
-            ui.add(egui::Slider::new(&mut ui_state.material.position_x, 0..=30).text("X axys"));
-            if ui.button("Increment").clicked() {
-                ui_state.material.position_x += 1;
-            }
-
-            ui.add(egui::Slider::new(&mut ui_state.material.position_y, 0..=30).text("Y axys"));
-            if ui.button("Increment").clicked() {
-                ui_state.material.position_y += 1;
-            }
-
-            ui.separator();
-
-            ui.horizontal(|ui| {
-                ui.label("New");
-                new_button = ui.button("New").clicked();
-            });
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                 ui.allocate_space(ui.available_size());
@@ -120,6 +133,16 @@ fn ui_state(
 
     if new_button {
         ui_state.new_material = !ui_state.new_material;
+    }
+
+    if material_button {
+        ui_state.fire_window = false;
+        ui_state.material_window = true;
+    }
+
+    if fire_button {
+        ui_state.material_window = false;
+        ui_state.fire_window = true;
     }
 
     if ui_state.new_material {
