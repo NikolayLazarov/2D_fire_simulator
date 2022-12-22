@@ -44,6 +44,37 @@ fn fire_fetch_system(
     });
 }
 
+fn all_elements_system(
+    mut query_fires: Query<&Fire>,
+    mut query_materials: Query<&Material>,
+    mut egui_ctx: ResMut<EguiContext>,
+    mut commands: Commands,
+){
+    egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
+        ui.label("Scene");
+
+        egui::Area::new("Central Area").show(ui.ctx(), |ui| {
+            for mut material in &mut query_materials {
+                let mut button = false;
+                ui.label(format!(
+                    "Material = {}, width = {}, height = {} ",
+                    material.name_type, material.width, material.height
+                ));
+                button = ui.button(material.name_type.to_string()).clicked();
+            }
+
+            for mut fire in &mut query_fires {
+                let mut button = false;
+                ui.label(format!(
+                    "Fire = {}, range = {}, speed{}",
+                    fire.name, fire.range, fire.speed
+                ));
+                button = ui.button(fire.name.to_string()).clicked();
+            }
+        });
+    });
+}
+
 fn main() {
     App::new()
         .init_resource::<UiState>()
@@ -53,8 +84,9 @@ fn main() {
         .add_startup_system(configure_ui_state)
         // .add_startup_system(setup)
         .add_system(ui_state)
-        .add_system(material_fetch_system)
-        .add_system(fire_fetch_system)
+        .add_system(all_elements_system)
+        // .add_system(material_fetch_system)
+        // .add_system(fire_fetch_system)
         .run();
 }
 
