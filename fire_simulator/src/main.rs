@@ -1,19 +1,25 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 use bevy_egui::{
     egui::{self, pos2},
     EguiContext, EguiPlugin,
 };
 
-fn print_system(mut query: Query<(&Material)>, mut egui_ctx: ResMut<EguiContext>) {
+fn print_system(
+    mut query: Query<&Material>,
+    mut egui_ctx: ResMut<EguiContext>,
+    mut commands: Commands,
+) {
     egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
         ui.label("Scene");
 
         egui::Area::new("Central Area").show(ui.ctx(), |ui| {
-            for material in &mut query {
+            for mut material in &mut query {
+                let mut button = false;
                 ui.label(format!(
                     "Material = {}, width = {}, height = {} ",
                     material.name_type, material.width, material.height
                 ));
+                button = ui.button(material.name_type.to_string()).clicked();
             }
         });
     });
@@ -26,6 +32,7 @@ fn main() {
         .add_plugin(EguiPlugin)
         .add_startup_system(configure_visuals)
         .add_startup_system(configure_ui_state)
+        // .add_startup_system(setup)
         .add_system(ui_state)
         .add_system(print_system)
         .run();
@@ -130,6 +137,7 @@ struct Material {
     height: u32,
     position_x: u32,
     position_y: u32,
+    clicked: bool,
 }
 
 impl Default for Material {
@@ -142,6 +150,7 @@ impl Default for Material {
             height: 5,
             position_x: 5,
             position_y: 5,
+            clicked: false,
         }
     }
 }
