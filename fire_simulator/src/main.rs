@@ -31,14 +31,17 @@ fn fire_fetch_system(
     mut query: Query<&Fire>,
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
-){
-    egui::Area::new("Fires").show(egui_ctx.ctx_mut() ,|ui|{
-        for mut fire in &mut query{
+) {
+    egui::Area::new("Fires").show(egui_ctx.ctx_mut(), |ui| {
+        for mut fire in &mut query {
             let mut button = false;
-            ui.label(format!("Fire = {}, range = {}, speed{}", fire.name, fire.range, fire.speed));
+            ui.label(format!(
+                "Fire = {}, range = {}, speed{}",
+                fire.name, fire.range, fire.speed
+            ));
             button = ui.button(fire.name.to_string()).clicked();
         }
-    } );
+    });
 }
 
 fn main() {
@@ -62,6 +65,7 @@ struct UiState {
     fire_window: bool,
     new_material: bool,
     material: Material,
+    fire: Fire,
 }
 
 fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
@@ -74,6 +78,7 @@ fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
 fn configure_ui_state(mut ui_state: ResMut<UiState>) {
     ui_state.is_window_open = true;
     ui_state.material = Material::default();
+    ui_state.fire = Fire::default();
     ui_state.new_material = false;
     ui_state.material_window = false;
     ui_state.fire_window = false;
@@ -97,7 +102,6 @@ fn ui_state(
             });
 
             if ui_state.material_window {
-                ui.heading("Side Panel");
                 ui.heading("Material");
 
                 ui.horizontal(|ui| {
@@ -132,7 +136,6 @@ fn ui_state(
                     new_button = ui.button("New").clicked();
                 });
             } else if ui_state.fire_window {
-                ui.label("this is fire window");
             }
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
