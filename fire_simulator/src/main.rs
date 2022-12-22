@@ -159,8 +159,25 @@ struct Fire {
     position_x: u32,
     position_y: u32,
     speed: u32,
-    range: f32,
+    range: u32,
     direction: String,
+    clicked: bool,
+}
+
+impl Default for Fire {
+    fn default() -> Self {
+        Self {
+            name: String::from("Fire_1"),
+            width: 4,
+            height: 4,
+            position_x: 4,
+            position_y: 4,
+            speed: 5,
+            range: 2,
+            direction: String::from("UP"),
+            clicked: false,
+        }
+    }
 }
 
 #[derive(Component, Debug, Clone)]
