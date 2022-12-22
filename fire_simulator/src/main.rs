@@ -151,6 +151,18 @@ fn ui_state(
     }
 }
 
+#[derive(Debug, Component, Clone)]
+struct Fire {
+    name: String,
+    width: u32,
+    height: u32,
+    position_x: u32,
+    position_y: u32,
+    speed: u32,
+    range: f32,
+    direction: String,
+}
+
 #[derive(Component, Debug, Clone)]
 struct Material {
     name_type: String,
