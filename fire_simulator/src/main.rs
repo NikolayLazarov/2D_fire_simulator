@@ -1,6 +1,9 @@
 use std::fmt::format;
 
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
+use bevy::{
+    prelude::*,
+    sprite::{collide_aabb::collide, MaterialMesh2dBundle},
+};
 use bevy_egui::{
     egui::{self, pos2},
     EguiContext, EguiPlugin,
@@ -49,7 +52,7 @@ fn all_elements_system(
     mut query_materials: Query<&Material>,
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
-){
+) {
     egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
         ui.label("Scene");
 
@@ -57,8 +60,12 @@ fn all_elements_system(
             for mut material in &mut query_materials {
                 let mut button = false;
                 ui.label(format!(
-                    "Material = {}, width = {}, height = {} ",
-                    material.name_type, material.width, material.height
+                    "Material = {}, width = {}, height = {}, x = {}, y = {}",
+                    material.name_type,
+                    material.width,
+                    material.height,
+                    material.position_x,
+                    material.position_y
                 ));
                 button = ui.button(material.name_type.to_string()).clicked();
             }
@@ -66,8 +73,14 @@ fn all_elements_system(
             for mut fire in &mut query_fires {
                 let mut button = false;
                 ui.label(format!(
-                    "Fire = {}, range = {}, speed{}",
-                    fire.name, fire.range, fire.speed
+                    "Fire = {}, range = {}, speed{},  width = {}, height = {}, x = {}, y = {}",
+                    fire.name,
+                    fire.range,
+                    fire.speed,
+                    fire.width,
+                    fire.height,
+                    fire.position_x,
+                    fire.position_y
                 ));
                 button = ui.button(fire.name.to_string()).clicked();
             }
@@ -176,34 +189,34 @@ fn ui_state(
                     ui.text_edit_singleline(&mut ui_state.fire.name);
                 });
 
-                ui.add(egui::Slider::new(&mut ui_state.fire.width, 0..=30).text("Width"));
+                ui.add(egui::Slider::new(&mut ui_state.fire.width, 0.0..=30.0).text("Width"));
                 if ui.button("Increment").clicked() {
-                    ui_state.fire.width += 1;
+                    ui_state.fire.width += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.fire.height, 0..=30).text("Height"));
+                ui.add(egui::Slider::new(&mut ui_state.fire.height, 0.0..=30.0).text("Height"));
                 if ui.button("Increment").clicked() {
-                    ui_state.fire.height += 1;
+                    ui_state.fire.height += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.fire.position_x, 0..=30).text("X axys"));
+                ui.add(egui::Slider::new(&mut ui_state.fire.position_x, 0.0..=30.0).text("X axys"));
                 if ui.button("Increment").clicked() {
-                    ui_state.fire.position_x += 1;
+                    ui_state.fire.position_x += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.fire.position_y, 0..=30).text("Y axys"));
+                ui.add(egui::Slider::new(&mut ui_state.fire.position_y, 0.0..=30.0).text("Y axys"));
                 if ui.button("Increment").clicked() {
-                    ui_state.fire.position_y += 1;
+                    ui_state.fire.position_y += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.fire.speed, 0..=30).text("Speed"));
+                ui.add(egui::Slider::new(&mut ui_state.fire.speed, 0.0..=30.0).text("Speed"));
                 if ui.button("Increment").clicked() {
-                    ui_state.fire.speed += 1;
+                    ui_state.fire.speed += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.fire.range, 0..=30).text("Range"));
+                ui.add(egui::Slider::new(&mut ui_state.fire.range, 0.0..=30.0).text("Range"));
                 if ui.button("Increment").clicked() {
-                    ui_state.fire.range += 1;
+                    ui_state.fire.range += 1.0;
                 }
 
                 ui.separator();
@@ -257,12 +270,12 @@ fn ui_state(
 #[derive(Debug, Component, Clone)]
 struct Fire {
     name: String,
-    width: u32,
-    height: u32,
-    position_x: u32,
-    position_y: u32,
-    speed: u32,
-    range: u32,
+    width: f32,
+    height: f32,
+    position_x: f32,
+    position_y: f32,
+    speed: f32,
+    range: f32,
     direction: String,
     clicked: bool,
 }
@@ -271,12 +284,12 @@ impl Default for Fire {
     fn default() -> Self {
         Self {
             name: String::from("Fire_1"),
-            width: 4,
-            height: 4,
-            position_x: 4,
-            position_y: 4,
-            speed: 5,
-            range: 2,
+            width: 4.0,
+            height: 4.0,
+            position_x: 4.0,
+            position_y: 4.0,
+            speed: 5.0,
+            range: 2.0,
             direction: String::from("UP"),
             clicked: false,
         }
@@ -309,3 +322,38 @@ impl Default for Material {
         }
     }
 }
+
+// commands.spawn(Camera2dBundle::default());
+
+// ui.add(
+//     // SpriteBundle {
+//     //     sprite: Sprite {
+//     //         color: Color::rgb(0.25, 0.25, 0.75),
+//     //         custom_size: Some(Vec2::new(50.0, 100.0)),
+//     //         ..default()
+//     //     },
+//     //     ..default()
+//     // }
+// );
+// commands.spawn(SpriteBundle {
+//     sprite: Sprite {
+//         color: Color::rgb(0.25, 0.25, 0.75),
+//         custom_size: Some(Vec2::new(50.0, 100.0)),
+//         ..default()
+//     },
+//     ..default()
+// });
+
+// fn setup(mut commands: Commands,){
+//     commands.spawn(Camera2dBundle::default());
+
+//     commands.spawn(SpriteBundle {
+//         sprite: Sprite {
+//             color: Color::rgb(0.25, 0.25, 0.75),
+//             custom_size: Some(Vec2::new(50.0, 100.0)),
+//             ..default()
+//         },
+//         ..default()
+//     });
+
+// }
