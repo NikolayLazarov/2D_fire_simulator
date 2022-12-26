@@ -88,6 +88,55 @@ fn all_elements_system(
     });
 }
 
+fn collision_system(
+    mut query_fires: Query<&Fire>,
+    mut query_materials: Query<&Material>,
+    mut egui_ctx: ResMut<EguiContext>,
+    mut commands: Commands,
+) {
+    egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
+        ui.label("Scene");
+
+        egui::Area::new("Central Area").show(ui.ctx(), |ui| {    
+            for fire in query_fires.iter() {
+                ui.label(format!(
+                    "Fire = {}, range = {}, speed{},  width = {}, height = {}, x = {}, y = {}",
+                    fire.name,
+                    fire.range,
+                    fire.speed,
+                    fire.width,
+                    fire.height,
+                    fire.position_x,
+                    fire.position_y
+                ));
+
+//                ui.label(format!("{}",fire.name));
+                for material in query_materials.iter() {
+                    //vec3 -> x,y,z
+                    let collision = collide(
+                        Vec3::new(fire.position_x, fire.position_y, 1.0),
+                        Vec2::new(fire.width, fire.height),
+                        Vec3::new(material.position_x, material.position_y, 1.0),
+                        Vec2::new(material.width, material.height),
+                    );
+
+                    if let Some(_) = collision{
+                        ui.label("Material collides with fire" );    
+                    }
+                        ui.label(format!(
+                            "Material = {}, width = {}, height = {}, x = {}, y = {}",
+                            material.name_type,
+                            material.width,
+                            material.height,
+                            material.position_x,
+                            material.position_y
+                        ));
+                }
+            }          
+        });
+    });
+}
+
 fn main() {
     App::new()
         .init_resource::<UiState>()
@@ -97,7 +146,8 @@ fn main() {
         .add_startup_system(configure_ui_state)
         // .add_startup_system(setup)
         .add_system(ui_state)
-        .add_system(all_elements_system)
+        // .add_system(all_elements_system)
+        .add_system(collision_system)
         // .add_system(material_fetch_system)
         // .add_system(fire_fetch_system)
         .run();
