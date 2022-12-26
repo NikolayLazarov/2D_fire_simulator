@@ -157,24 +157,24 @@ fn ui_state(
                     ui.text_edit_singleline(&mut ui_state.material.name_type);
                 });
 
-                ui.add(egui::Slider::new(&mut ui_state.material.width, 0..=30).text("Width"));
+                ui.add(egui::Slider::new(&mut ui_state.material.width, 0.0..=30.0).text("Width"));
                 if ui.button("Increment").clicked() {
-                    ui_state.material.width += 1;
+                    ui_state.material.width += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.material.height, 0..=30).text("Height"));
+                ui.add(egui::Slider::new(&mut ui_state.material.height, 0.0..=30.0).text("Height"));
                 if ui.button("Increment").clicked() {
-                    ui_state.material.height += 1;
+                    ui_state.material.height += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.material.position_x, 0..=30).text("X axys"));
+                ui.add(egui::Slider::new(&mut ui_state.material.position_x, 0.0..=30.0).text("X axys"));
                 if ui.button("Increment").clicked() {
-                    ui_state.material.position_x += 1;
+                    ui_state.material.position_x += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.material.position_y, 0..=30).text("Y axys"));
+                ui.add(egui::Slider::new(&mut ui_state.material.position_y, 0.0..=30.0).text("Y axys"));
                 if ui.button("Increment").clicked() {
-                    ui_state.material.position_y += 1;
+                    ui_state.material.position_y += 1.0;
                 }
 
                 ui.separator();
@@ -301,10 +301,10 @@ struct Material {
     name_type: String,
     flamability: f32,
     color: Color,
-    width: u32,
-    height: u32,
-    position_x: u32,
-    position_y: u32,
+    width: f32,
+    height: f32,
+    position_x: f32,
+    position_y: f32,
     clicked: bool,
 }
 
@@ -314,10 +314,10 @@ impl Default for Material {
             name_type: String::from("Material"),
             flamability: 0.5,
             color: Color::BEIGE,
-            width: 4,
-            height: 5,
-            position_x: 5,
-            position_y: 5,
+            width: 4.0,
+            height: 5.0,
+            position_x: 5.0,
+            position_y: 5.0,
             clicked: false,
         }
     }
