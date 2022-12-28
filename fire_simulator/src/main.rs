@@ -97,7 +97,7 @@ fn collision_system(
     egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
         ui.label("Scene");
 
-        egui::Area::new("Central Area").show(ui.ctx(), |ui| {    
+        egui::Area::new("Central Area").show(ui.ctx(), |ui| {
             for fire in query_fires.iter() {
                 ui.label(format!(
                     "Fire = {}, range = {}, speed{},  width = {}, height = {}, x = {}, y = {}",
@@ -110,7 +110,7 @@ fn collision_system(
                     fire.position_y
                 ));
 
-//                ui.label(format!("{}",fire.name));
+                //                ui.label(format!("{}",fire.name));
                 for material in query_materials.iter() {
                     //vec3 -> x,y,z
                     let collision = collide(
@@ -120,19 +120,19 @@ fn collision_system(
                         Vec2::new(material.width, material.height),
                     );
 
-                    if let Some(_) = collision{
-                        ui.label("Material collides with fire" );    
+                    if let Some(_) = collision {
+                        ui.label("Material collides with fire");
                     }
-                        ui.label(format!(
-                            "Material = {}, width = {}, height = {}, x = {}, y = {}",
-                            material.name_type,
-                            material.width,
-                            material.height,
-                            material.position_x,
-                            material.position_y
-                        ));
+                    ui.label(format!(
+                        "Material = {}, width = {}, height = {}, x = {}, y = {}",
+                        material.name_type,
+                        material.width,
+                        material.height,
+                        material.position_x,
+                        material.position_y
+                    ));
                 }
-            }          
+            }
         });
     });
 }
@@ -217,12 +217,16 @@ fn ui_state(
                     ui_state.material.height += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.material.position_x, 0.0..=30.0).text("X axys"));
+                ui.add(
+                    egui::Slider::new(&mut ui_state.material.position_x, 0.0..=30.0).text("X axys"),
+                );
                 if ui.button("Increment").clicked() {
                     ui_state.material.position_x += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.material.position_y, 0.0..=30.0).text("Y axys"));
+                ui.add(
+                    egui::Slider::new(&mut ui_state.material.position_y, 0.0..=30.0).text("Y axys"),
+                );
                 if ui.button("Increment").clicked() {
                     ui_state.material.position_y += 1.0;
                 }
