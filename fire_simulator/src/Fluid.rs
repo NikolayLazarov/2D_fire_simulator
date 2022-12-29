@@ -6,7 +6,7 @@ static iter: u32 = 10;
 fn IX(x: u32, y: u32) -> u32 {
     x + y * N
 }
-#[derive(Debug)]
+#[derive(Default)]
 pub struct FluidMatrix {
     size: u32,
 
