@@ -136,6 +136,26 @@ fn collision_system(
     });
 }
 
+fn fluid_sys(
+    mut query: Query<&Fire>,
+    mut egui_ctx: ResMut<EguiContext>,
+    mut commands: Commands,
+    mut ui_state: ResMut<UiState>,
+) {
+    // egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
+    //     ui.label("Scene");
+
+    //     egui::Area::new("Fluid").show(ui.ctx(), |ui| {
+    //         ui.label("Fluid");
+           
+    //     });
+    // });
+
+    ui_state.fluid.step();
+}
+
+
+
 fn main() {
     App::new()
         .init_resource::<UiState>()
@@ -146,7 +166,8 @@ fn main() {
         // .add_startup_system(setup)
         .add_system(ui_state)
         // .add_system(all_elements_system)
-        .add_system(collision_system)
+        // .add_system(collision_system)
+        .add_system(fluid_sys)
         // .add_system(material_fetch_system)
         // .add_system(fire_fetch_system)
         .run();
@@ -191,6 +212,7 @@ fn ui_state(
     let mut new_fire_button = false;
     let mut material_button = false;
     let mut fire_button = false;
+    
     egui::SidePanel::right("side_panel")
         .default_width(200.0)
         .resizable(true)
