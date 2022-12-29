@@ -4,10 +4,9 @@ static N: u32 = 256;
 static iter: u32 = 10;
 
 fn IX(x: u32, y: u32) -> u32 {
-    return x + y * N;
+    x + y * N
 }
-
-#[derive(Default)]
+#[derive(Debug)]
 pub struct FluidMatrix {
     size: u32,
 
@@ -35,11 +34,6 @@ impl FluidMatrix {
             dt: dt_outside,
             diffuusion: diff_outside,
             viscosity: visc_outside,
-
-            //not needed
-            //    dt = dt;
-            //    diff: diff_outside;
-            //    visc: visc_outside;
             s: vec![0.; N.pow(2).try_into().unwrap()],
             density: vec![0.; N.pow(2).try_into().unwrap()],
 
@@ -49,6 +43,31 @@ impl FluidMatrix {
             Vx0: vec![0.; N.pow(2).try_into().unwrap()],
             Vy0: vec![0.; N.pow(2).try_into().unwrap()],
         }
+    }
+
+    pub fn step(&mut self) {
+        let visc: f32 = self.viscosity;
+        let diff: f32 = self.diffuusion;
+        let dt: f32 = self.dt;
+        let Vx: &mut Vec<f32> = &mut self.Vx;
+        let Vy: &mut Vec<f32> = &mut self.Vy;
+        let Vx0: &mut Vec<f32> = &mut self.Vx0;
+        let Vy0: &mut Vec<f32> = &mut self.Vy0;
+        let s: &mut Vec<f32> = &mut self.s;
+        let density: &mut Vec<f32> = &mut self.density;
+
+        diffuse(1, Vx0, Vx, visc, dt);
+        diffuse(2, Vy0, Vy, visc, dt);
+
+        project(Vx0, Vy0, Vx, Vy);
+
+        advect(1, Vx, Vx0, Vx0, Vy0, dt);
+        advect(2, Vy, Vy0, Vx0, Vy0, dt);
+
+        project(Vx, Vy, Vx0, Vy0);
+
+        diffuse(0, s, density, diff, dt);
+        advect(0, density, s, Vx, Vy, dt);
     }
 
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {
@@ -125,7 +144,7 @@ fn project(
     set_bnd(2, velocY);
 }
 
-fn advect(b: u32, mut d: &mut Vec<f32>, d0: Vec<f32>, velocX: Vec<f32>, velocY: Vec<f32>, dt: f32) {
+fn advect(b: u32, d: &mut Vec<f32>, d0: &Vec<f32>, velocX: &Vec<f32>, velocY: &Vec<f32>, dt: f32) {
     let [mut i0, mut i1, mut j0, mut j1] = [0.; 4];
 
     let dtx: f32 = dt * (N - 2) as f32;
