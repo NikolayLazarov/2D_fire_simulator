@@ -59,17 +59,17 @@ impl FluidMatrix {
 
         diffuse(1, Vx0, Vx, visc, dt);
         diffuse(2, Vy0, Vy, visc, dt);
-      
+
         project(Vx0, Vy0, Vx, Vy);
-      
+
         advect(1, Vx, Vx0, Vx0, Vy0, dt);
         advect(2, Vy, Vy0, Vx0, Vy0, dt);
-      
+
         project(Vx, Vy, Vx0, Vy0);
-      
+
         diffuse(0, s, density, diff, dt);
         advect(0, density, s, Vx, Vy, dt);
-      }
+    }
 
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {
         let index: u32 = IX(x, y);
@@ -156,20 +156,20 @@ fn advect(b: u32, d: &mut Vec<f32>, d0: &Vec<f32>, velocX: &Vec<f32>, velocY: &V
 
     let N_float: f32 = N as f32;
     let [mut ifloat, mut jfloat] = [1.; 2];
- 
+
     for j in (1..N - 1) {
         for i in (1..N - 1) {
             tmp1 = dtx * velocX[IX(i, j) as usize];
             tmp2 = dty * velocY[IX(i, j) as usize];
             x = ifloat - tmp1;
             y = jfloat - tmp2;
-            
+
             if (x < 0.5) {
                 x = 0.5;
             }
             if (x > N_float + 0.5) {
                 x = N_float + 0.5
-            };           
+            };
             i0 = x.floor();
             i1 = i0 + 1.;
             if (y < 0.5) {
@@ -180,7 +180,7 @@ fn advect(b: u32, d: &mut Vec<f32>, d0: &Vec<f32>, velocX: &Vec<f32>, velocY: &V
             }
             j0 = y.floor();
             j1 = j0 + 1.;
-            
+
             s1 = x - i0;
             s0 = 1. - s1;
             t1 = y - j0;
@@ -191,7 +191,7 @@ fn advect(b: u32, d: &mut Vec<f32>, d0: &Vec<f32>, velocX: &Vec<f32>, velocY: &V
             let j0i: u32 = j0 as u32;
             let j1i: u32 = j1 as u32;
 
-            d[IX(i, j) as usize] = s0 * (t0 * d0[IX(i0i, j0i) as usize ])
+            d[IX(i, j) as usize] = s0 * (t0 * d0[IX(i0i, j0i) as usize])
                 + (t1 * d0[IX(i0i, j1i) as usize])
                 + s1 * (t0 * d0[IX(i1i, j0i) as usize])
                 + (t1 * d0[IX(i1i, j1i) as usize]);

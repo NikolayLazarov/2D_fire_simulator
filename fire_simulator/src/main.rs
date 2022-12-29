@@ -142,19 +142,16 @@ fn fluid_sys(
     mut commands: Commands,
     mut ui_state: ResMut<UiState>,
 ) {
-    // egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
-    //     ui.label("Scene");
+    egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
+        ui.label("Scene");
 
-    //     egui::Area::new("Fluid").show(ui.ctx(), |ui| {
-    //         ui.label("Fluid");
-           
-    //     });
-    // });
+        egui::Area::new("Fluid").show(ui.ctx(), |ui| {
+            ui.label("Fluid");
+        });
+    });
 
     ui_state.fluid.step();
 }
-
-
 
 fn main() {
     App::new()
@@ -178,6 +175,7 @@ struct UiState {
     is_window_open: bool,
     material_window: bool,
     fire_window: bool,
+    fluid_window: bool,
     new_material: bool,
     new_fire: bool,
     material: Material,
@@ -201,6 +199,7 @@ fn configure_ui_state(mut ui_state: ResMut<UiState>) {
     ui_state.new_fire = false;
     ui_state.material_window = false;
     ui_state.fire_window = false;
+    ui_state.fluid_window = false;
 }
 
 fn ui_state(
@@ -212,7 +211,8 @@ fn ui_state(
     let mut new_fire_button = false;
     let mut material_button = false;
     let mut fire_button = false;
-    
+    let mut fluid_button = false;
+
     egui::SidePanel::right("side_panel")
         .default_width(200.0)
         .resizable(true)
@@ -220,6 +220,7 @@ fn ui_state(
             ui.horizontal(|ui| {
                 material_button = ui.button("Material").clicked();
                 fire_button = ui.button("Fire").clicked();
+                fluid_button = ui.button("Update_fluid").clicked();
             });
 
             if ui_state.material_window {
@@ -302,6 +303,8 @@ fn ui_state(
                     ui.label("New");
                     new_fire_button = ui.button("New").clicked();
                 });
+            } else if ui_state.fluid_window {
+                ui.label("Change fluid");
             }
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
@@ -325,13 +328,21 @@ fn ui_state(
     }
 
     if material_button {
+        ui_state.fluid_window = false;
         ui_state.fire_window = false;
         ui_state.material_window = true;
     }
 
     if fire_button {
+        ui_state.fluid_window = false;
         ui_state.material_window = false;
         ui_state.fire_window = true;
+    }
+
+    if fluid_button {
+        ui_state.material_window = false;
+        ui_state.fire_window = false;
+        ui_state.fluid_window = true;
     }
 
     if ui_state.new_material {
