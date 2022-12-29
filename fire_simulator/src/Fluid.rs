@@ -1,10 +1,14 @@
-use crate::{iter, N};
+// use crate::{iter, N};
+
+static N: u32 = 256;
+static iter: u32 = 10;
 
 fn IX(x: u32, y: u32) -> u32 {
     return x + y * N;
 }
 
-pub struct FluidCube {
+#[derive(Default)]
+pub struct FluidMatrix {
     size: u32,
 
     //timestep
@@ -24,7 +28,7 @@ pub struct FluidCube {
     Vy0: Vec<f32>,
 }
 
-impl FluidCube {
+impl FluidMatrix {
     pub fn new(dt_outside: f32, diff_outside: f32, visc_outside: f32) -> Self {
         Self {
             size: N,

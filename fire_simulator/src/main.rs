@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 use bevy::{
     prelude::*,
     sprite::{collide_aabb::collide, MaterialMesh2dBundle},
@@ -161,8 +159,7 @@ struct UiState {
     new_material: bool,
     new_fire: bool,
     material: Material,
-    fire: Fire,
-}
+    fire: Fire,}
 
 fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
     egui_ctx.ctx_mut().set_visuals(egui::Visuals {
