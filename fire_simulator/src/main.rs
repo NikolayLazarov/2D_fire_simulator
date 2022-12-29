@@ -142,6 +142,7 @@ fn fluid_sys(
     mut commands: Commands,
     mut ui_state: ResMut<UiState>,
 ) {
+    ui_state.fluid.step();
     egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
         ui.label("Scene");
 
@@ -149,8 +150,6 @@ fn fluid_sys(
             ui.label("Fluid");
         });
     });
-
-    ui_state.fluid.step();
 }
 
 fn main() {
@@ -258,8 +257,8 @@ fn ui_state(
                 ui.separator();
 
                 ui.horizontal(|ui| {
-                    ui.label("New");
-                    new_material_button = ui.button("New").clicked();
+                    ui.label("addDensity");
+                    new_fire_button = ui.button("New").clicked();
                 });
             } else if ui_state.fire_window {
                 ui.horizontal(|ui| {
@@ -305,6 +304,19 @@ fn ui_state(
                 });
             } else if ui_state.fluid_window {
                 ui.label("Change fluid");
+
+                ui.separator();
+
+                ui.horizontal(|ui| {
+                    ui.label("Add density");
+                    let mut update_fluid_density = ui.button("Add Density").clicked();
+
+                    if update_fluid_density {
+                        //temporary changes
+                        println!("here");
+                        ui_state.fluid.add_density(4, 4, 100.0);
+                    }
+                });
             }
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
