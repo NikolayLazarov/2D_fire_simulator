@@ -1,12 +1,26 @@
 // use crate::{iter, N};
 
-static N: u32 = 5;
+pub static N: u32 = 16;
 static iter: u32 = 4;
 
-fn IX(x: u32, y: u32) -> u32 {
+pub fn IX(mut x: u32, mut y: u32) -> u32 {
     // println!("error? = {}", (x) + y * N);
+    if x < 0 {
+        x = 0;
+    }
+    if x > N - 1 {
+        x = N - 1;
+    }
+
+    if y < 0 {
+        y = 0;
+    }
+    if y > N - 1 {
+        y = N - 1;
+    }
     x + y * N
 }
+
 #[derive(Default)]
 pub struct FluidMatrix {
     size: u32,
@@ -26,6 +40,13 @@ pub struct FluidMatrix {
 
     Vx0: Vec<f32>,
     Vy0: Vec<f32>,
+    //for adding new values
+    pub fluid_x: u32,
+    pub fluid_y: u32,
+    pub amount: f32,
+    //power velocity
+    pub amount_x: f32,
+    pub amount_y: f32,
 }
 
 impl FluidMatrix {
@@ -43,6 +64,12 @@ impl FluidMatrix {
 
             Vx0: vec![0.; N.pow(2) as usize],
             Vy0: vec![0.; N.pow(2) as usize],
+
+            fluid_x: 0,
+            fluid_y: 0,
+            amount: 25.0,
+            amount_x: 15.0,
+            amount_y: 15.0,
         }
     }
 
@@ -85,6 +112,23 @@ impl FluidMatrix {
 
         self.Vx[index as usize] = amountX;
         self.Vy[index as usize] = amountY;
+    }
+
+    pub fn get_density(&mut self) -> &Vec<f32> {
+        &self.density
+    }
+
+    pub fn render_density(&mut self) {
+        for i in 0..N {
+            for j in 0..N {
+                let x: u32 = i;
+                let y: u32 = j;
+                let d = self.density[IX(x, y) as usize];
+                //use d as alpha color a
+                //no stroke
+                //square(x,y, Scale)
+            }
+        }
     }
 }
 

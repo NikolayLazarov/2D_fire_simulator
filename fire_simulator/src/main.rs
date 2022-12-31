@@ -8,6 +8,7 @@ use bevy_egui::{
 };
 mod Fluid;
 
+use crate::Fluid::N;
 fn material_fetch_system(
     mut query: Query<&Material>,
     mut egui_ctx: ResMut<EguiContext>,
@@ -142,12 +143,14 @@ fn fluid_sys(
     mut commands: Commands,
     mut ui_state: ResMut<UiState>,
 ) {
-    ui_state.fluid.step();
+    // ui_state.fluid.step();
+    // ui_state.fluid.render_density();
     egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
         ui.label("Scene");
 
         egui::Area::new("Fluid").show(ui.ctx(), |ui| {
             ui.label("Fluid");
+            egui::Rect::from_min_max(pos2(0.0, 1.0), pos2(2.0, 3.0));
         });
     });
 }
@@ -303,9 +306,37 @@ fn ui_state(
                     new_fire_button = ui.button("New").clicked();
                 });
             } else if ui_state.fluid_window {
+                ui_state.fluid.step();
                 ui.label("Change fluid");
 
                 ui.separator();
+
+                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_x, 0..=N - 1).text("Fluid X"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fluid.fluid_x += 1;
+                }
+                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_y, 0..=N - 1).text("Fluid Y"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fluid.fluid_y += 1;
+                }
+                ui.add(egui::Slider::new(&mut ui_state.fluid.amount, 0.0..=30.0).text("Power"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fluid.amount += 1.0;
+                }
+
+                ui.add(
+                    egui::Slider::new(&mut ui_state.fluid.amount_x, 0.0..=30.0).text("Velocity X"),
+                );
+                if ui.button("Increment").clicked() {
+                    ui_state.fluid.amount_x += 1.0;
+                }
+
+                ui.add(
+                    egui::Slider::new(&mut ui_state.fluid.amount_y, 0.0..=30.0).text("Velocity Y"),
+                );
+                if ui.button("Increment").clicked() {
+                    ui_state.fluid.amount_y += 1.0;
+                }
 
                 ui.horizontal(|ui| {
                     ui.label("Add density");
@@ -314,7 +345,41 @@ fn ui_state(
                     if update_fluid_density {
                         //temporary changes
                         println!("here");
-                        ui_state.fluid.add_density(4, 4, 100.0);
+
+                        let mut fluid_x: u32 = ui_state.fluid.fluid_x;
+                        let mut fluid_y: u32 = ui_state.fluid.fluid_y;
+                        let mut amount: f32 = ui_state.fluid.amount;
+                        let mut amount_x: f32 = ui_state.fluid.amount_x;
+                        let mut amount_y: f32 = ui_state.fluid.amount_y;
+
+                        ui_state.fluid.add_density(fluid_x, fluid_y, amount);
+
+                        //example
+
+                        ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
+
+                        for i in 0..N - 1 {
+                            for j in 0..N - 1 {
+                                let x: u32 = i;
+                                let y: u32 = j;
+                                let d = ui_state.fluid.get_density()[Fluid::IX(x, y) as usize];
+                                print!("{} ", d);
+                                //use d as alpha color a
+                                //no stroke
+                                //square(x,y, Scale)
+                            }
+                            println!();
+                        }
+
+                        // let len = ui_state.fluid.get_density().len();
+                        // for i in(0..len){
+                        //     print!("{} ",ui_state.fluid.get_density()[i] as f32);
+                        //     if len%i == 0{
+                        //         println!();
+                        //     }
+                        // }
+
+                        // println!("Density = {:?}", ui_state.fluid.get_density() );
                     }
                 });
             }
