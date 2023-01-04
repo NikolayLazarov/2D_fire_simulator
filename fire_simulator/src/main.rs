@@ -306,16 +306,16 @@ fn ui_state(
                     new_fire_button = ui.button("New").clicked();
                 });
             } else if ui_state.fluid_window {
-                ui_state.fluid.step();
+                
                 ui.label("Change fluid");
 
                 ui.separator();
 
-                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_x, 0..=N - 1).text("Fluid X"));
+                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_x, 0..=N - 2).text("Fluid X"));
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.fluid_x += 1;
                 }
-                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_y, 0..=N - 1).text("Fluid Y"));
+                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_y, 0..=N - 2).text("Fluid Y"));
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.fluid_y += 1;
                 }
@@ -357,9 +357,10 @@ fn ui_state(
                         //example
 
                         ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
-
+                        ui_state.fluid.step();
                         for i in 0..N - 1 {
                             for j in 0..N - 1 {
+                                
                                 let x: u32 = i;
                                 let y: u32 = j;
                                 let d = ui_state.fluid.get_density()[Fluid::IX(x, y) as usize];
