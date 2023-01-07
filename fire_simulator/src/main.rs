@@ -22,7 +22,9 @@ fn main() {
         // .add_startup_system(setup)
         .add_system(UiState::ui_state)
         // .add_system(all_elements_system)
-        .add_system(systems::collision_system)
+        // .add_system(systems::collision_system)
+        .add_system(systems::fluid_sys)
+        
         // .add_system(systems::fluid_sys)
         // .add_system(material_fetch_system)
         // .add_system(fire_fetch_system)
