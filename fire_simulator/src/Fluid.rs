@@ -100,16 +100,11 @@ impl FluidMatrix {
 
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {
         let index: u32 = IX(x, y);
-        // self.density.get_mut(index as usize) amount   ;
-
         self.density[index as usize] = amount;
-        println!("changed successfully");
     }
 
     pub fn add_velocity(&mut self, x: u32, y: u32, amountX: f32, amountY: f32) {
         let index: u32 = IX(x, y);
-        // self.density.get_mut(index as usize) amount   ;
-
         self.Vx[index as usize] = amountX;
         self.Vy[index as usize] = amountY;
     }
