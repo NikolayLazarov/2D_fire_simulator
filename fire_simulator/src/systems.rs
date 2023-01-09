@@ -8,19 +8,15 @@ use crate::Fluid::N;
 use crate::Material;
 use crate::UiState;
 
-
-
 pub fn fluid_and_materials(
-    mut query: Query<& Material>,
+    mut query: Query<&Material>,
     mut egui_ctx: ResMut<EguiContext>,
-    mut ui_state: ResMut<UiState::UiState>
-){
-
+    mut ui_state: ResMut<UiState::UiState>,
+) {
 }
 
-
 pub fn fluid_sys(
-    mut query_material: Query<&Material>,
+    mut query_material: Query<&mut Material>,
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
     mut ui_state: ResMut<UiState::UiState>,
@@ -33,26 +29,30 @@ pub fn fluid_sys(
         egui::Area::new("Fluid").show(ui.ctx(), |ui| {
             ui.label("Fluid");
 
-            
             for i in 0..N - 1 {
                 for j in 0..N - 1 {
                     let x: u32 = i;
                     let y: u32 = j;
                     let d = ui_state.fluid.get_density()[Fluid::IX(x, y) as usize];
                     // ui.monospace(format!("{}", d));
-                    // 
+                    //
                     //use d as alpha color a
                     //no stroke
                     //square(x,y, Scale)
 
-                    for material in query_material.iter(){
+                    for mut material in query_material.iter_mut() {
                         let collision = collide(
-                            Vec3::new(x as f32,y as f32,1.0),
-                            Vec2::new(1.0,1.0 ),
+                            Vec3::new(x as f32, y as f32, 1.0),
+                            Vec2::new(1.0, 1.0),
                             Vec3::new(material.position_x, material.position_y, 1.0),
                             Vec2::new(material.width, material.height),
                         );
-                        if let Some(_) = collision{
+                        if let Some(_) = collision {
+                            if material.fuel <= 0.0 {
+                                continue;
+                            }
+                            material.fuel = material.fuel - d;
+
                             ui.label("Material collides with Fire");
                         }
                         // ui.label(format!(

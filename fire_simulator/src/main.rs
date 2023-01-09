@@ -24,7 +24,6 @@ fn main() {
         // .add_system(all_elements_system)
         // .add_system(systems::collision_system)
         .add_system(systems::fluid_sys)
-        
         // .add_system(systems::fluid_sys)
         // .add_system(material_fetch_system)
         // .add_system(fire_fetch_system)
@@ -70,6 +69,7 @@ pub struct Material {
     position_x: f32,
     position_y: f32,
     clicked: bool,
+    fuel: f32,
 }
 
 impl Default for Material {
@@ -83,6 +83,7 @@ impl Default for Material {
             position_x: 5.0,
             position_y: 5.0,
             clicked: false,
+            fuel: 1000.0,
         }
     }
 }
