@@ -229,7 +229,7 @@ pub fn ui_state(
     }
 
     if ui_state.new_material {
-        commands.spawn(ui_state.material.clone());
+        commands.spawn( ui_state.material.clone());
         ui_state.new_material = false;
     }
     if ui_state.new_fire {

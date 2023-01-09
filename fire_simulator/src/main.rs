@@ -70,6 +70,7 @@ pub struct Material {
     position_x: f32,
     position_y: f32,
     clicked: bool,
+    fuel: f32,
 }
 
 impl Default for Material {
@@ -83,9 +84,12 @@ impl Default for Material {
             position_x: 5.0,
             position_y: 5.0,
             clicked: false,
+            fuel: 1000.0,
         }
     }
 }
+
+
 
 // commands.spawn(Camera2dBundle::default());
 
