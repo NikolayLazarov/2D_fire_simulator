@@ -16,7 +16,7 @@ pub fn fluid_and_materials(
 }
 
 pub fn fluid_sys(
-    mut query_material: Query<&mut Material>,
+    mut query_material: Query<& mut Material>,
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
     mut ui_state: ResMut<UiState::UiState>,
@@ -40,18 +40,20 @@ pub fn fluid_sys(
                     //no stroke
                     //square(x,y, Scale)
 
-                    for mut material in query_material.iter_mut() {
+
+                    for mut material in  query_material.iter_mut(){
                         let collision = collide(
                             Vec3::new(x as f32, y as f32, 1.0),
                             Vec2::new(1.0, 1.0),
                             Vec3::new(material.position_x, material.position_y, 1.0),
                             Vec2::new(material.width, material.height),
                         );
-                        if let Some(_) = collision {
-                            if material.fuel <= 0.0 {
+                        if let Some(_) = collision{
+                            if material.fuel <= 0.0{
+                                
                                 continue;
                             }
-                            material.fuel = material.fuel - d;
+                             material.fuel = material.fuel - d;
 
                             ui.label("Material collides with Fire");
                         }
