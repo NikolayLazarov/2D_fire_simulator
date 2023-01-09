@@ -135,20 +135,20 @@ pub fn ui_state(
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.fluid_y += 1;
                 }
-                ui.add(egui::Slider::new(&mut ui_state.fluid.amount, 0.0..=30.0).text("Power"));
+                ui.add(egui::Slider::new(&mut ui_state.fluid.amount, 0.0..=200.0).text("Power"));
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.amount += 1.0;
                 }
 
                 ui.add(
-                    egui::Slider::new(&mut ui_state.fluid.amount_x, 0.0..=30.0).text("Velocity X"),
+                    egui::Slider::new(&mut ui_state.fluid.amount_x, 0.0..=200.0).text("Velocity X"),
                 );
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.amount_x += 1.0;
                 }
 
                 ui.add(
-                    egui::Slider::new(&mut ui_state.fluid.amount_y, 0.0..=30.0).text("Velocity Y"),
+                    egui::Slider::new(&mut ui_state.fluid.amount_y, 0.0..=200.0).text("Velocity Y"),
                 );
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.amount_y += 1.0;
@@ -159,9 +159,6 @@ pub fn ui_state(
                     let mut update_fluid_density = ui.button("Add Density").clicked();
 
                     if update_fluid_density {
-                        //temporary changes
-                        println!("here");
-
                         let mut fluid_x: u32 = ui_state.fluid.fluid_x;
                         let mut fluid_y: u32 = ui_state.fluid.fluid_y;
                         let mut amount: f32 = ui_state.fluid.amount;
@@ -169,8 +166,6 @@ pub fn ui_state(
                         let mut amount_y: f32 = ui_state.fluid.amount_y;
 
                         ui_state.fluid.add_density(fluid_x, fluid_y, amount);
-
-                        //example
 
                         ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
                         ui_state.fluid.step();
@@ -229,7 +224,7 @@ pub fn ui_state(
     }
 
     if ui_state.new_material {
-        commands.spawn( ui_state.material.clone());
+        commands.spawn(ui_state.material.clone());
         ui_state.new_material = false;
     }
     if ui_state.new_fire {
