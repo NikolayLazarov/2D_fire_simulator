@@ -88,8 +88,6 @@ impl Default for Material {
     }
 }
 
-
-
 // commands.spawn(Camera2dBundle::default());
 
 // ui.add(
