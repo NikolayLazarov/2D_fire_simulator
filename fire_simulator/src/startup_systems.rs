@@ -20,9 +20,10 @@ pub fn configure_ui_state(mut ui_state: ResMut<UiState::UiState>) {
     ui_state.is_window_open = true;
     ui_state.material = Material::default();
     ui_state.fire = Fire::default();
-    ui_state.fluid = Fluid::FluidMatrix::new(0.1, 0., 0.);
+    ui_state.fluid = Fluid::FluidMatrix::new(1.0, 0., 0.);
     ui_state.new_material = false;
     ui_state.new_fire = false;
+    ui_state.new_fluid = false;
     ui_state.material_window = false;
     ui_state.fire_window = false;
     ui_state.fluid_window = false;

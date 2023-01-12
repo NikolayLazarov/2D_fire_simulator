@@ -16,6 +16,7 @@ pub struct UiState {
     pub fluid_window: bool,
     pub new_material: bool,
     pub new_fire: bool,
+    pub new_fluid: bool,
     pub material: Material,
     pub fire: Fire,
     pub fluid: Fluid::FluidMatrix,
@@ -159,16 +160,16 @@ pub fn ui_state(
                     let mut update_fluid_density = ui.button("Add Density").clicked();
 
                     if update_fluid_density {
-                        let mut fluid_x: u32 = ui_state.fluid.fluid_x;
-                        let mut fluid_y: u32 = ui_state.fluid.fluid_y;
-                        let mut amount: f32 = ui_state.fluid.amount;
-                        let mut amount_x: f32 = ui_state.fluid.amount_x;
-                        let mut amount_y: f32 = ui_state.fluid.amount_y;
+                        // let mut fluid_x: u32 = ui_state.fluid.fluid_x;
+                        // let mut fluid_y: u32 = ui_state.fluid.fluid_y;
+                        // let mut amount: f32 = ui_state.fluid.amount;
+                        // let mut amount_x: f32 = ui_state.fluid.amount_x;
+                        // let mut amount_y: f32 = ui_state.fluid.amount_y;
 
-                        ui_state.fluid.add_density(fluid_x, fluid_y, amount);
+                        // ui_state.fluid.add_density(fluid_x, fluid_y, amount);
 
-                        ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
-                        ui_state.fluid.step();
+                        // ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
+                        // ui_state.fluid.step();
                         for i in 0..N - 1 {
                             for j in 0..N - 1 {
                                 let x: u32 = i;
@@ -181,6 +182,8 @@ pub fn ui_state(
                             }
                             println!();
                         }
+                        ui_state.new_fluid = true;
+                        update_fluid_density = false;
                     }
                 });
             }
@@ -230,5 +233,8 @@ pub fn ui_state(
     if ui_state.new_fire {
         commands.spawn(ui_state.fire.clone());
         ui_state.new_fire = false;
+    }
+    if ui_state.new_material {
+        commands.spawn(ui_state.fire.clone());
     }
 }

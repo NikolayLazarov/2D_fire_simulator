@@ -4,7 +4,7 @@ use bevy::{
 };
 use bevy_egui::{
     egui::{self, pos2},
-    EguiContext, EguiPlugin,
+    EguiPlugin,
 };
 mod Fluid;
 mod UiState;
@@ -87,38 +87,3 @@ impl Default for Material {
         }
     }
 }
-
-// commands.spawn(Camera2dBundle::default());
-
-// ui.add(
-//     // SpriteBundle {
-//     //     sprite: Sprite {
-//     //         color: Color::rgb(0.25, 0.25, 0.75),
-//     //         custom_size: Some(Vec2::new(50.0, 100.0)),
-//     //         ..default()
-//     //     },
-//     //     ..default()
-//     // }
-// );
-// commands.spawn(SpriteBundle {
-//     sprite: Sprite {
-//         color: Color::rgb(0.25, 0.25, 0.75),
-//         custom_size: Some(Vec2::new(50.0, 100.0)),
-//         ..default()
-//     },
-//     ..default()
-// });
-
-// fn setup(mut commands: Commands,){
-//     commands.spawn(Camera2dBundle::default());
-
-//     commands.spawn(SpriteBundle {
-//         sprite: Sprite {
-//             color: Color::rgb(0.25, 0.25, 0.75),
-//             custom_size: Some(Vec2::new(50.0, 100.0)),
-//             ..default()
-//         },
-//         ..default()
-//     });
-
-// }

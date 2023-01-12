@@ -1,7 +1,9 @@
 // use crate::{iter, N};
 
-pub static N: u32 = 16;
-static iter: u32 = 4;
+use bevy::prelude::Component;
+
+pub static N: u32 = 30;
+static iter: u32 = 16;
 
 pub fn IX(mut x: u32, mut y: u32) -> u32 {
     // println!("error? = {}", (x) + y * N);
@@ -21,7 +23,7 @@ pub fn IX(mut x: u32, mut y: u32) -> u32 {
     x + y * N
 }
 
-#[derive(Default)]
+#[derive(Default, Component)]
 pub struct FluidMatrix {
     size: u32,
 
@@ -47,6 +49,8 @@ pub struct FluidMatrix {
     //power velocity
     pub amount_x: f32,
     pub amount_y: f32,
+
+    pub frames: u32,
 }
 
 impl FluidMatrix {
@@ -70,6 +74,7 @@ impl FluidMatrix {
             amount: 25.0,
             amount_x: 15.0,
             amount_y: 15.0,
+            frames: 20,
         }
     }
 
@@ -111,19 +116,6 @@ impl FluidMatrix {
 
     pub fn get_density(&mut self) -> &Vec<f32> {
         &self.density
-    }
-
-    pub fn render_density(&mut self) {
-        for i in 0..N {
-            for j in 0..N {
-                let x: u32 = i;
-                let y: u32 = j;
-                let d = self.density[IX(x, y) as usize];
-                //use d as alpha color a
-                //no stroke
-                //square(x,y, Scale)
-            }
-        }
     }
 }
 
