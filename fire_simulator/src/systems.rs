@@ -10,7 +10,7 @@ use crate::Fluid::{self, FluidMatrix};
 use crate::Material;
 use crate::UiState;
 
-fn print_squares(ui: &mut Ui, density: &Vec<f32>) {
+fn render_density(ui: &mut Ui, density: &Vec<f32>) {
     for i in 0..N - 1 {
         ui.horizontal(|ui| {
             for j in 0..N - 1 {
@@ -21,11 +21,11 @@ fn print_squares(ui: &mut Ui, density: &Vec<f32>) {
                 let x: u32 = i;
                 let y: u32 = j;
                 let d = density[Fluid::IX(x, y) as usize];
-                let (rect, Response) = ui.allocate_at_least(vec2(10.0, 10.0), egui::Sense::hover());
+                let (rect, Response) = ui.allocate_at_least(vec2(20.0, 20.0), egui::Sense::hover());
                 ui.painter().rect(
                     rect,
                     0.0,
-                    egui::Color32::from_gray(d as u8),
+                    egui::Color32:: from_gray(d as u8),
                     egui::Stroke::new(0.0, egui::Color32::WHITE), /* :none()*/
                 );
 
@@ -88,8 +88,8 @@ pub fn fluid_sys(
 
                 // print_squares(ui,ui_state.fluid.get_density() );
                 // println!("sec {}",i);
-                // thread::sleep(ten_millis);
-                // assert!(now.elapsed() >= ten_millis);
+                thread::sleep(ten_millis);
+                assert!(now.elapsed() >= ten_millis);
 
                 // }
                 ui_state.fluid.frames -= 1;
@@ -98,7 +98,8 @@ pub fn fluid_sys(
                 }
             }
             // else{
-            print_squares(ui, ui_state.fluid.get_density());
+            render_density(ui, ui_state.fluid.get_density());
+            ui_state.fluid.step();
             // }
         });
     });
