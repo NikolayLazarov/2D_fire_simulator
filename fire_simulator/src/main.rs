@@ -1,57 +1,89 @@
-use bevy::prelude::*;
-use bevy_egui::{
-    egui,
-    EguiContext, EguiPlugin,
+use bevy::{
+    prelude::*,
+    sprite::{collide_aabb::collide, MaterialMesh2dBundle},
 };
+use bevy_egui::{
+    egui::{self, pos2},
+    EguiPlugin,
+};
+mod Fluid;
+mod UiState;
+mod startup_systems;
+mod systems;
 
+use crate::Fluid::N;
 fn main() {
     App::new()
-        .init_resource::<UiState>()
+        .init_resource::<UiState::UiState>()
         .add_plugins(DefaultPlugins)
         .add_plugin(EguiPlugin)
-        .add_startup_system(configure_visuals)
-        .add_startup_system(configure_ui_state)
-        .add_system(ui)
+        .add_startup_system(startup_systems::configure_visuals)
+        .add_startup_system(startup_systems::configure_ui_state)
+        // .add_startup_system(setup)
+        .add_system(UiState::ui_state)
+        // .add_system(all_elements_system)
+        // .add_system(systems::collision_system)
+        .add_system(systems::fluid_sys)
+        // .add_system(systems::fluid_sys)
+        // .add_system(material_fetch_system)
+        // .add_system(fire_fetch_system)
         .run();
 }
 
-#[derive(Default, Resource)]
-struct UiState {
-    is_window_open: bool,
+#[derive(Debug, Component, Clone)]
+pub struct Fire {
+    name: String,
+    width: f32,
+    height: f32,
+    position_x: f32,
+    position_y: f32,
+    speed: f32,
+    range: f32,
+    direction: String,
+    clicked: bool,
 }
 
-fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
-    egui_ctx.ctx_mut().set_visuals(egui::Visuals {
-        window_rounding: 0.0.into(),
-        ..Default::default()
-    });
+impl Default for Fire {
+    fn default() -> Self {
+        Self {
+            name: String::from("Fire_1"),
+            width: 4.0,
+            height: 4.0,
+            position_x: 4.0,
+            position_y: 4.0,
+            speed: 5.0,
+            range: 2.0,
+            direction: String::from("UP"),
+            clicked: false,
+        }
+    }
 }
 
-fn configure_ui_state(mut ui_state: ResMut<UiState>) {
-    ui_state.is_window_open = true;
+#[derive(Component, Debug, Clone)]
+pub struct Material {
+    name_type: String,
+    flamability: f32,
+    color: Color,
+    width: f32,
+    height: f32,
+    position_x: f32,
+    position_y: f32,
+    clicked: bool,
+    fuel: f32,
 }
 
-fn ui(mut egui_ctx: ResMut<EguiContext>) {
-    egui::SidePanel::right("side_panel")
-        .default_width(200.0)
-        .resizable(true)
-        .show(egui_ctx.ctx_mut(), |ui| {
-            ui.heading("Side Panel");
-
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
-                ui.allocate_space(ui.available_size());
-            });
-        });
-
-    egui::TopBottomPanel::top("top_panel").show(egui_ctx.ctx_mut(), |ui| {
-        ui.label("Top pannel");
-    });
-
-    egui::TopBottomPanel::bottom("bottom_panel").show(egui_ctx.ctx_mut(), |ui| {
-        ui.label("Bottom pannel");
-    });
-
-    egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
-        ui.label("Scene");
-    });
+impl Default for Material {
+    fn default() -> Self {
+        Self {
+            name_type: String::from("Material"),
+            flamability: 0.5,
+            color: Color::BEIGE,
+            width: 4.0,
+            height: 5.0,
+            position_x: 5.0,
+            position_y: 5.0,
+            clicked: false,
+            fuel: 1000.0,
+        }
+    }
 }
