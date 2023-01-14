@@ -2,7 +2,7 @@
 
 use bevy::prelude::Component;
 
-pub static N: u32 = 30;
+pub static N: u32 = 16 *8;
 static iter: u32 = 16;
 
 pub fn IX(mut x: u32, mut y: u32) -> u32 {

@@ -12,7 +12,7 @@ use crate::UiState;
 
 fn render_density(ui: &mut Ui, density: &Vec<f32>) {
     for i in 0..N - 1 {
-        ui.horizontal(|ui| {
+        ui.horizontal_top(|ui| {
             for j in 0..N - 1 {
                 // for mut fluid in query_fluid.iter_mut(){
                 //         fluid.get_density();
@@ -21,12 +21,12 @@ fn render_density(ui: &mut Ui, density: &Vec<f32>) {
                 let x: u32 = i;
                 let y: u32 = j;
                 let d = density[Fluid::IX(x, y) as usize];
-                let (rect, Response) = ui.allocate_at_least(vec2(20.0, 20.0), egui::Sense::hover());
+                let (rect, Response) = ui.allocate_at_least(vec2(0.5, 0.5), egui::Sense::hover());
                 ui.painter().rect(
                     rect,
                     0.0,
                     egui::Color32:: from_gray(d as u8),
-                    egui::Stroke::new(0.0, egui::Color32::WHITE), /* :none()*/
+                    egui::Stroke::new(10.0, egui::Color32::from_gray(d as u8) ), /* :none()*/
                 );
 
                 // for mut material in query_material.iter_mut() {
@@ -49,6 +49,28 @@ fn render_density(ui: &mut Ui, density: &Vec<f32>) {
         });
     }
     // println!(" It is here");
+}
+
+fn constrain(mut value:f32, min:f32, max:f32) ->f32 {
+    if value < min {
+        value = min;
+    }
+    if value > max{
+        value = max;
+    }
+    value
+}
+
+pub fn fade_density( mut density: &mut Vec<f32>){
+    for i in 0..density.len(){
+        let d:f32 = density[i];
+
+        
+        density[i] = constrain(d-0.1, 0., 255.);
+        
+        
+        
+    }
 }
 
 pub fn fluid_sys(
@@ -98,8 +120,11 @@ pub fn fluid_sys(
                 }
             }
             // else{
+            // ui_state.fluid.step();
             render_density(ui, ui_state.fluid.get_density());
-            ui_state.fluid.step();
+            // todo!();
+            // fade_density(& ui_state.fluid.get_density());
+            
             // }
         });
     });
