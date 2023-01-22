@@ -76,7 +76,7 @@ pub fn fluid_sys(
     mut commands: Commands,
     mut ui_state: ResMut<UiState::UiState>,
 ) {
-    let ten_millis = time::Duration::from_millis(1000);
+    let ten_millis = time::Duration::from_millis(500);
     let now = time::Instant::now();
     let mut frames = 0;
     if ui_state.new_fluid {
