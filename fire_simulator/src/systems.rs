@@ -4,7 +4,7 @@ use std::{thread, time};
 use bevy_egui::egui::{vec2, Ui};
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 
-use crate::Fire;
+// use crate::Fire;
 use crate::Fluid::N;
 use crate::Fluid::{self, FluidMatrix};
 use crate::Material;
@@ -25,8 +25,8 @@ fn render_density(ui: &mut Ui, density: &Vec<f32>) {
                 ui.painter().rect(
                     rect,
                     0.0,
-                    egui::Color32:: from_gray(d as u8),
-                    egui::Stroke::new(10.0, egui::Color32::from_gray(d as u8) ), /* :none()*/
+                    egui::Color32::from_gray(d as u8),
+                    egui::Stroke::new(10.0, egui::Color32::from_gray(d as u8)), /* :none()*/
                 );
 
                 // for mut material in query_material.iter_mut() {
@@ -51,25 +51,21 @@ fn render_density(ui: &mut Ui, density: &Vec<f32>) {
     // println!(" It is here");
 }
 
-fn constrain(mut value:f32, min:f32, max:f32) ->f32 {
+fn constrain(mut value: f32, min: f32, max: f32) -> f32 {
     if value < min {
         value = min;
     }
-    if value > max{
+    if value > max {
         value = max;
     }
     value
 }
 
-pub fn fade_density( mut density: &mut Vec<f32>){
-    for i in 0..density.len(){
-        let d:f32 = density[i];
+pub fn fade_density(mut density: &mut Vec<f32>) {
+    for i in 0..density.len() {
+        let d: f32 = density[i];
 
-        
-        density[i] = constrain(d-0.1, 0., 255.);
-        
-        
-        
+        density[i] = constrain(d - 0.1, 0., 255.);
     }
 }
 
@@ -124,7 +120,7 @@ pub fn fluid_sys(
             render_density(ui, ui_state.fluid.get_density());
             // todo!();
             // fade_density(& ui_state.fluid.get_density());
-            
+
             // }
         });
     });
@@ -146,113 +142,6 @@ pub fn material_fetch_system(
                     material.name_type, material.width, material.height
                 ));
                 button = ui.button(material.name_type.to_string()).clicked();
-            }
-        });
-    });
-}
-
-pub fn fire_fetch_system(
-    mut query: Query<&Fire>,
-    mut egui_ctx: ResMut<EguiContext>,
-    mut commands: Commands,
-) {
-    egui::Area::new("Fires").show(egui_ctx.ctx_mut(), |ui| {
-        for mut fire in &mut query {
-            let mut button = false;
-            ui.label(format!(
-                "Fire = {}, range = {}, speed{}",
-                fire.name, fire.range, fire.speed
-            ));
-            button = ui.button(fire.name.to_string()).clicked();
-        }
-    });
-}
-
-fn all_elements_system(
-    mut query_fires: Query<&Fire>,
-    mut query_materials: Query<&Material>,
-    mut egui_ctx: ResMut<EguiContext>,
-    mut commands: Commands,
-) {
-    egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
-        ui.label("Scene");
-
-        egui::Area::new("Central Area").show(ui.ctx(), |ui| {
-            for mut material in &mut query_materials {
-                let mut button = false;
-                ui.label(format!(
-                    "Material = {}, width = {}, height = {}, x = {}, y = {}",
-                    material.name_type,
-                    material.width,
-                    material.height,
-                    material.position_x,
-                    material.position_y
-                ));
-                button = ui.button(material.name_type.to_string()).clicked();
-            }
-
-            for mut fire in &mut query_fires {
-                let mut button = false;
-                ui.label(format!(
-                    "Fire = {}, range = {}, speed{},  width = {}, height = {}, x = {}, y = {}",
-                    fire.name,
-                    fire.range,
-                    fire.speed,
-                    fire.width,
-                    fire.height,
-                    fire.position_x,
-                    fire.position_y
-                ));
-                button = ui.button(fire.name.to_string()).clicked();
-            }
-        });
-    });
-}
-
-pub fn collision_system(
-    mut query_fires: Query<&Fire>,
-    mut query_materials: Query<&Material>,
-    mut egui_ctx: ResMut<EguiContext>,
-    mut commands: Commands,
-) {
-    egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
-        ui.label("Scene");
-
-        egui::Area::new("Central Area").show(ui.ctx(), |ui| {
-            for fire in query_fires.iter() {
-                ui.label(format!(
-                    "Fire = {}, range = {}, speed{},  width = {}, height = {}, x = {}, y = {}",
-                    fire.name,
-                    fire.range,
-                    fire.speed,
-                    fire.width,
-                    fire.height,
-                    fire.position_x,
-                    fire.position_y
-                ));
-
-                //                ui.label(format!("{}",fire.name));
-                for material in query_materials.iter() {
-                    //vec3 -> x,y,z
-                    let collision = collide(
-                        Vec3::new(fire.position_x, fire.position_y, 1.0),
-                        Vec2::new(fire.width, fire.height),
-                        Vec3::new(material.position_x, material.position_y, 1.0),
-                        Vec2::new(material.width, material.height),
-                    );
-
-                    if let Some(_) = collision {
-                        ui.label("Material collides with fire");
-                    }
-                    ui.label(format!(
-                        "Material = {}, width = {}, height = {}, x = {}, y = {}",
-                        material.name_type,
-                        material.width,
-                        material.height,
-                        material.position_x,
-                        material.position_y
-                    ));
-                }
             }
         });
     });

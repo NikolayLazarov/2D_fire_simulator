@@ -30,35 +30,6 @@ fn main() {
         .run();
 }
 
-#[derive(Debug, Component, Clone)]
-pub struct Fire {
-    name: String,
-    width: f32,
-    height: f32,
-    position_x: f32,
-    position_y: f32,
-    speed: f32,
-    range: f32,
-    direction: String,
-    clicked: bool,
-}
-
-impl Default for Fire {
-    fn default() -> Self {
-        Self {
-            name: String::from("Fire_1"),
-            width: 4.0,
-            height: 4.0,
-            position_x: 4.0,
-            position_y: 4.0,
-            speed: 5.0,
-            range: 2.0,
-            direction: String::from("UP"),
-            clicked: false,
-        }
-    }
-}
-
 #[derive(Component, Debug, Clone)]
 pub struct Material {
     name_type: String,
