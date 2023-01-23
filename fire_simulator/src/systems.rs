@@ -5,7 +5,6 @@ use std::{thread, time};
 use bevy_egui::egui::{vec2, Ui};
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 
-// use crate::Fire;
 use crate::Fluid::N;
 use crate::Fluid::{self, FluidMatrix};
 use crate::Material;
@@ -31,16 +30,11 @@ use crate::UiState;
 // }
 
 fn render_density(ui: &mut Ui, density: &Vec<f32>
-    // ,    mut query_material: Query<&mut dyn Segment>
 ) {
 
     for i in 0..N - 1 {
         ui. horizontal_top (|ui| {
             for j in 0..N - 1 {
-                // for mut fluid in query_fluid.iter_mut(){
-                //         fluid.get_density();
-                // }
-                //print squares
                 let x: u32 = i;
                 let y: u32 = j;
                 let d = density[Fluid::IX(x, y) as usize];
@@ -49,43 +43,15 @@ fn render_density(ui: &mut Ui, density: &Vec<f32>
                  rect(
                     rect,
                     0.0,
-                    egui::Color32:: from_rgb(d as u8, 50, 50) ,//:from_rgb(50, 100, 150).linear_multiply(0.25), //:from_gray(d as u8),
-                    egui::Stroke::new(9.0, egui::Color32:: from_rgb(d as u8, 0, 0)), /* :none()*/
+                    egui::Color32:: from_rgb(d as u8, 50, 50) ,
+                    egui::Stroke::new(9.0, egui::Color32:: from_rgb(d as u8, 0, 0)),
                 );
-
-
-                // functionCheckCollision(query_material);
             }
         } ) ;
     }
-    // println!(" It is here");
 }
 
-//function for constraining values
-// fn constrain( mut value: f32, min: f32, max: f32) -> &'static mut f32 {
-//     if value < min {
-//         value = min;
-//     }
-//     if value > max {
-//         value = max;
-//     }
-//    &mut value
-// }
-
-// function for faiding away
-// pub fn fade_density(
-//      density: & Vec<f32> ) {
-
-//PROBLEM HERE
-//     for mut cell in density.iter_mut(){
-//         let mut old = cell.clone();
-//         cell = &mut old - 0.1;
-//         cell = constrain(cell - (0.1 as f32),0.255.);    
-//     }
-// }
-
 pub fn fluid_sys(
-    // mut query_material: Query<&mut Material>,
     mut query_fluid: Query<&mut FluidMatrix>,
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
@@ -105,38 +71,25 @@ pub fn fluid_sys(
             ui.label("Fluid");
 
             if frames > 0 {
-                // if ui_state.new_fluid{
-
                 let mut fluid_x: u32 = ui_state.fluid.fluid_x;
                 let mut fluid_y: u32 = ui_state.fluid.fluid_y;
                 let mut amount: f32 = ui_state.fluid.amount;
                 let mut amount_x: f32 = ui_state.fluid.amount_x;
                 let mut amount_y: f32 = ui_state.fluid.amount_y;
 
-                println!("frame = {}", frames);
-                // for i in 1.. 20{
                 ui_state.fluid.add_density(fluid_x, fluid_y, amount);
                 ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
                 ui_state.fluid.step();
 
-                // print_squares(ui,ui_state.fluid.get_density() );
-                // println!("sec {}",i);
                 thread::sleep(ten_millis);
                 assert!(now.elapsed() >= ten_millis);
 
-                // }
                 ui_state.fluid.frames -= 1;
                 if ui_state.fluid.frames == 0 {
                     ui_state.new_fluid = false;
                 }
             }
-            // else{
-            // ui_state.fluid.step();
             render_density(ui, ui_state.fluid.get_density());
-            // todo!();
-            // fade_density( ui_state.fluid.get_density());
-
-            // }
         });
     });
 }
