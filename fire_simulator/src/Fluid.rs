@@ -2,7 +2,7 @@
 
 use bevy::prelude::Component;
 
-pub static N: u32 = 16 * 8;
+pub static N: u32 = 25 * 4;
 static iter: u32 = 16;
 
 pub fn IX(mut x: u32, mut y: u32) -> u32 {
@@ -54,12 +54,12 @@ pub struct FluidMatrix {
 }
 
 impl FluidMatrix {
-    pub fn new(dt_outside: f32, diff_outside: f32, visc_outside: f32) -> Self {
+    pub fn new(dt_given_value: f32, diffusion_given_value: f32, viscosity_given_value: f32) -> Self {
         Self {
             size: N,
-            dt: dt_outside,
-            diffuusion: diff_outside,
-            viscosity: visc_outside,
+            dt: dt_given_value,
+            diffuusion: diffusion_given_value,
+            viscosity: viscosity_given_value,
             s: vec![0.; N.pow(2) as usize],
             density: vec![0.; N.pow(2) as usize],
 

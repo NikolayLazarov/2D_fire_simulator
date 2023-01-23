@@ -1,3 +1,4 @@
+use bevy::ui;
 use bevy::{prelude::*, sprite::collide_aabb::collide};
 use std::{thread, time};
 
@@ -10,26 +11,8 @@ use crate::Fluid::{self, FluidMatrix};
 use crate::Material;
 use crate::UiState;
 
-fn render_density(ui: &mut Ui, density: &Vec<f32>) {
-    for i in 0..N - 1 {
-        ui.horizontal_top(|ui| {
-            for j in 0..N - 1 {
-                // for mut fluid in query_fluid.iter_mut(){
-                //         fluid.get_density();
-                // }
-                //print squares
-                let x: u32 = i;
-                let y: u32 = j;
-                let d = density[Fluid::IX(x, y) as usize];
-                let (rect, Response) = ui.allocate_at_least(vec2(0.5, 0.5), egui::Sense::hover());
-                ui.painter().rect(
-                    rect,
-                    0.0,
-                    egui::Color32::from_gray(d as u8),
-                    egui::Stroke::new(10.0, egui::Color32::from_gray(d as u8)), /* :none()*/
-                );
-
-                // for mut material in query_material.iter_mut() {
+// fn functionCheckCollision(  list_materials:  <>){
+        // for mut material in query_material.iter_mut() {
                 //     let collision = collide(
                 //         Vec3::new(x as f32, y as f32, 1.0),
                 //         Vec2::new(1.0, 1.0),
@@ -45,32 +28,64 @@ fn render_density(ui: &mut Ui, density: &Vec<f32>) {
                 //         ui.label("Material collides with Fire");
                 //     }
                 // }
+// }
+
+fn render_density(ui: &mut Ui, density: &Vec<f32>
+    // ,    mut query_material: Query<&mut dyn Segment>
+) {
+
+    for i in 0..N - 1 {
+        ui. horizontal_top (|ui| {
+            for j in 0..N - 1 {
+                // for mut fluid in query_fluid.iter_mut(){
+                //         fluid.get_density();
+                // }
+                //print squares
+                let x: u32 = i;
+                let y: u32 = j;
+                let d = density[Fluid::IX(x, y) as usize];
+                let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                ui.painter().
+                 rect(
+                    rect,
+                    0.0,
+                    egui::Color32:: from_rgb(d as u8, 50, 50) ,//:from_rgb(50, 100, 150).linear_multiply(0.25), //:from_gray(d as u8),
+                    egui::Stroke::new(9.0, egui::Color32:: from_rgb(d as u8, 0, 0)), /* :none()*/
+                );
+
+
+                // functionCheckCollision(query_material);
             }
-        });
+        } ) ;
     }
     // println!(" It is here");
 }
 
-fn constrain(mut value: f32, min: f32, max: f32) -> f32 {
-    if value < min {
-        value = min;
-    }
-    if value > max {
-        value = max;
-    }
-    value
-}
+//function for constraining values
+// fn constrain( mut value: f32, min: f32, max: f32) -> &'static mut f32 {
+//     if value < min {
+//         value = min;
+//     }
+//     if value > max {
+//         value = max;
+//     }
+//    &mut value
+// }
 
-pub fn fade_density(mut density: &mut Vec<f32>) {
-    for i in 0..density.len() {
-        let d: f32 = density[i];
+// function for faiding away
+// pub fn fade_density(
+//      density: & Vec<f32> ) {
 
-        density[i] = constrain(d - 0.1, 0., 255.);
-    }
-}
+//PROBLEM HERE
+//     for mut cell in density.iter_mut(){
+//         let mut old = cell.clone();
+//         cell = &mut old - 0.1;
+//         cell = constrain(cell - (0.1 as f32),0.255.);    
+//     }
+// }
 
 pub fn fluid_sys(
-    mut query_material: Query<&mut Material>,
+    // mut query_material: Query<&mut Material>,
     mut query_fluid: Query<&mut FluidMatrix>,
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
@@ -119,7 +134,7 @@ pub fn fluid_sys(
             // ui_state.fluid.step();
             render_density(ui, ui_state.fluid.get_density());
             // todo!();
-            // fade_density(& ui_state.fluid.get_density());
+            // fade_density( ui_state.fluid.get_density());
 
             // }
         });
