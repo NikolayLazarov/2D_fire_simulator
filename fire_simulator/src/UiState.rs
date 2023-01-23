@@ -109,7 +109,7 @@ pub fn ui_state(
                     ui_state.fluid.amount_y += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.fluid.frames, 0..=30).text("Frames"));
+                ui.add(egui::Slider::new(&mut ui_state.fluid.frames, 0..=100).text("Frames"));
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.frames += 1;
                 }
