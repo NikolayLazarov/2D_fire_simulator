@@ -1,13 +1,14 @@
 use bevy::ui;
 use bevy::{prelude::*, sprite::collide_aabb::collide};
+use bevy_egui::egui::epaint::RectShape;
 use std::{thread, time};
 
-use bevy_egui::egui::{vec2, Ui};
+use bevy_egui::egui::{vec2, Ui, Pos2, Rounding};
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 
 use crate::Fluid::N;
 use crate::Fluid::{self, FluidMatrix};
-use crate::Material;
+use crate::Materials;
 use crate::UiState;
 
 // fn functionCheckCollision(  list_materials:  <>){
@@ -29,30 +30,91 @@ use crate::UiState;
                 // }
 // }
 
-fn render_density(ui: &mut Ui, density: &Vec<f32>
+fn check_if_material_at_position(x_cord: u32, y_cord:u32, x_material:u32, y_material:u32 )-> bool{
+    
+        if  x_cord == x_material && y_cord == y_material{
+            return true;
+        }
+    return false;
+
+}
+
+fn render_density(ui: &mut Ui, density: &Vec<f32>, mut query_materials: Query<&mut Materials>
 ) {
 
+    // // ui.add( );
+
+    // ui.horizontal(|ui|{
+
+    //     egui::Frame::canvas(ui.style()  ) 
+    // .fill(egui::Color32::RED)
+    // .show(ui, |ui| {
+
+    //     // ui.add(       
+
+    //     // );
+
+    //     let (response, painter) = ui.allocate_painter(ui .available_size_before_wrap(), egui::Sense::hover());
+    //     // let (rect) = ui.allocate ( egui::Rect{ min: Pos2 { x: 2., y: 2. }, max: Pos2 { x: 4., y: 4. }} , egui::Sense::hover());
+    //     let mut rect = response.rect;
+    //     // rect.min = Pos2 { x: 2., y: 2. };
+    //     // rect.max = Pos2 { x: 4., y: 4. };
+    //     // height() = ; 
+    //     painter.add( egui::Shape::Rect(RectShape { rect: egui::Rect{ min: Pos2 { x: 2., y: 2. }, max: Pos2 { x: 4., y: 4. } } , rounding: Rounding::none(), fill: egui::Color32::BLUE, stroke: egui::Stroke::new(3.5,egui::Color32::RED)} ) );
+    //     // painter.add(egui::Shape::Rect(RectShape { rect: rect,  rounding: Rounding::none(), fill: egui::Color32::BLUE, stroke: egui::Stroke::new(3.5,egui::Color32::RED) }) );
+        
+    // });
+
+    // });
+    
+    
+        
     for i in 0..N - 1 {
         ui. horizontal_top (|ui| {
             for j in 0..N - 1 {
-                let x: u32 = i;
-                let y: u32 = j;
-                let d = density[Fluid::IX(x, y) as usize];
-                let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
-                ui.painter().
-                 rect(
-                    rect,
-                    0.0,
-                    egui::Color32:: from_rgb(d as u8, 50, 50) ,
-                    egui::Stroke::new(9.0, egui::Color32:: from_rgb(d as u8, 0, 0)),
-                );
-            }
+                    let x: u32 = i;
+                    let y: u32 = j;
+                    let mut material_flag:bool = false;
+
+                    for material in query_materials.iter(){
+
+                        // ui.label(format!("Mat {}",material.name_type) );
+                       material_flag = check_if_material_at_position(x,y, material.position_x, material.position_y);
+
+                    }
+
+                    if material_flag{
+                        let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                        ui.painter().
+                         rect(
+                            rect,
+                            0.0,
+                            egui::Color32::BLUE ,
+                            egui::Stroke::new(9.0, egui::Color32::BLUE),
+                        );
+                        material_flag = false
+                    }else{
+                        let d = density[Fluid::IX(x, y) as usize];
+
+                        let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                        ui.painter().
+                        rect(
+                            rect,
+                            0.0,
+                            egui::Color32:: from_rgb(d as u8, 50, 50) ,
+                            egui::Stroke::new(9.0, egui::Color32:: from_rgb(d as u8, 0, 0)),
+                        );
+                    }
+                }       
         } ) ;
     }
+
 }
 
 pub fn fluid_sys(
     mut query_fluid: Query<&mut FluidMatrix>,
+    mut query_materials: Query<&mut Materials>,
+
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
     mut ui_state: ResMut<UiState::UiState>,
@@ -80,6 +142,22 @@ pub fn fluid_sys(
                 ui_state.fluid.add_density(fluid_x, fluid_y, amount);
                 ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
                 ui_state.fluid.step();
+                //prints density
+                let mut vector: Vec<(u32,u32,f32)> = vec![];
+                for i in 0..N - 1 {
+                    for j in 0..N - 1 {
+                        let x: u32 = i;
+                        let y: u32 = j;
+                        let d = ui_state.fluid.get_density()[Fluid::IX(x, y) as usize];
+                        // print!("{} ", d);
+                        if d > 1.0 {
+                            vector.push((x,y,d));
+                        }
+                }
+                    println!();
+                }
+                println!("Out of bound: {:?}", vector);
+
 
                 thread::sleep(ten_millis);
                 assert!(now.elapsed() >= ten_millis);
@@ -89,13 +167,13 @@ pub fn fluid_sys(
                     ui_state.new_fluid = false;
                 }
             }
-            render_density(ui, ui_state.fluid.get_density());
+            render_density(ui, ui_state.fluid.get_density(), query_materials);
         });
     });
 }
 
 pub fn material_fetch_system(
-    mut query: Query<&Material>,
+    mut query: Query<&Materials>,
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
 ) {

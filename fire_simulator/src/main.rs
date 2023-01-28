@@ -25,19 +25,19 @@ fn main() {
 }
 
 #[derive(Component, Debug, Clone)]
-pub struct Material {
+pub struct Materials {
     name_type: String,
     flamability: f32,
     color: Color,
     width: f32,
     height: f32,
-    position_x: f32,
-    position_y: f32,
+    position_x: u32,
+    position_y: u32,
     clicked: bool,
     fuel: f32,
 }
 
-impl Default for Material {
+impl Default for Materials {
     fn default() -> Self {
         Self {
             name_type: String::from("Material"),
@@ -45,8 +45,8 @@ impl Default for Material {
             color: Color::BEIGE,
             width: 4.0,
             height: 5.0,
-            position_x: 5.0,
-            position_y: 5.0,
+            position_x: 5,
+            position_y: 5,
             clicked: false,
             fuel: 1000.0,
         }

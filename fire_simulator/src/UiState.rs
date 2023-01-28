@@ -1,7 +1,7 @@
 // use crate::Fire;
 use crate::Fluid;
 use crate::Fluid::N;
-use crate::Material;
+use crate::Materials;
 use bevy::prelude::*;
 use bevy_egui::{
     egui::{self, pos2},
@@ -17,7 +17,7 @@ pub struct UiState {
     pub new_material: bool,
     pub new_fire: bool,
     pub new_fluid: bool,
-    pub material: Material,
+    pub material: Materials,
     pub fluid: Fluid::FluidMatrix,
 }
 
@@ -58,17 +58,17 @@ pub fn ui_state(
                 }
 
                 ui.add(
-                    egui::Slider::new(&mut ui_state.material.position_x, 0.0..=30.0).text("X axys"),
+                    egui::Slider::new(&mut ui_state.material.position_x, 0..=N-1).text("X axys"),
                 );
                 if ui.button("Increment").clicked() {
-                    ui_state.material.position_x += 1.0;
+                    ui_state.material.position_x += 1;
                 }
 
                 ui.add(
-                    egui::Slider::new(&mut ui_state.material.position_y, 0.0..=30.0).text("Y axys"),
+                    egui::Slider::new(&mut ui_state.material.position_y, 0..=N-1).text("Y axys"),
                 );
                 if ui.button("Increment").clicked() {
-                    ui_state.material.position_y += 1.0;
+                    ui_state.material.position_y += 1;
                 }
 
                 ui.separator();
