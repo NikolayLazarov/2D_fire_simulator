@@ -58,14 +58,14 @@ pub fn ui_state(
                 }
 
                 ui.add(
-                    egui::Slider::new(&mut ui_state.material.position_x, 0..=N-1).text("X axys"),
+                    egui::Slider::new(&mut ui_state.material.position_x, 0..=N - 1).text("X axys"),
                 );
                 if ui.button("Increment").clicked() {
                     ui_state.material.position_x += 1;
                 }
 
                 ui.add(
-                    egui::Slider::new(&mut ui_state.material.position_y, 0..=N-1).text("Y axys"),
+                    egui::Slider::new(&mut ui_state.material.position_y, 0..=N - 1).text("Y axys"),
                 );
                 if ui.button("Increment").clicked() {
                     ui_state.material.position_y += 1;
@@ -125,7 +125,7 @@ pub fn ui_state(
                                 let y: u32 = j;
                                 let d = ui_state.fluid.get_density()[Fluid::IX(x, y) as usize];
                                 print!("{} ", d);
-                        }
+                            }
                             println!();
                         }
                         ui_state.new_fluid = true;

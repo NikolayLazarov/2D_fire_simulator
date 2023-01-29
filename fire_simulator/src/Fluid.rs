@@ -55,7 +55,11 @@ pub struct FluidMatrix {
 }
 
 impl FluidMatrix {
-    pub fn new(dt_given_value: f32, diffusion_given_value: f32, viscosity_given_value: f32) -> Self {
+    pub fn new(
+        dt_given_value: f32,
+        diffusion_given_value: f32,
+        viscosity_given_value: f32,
+    ) -> Self {
         Self {
             size: N,
             dt: dt_given_value,
@@ -124,8 +128,8 @@ impl FluidMatrix {
 fn diffuse(b: u32, mut x: &mut Vec<f32>, mut x0: &mut Vec<f32>, diff: f32, dt: f32) {
     //see what does a
     let a: f32 = dt * diff * ((N - 2) * (N - 2)) as f32;
-    println!("diffuse; a = {}, b = {}", a,b);
-    //see why it is 1 and 6 -> maybe the saids that are around it 
+    println!("diffuse; a = {}, b = {}", a, b);
+    //see why it is 1 and 6 -> maybe the saids that are around it
     // so it should be 4
 
     lin_solve(b, x, x0, a, (1 as f32) + (4 as f32) * a);
@@ -171,7 +175,7 @@ fn project(
 
     set_bnd(0, div);
     set_bnd(0, p);
-    //changed c from 6.0 to 4.0 
+    //changed c from 6.0 to 4.0
     lin_solve(0, p, div, 1.0, 4.0);
 
     for j in 1..N - 1 {
