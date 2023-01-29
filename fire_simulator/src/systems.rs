@@ -75,40 +75,69 @@ fn render_density(ui: &mut Ui, density: &Vec<f32>, mut query_materials: Query<&m
                     let x: u32 = i;
                     let y: u32 = j;
                     let mut material_flag:bool = false;
-
                     for material in query_materials.iter(){
 
+                        // ui.label(format!("Mat = {}, {}, {}",material.name_type, material.position_x, material.position_y) );
+                        if x == material.position_x && y == material.position_y{
+                            let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                                        ui.painter().
+                                         rect(
+                                            rect,
+                                            0.0,
+                                            egui::Color32::BLUE ,
+                                            egui::Stroke::new(9.0, egui::Color32::BLUE),
+                                        );
+                        }                
+                    }
+                    let d = density[Fluid::IX(x, y) as usize];
+
+                    let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                    ui.painter().
+                    rect(
+                        rect,
+                        0.0,
+                        egui::Color32:: from_rgb(d as u8, 50, 50) ,
+                        egui::Stroke::new(9.0, egui::Color32:: from_rgb(d as u8, 0, 0)),
+                    );
+            
+
+                    // for material in query_materials.iter(){
+
                         // ui.label(format!("Mat {}",material.name_type) );
-                       material_flag = check_if_material_at_position(x,y, material.position_x, material.position_y);
+                    //    material_flag = check_if_material_at_position(x,y, material.position_x, material.position_y);
+                        // if material_flag == true{
+                        //     continue;
+                        // }
+                    // 
 
-                    }
+                    // if material_flag{
+                    //     let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                    //     ui.painter().
+                    //      rect(
+                    //         rect,
+                    //         0.0,
+                    //         egui::Color32::BLUE ,
+                    //         egui::Stroke::new(9.0, egui::Color32::BLUE),
+                    //     );
+                    //     material_flag = false;
+                    // }
+                    // else{
+                    //     let d = density[Fluid::IX(x, y) as usize];
 
-                    if material_flag{
-                        let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
-                        ui.painter().
-                         rect(
-                            rect,
-                            0.0,
-                            egui::Color32::BLUE ,
-                            egui::Stroke::new(9.0, egui::Color32::BLUE),
-                        );
-                        material_flag = false
-                    }else{
-                        let d = density[Fluid::IX(x, y) as usize];
-
-                        let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
-                        ui.painter().
-                        rect(
-                            rect,
-                            0.0,
-                            egui::Color32:: from_rgb(d as u8, 50, 50) ,
-                            egui::Stroke::new(9.0, egui::Color32:: from_rgb(d as u8, 0, 0)),
-                        );
-                    }
+                    //     let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                    //     ui.painter().
+                    //     rect(
+                    //         rect,
+                    //         0.0,
+                    //         egui::Color32:: from_rgb(d as u8, 50, 50) ,
+                    //         egui::Stroke::new(9.0, egui::Color32:: from_rgb(d as u8, 0, 0)),
+                    //     );
+                    // }
                 }       
         } ) ;
     }
 
+    
 }
 
 pub fn fluid_sys(
