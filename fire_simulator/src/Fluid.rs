@@ -2,11 +2,10 @@
 
 use bevy::prelude::Component;
 
-pub static N: u32 = 16 *8;
+pub static N: u32 = 25 * 2;
 static iter: u32 = 16;
 
 pub fn IX(mut x: u32, mut y: u32) -> u32 {
-    // println!("error? = {}", (x) + y * N);
     if x < 0 {
         x = 0;
     }
@@ -37,7 +36,9 @@ pub struct FluidMatrix {
     s: Vec<f32>,
     density: Vec<f32>,
 
+    //velocity X -> current
     Vx: Vec<f32>,
+    //velocity y -> current
     Vy: Vec<f32>,
 
     Vx0: Vec<f32>,
@@ -54,12 +55,16 @@ pub struct FluidMatrix {
 }
 
 impl FluidMatrix {
-    pub fn new(dt_outside: f32, diff_outside: f32, visc_outside: f32) -> Self {
+    pub fn new(
+        dt_given_value: f32,
+        diffusion_given_value: f32,
+        viscosity_given_value: f32,
+    ) -> Self {
         Self {
             size: N,
-            dt: dt_outside,
-            diffuusion: diff_outside,
-            viscosity: visc_outside,
+            dt: dt_given_value,
+            diffuusion: diffusion_given_value,
+            viscosity: viscosity_given_value,
             s: vec![0.; N.pow(2) as usize],
             density: vec![0.; N.pow(2) as usize],
 
@@ -104,6 +109,7 @@ impl FluidMatrix {
     }
 
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {
+        //here
         let index: u32 = IX(x, y);
         self.density[index as usize] = amount;
     }
@@ -120,13 +126,19 @@ impl FluidMatrix {
 }
 
 fn diffuse(b: u32, mut x: &mut Vec<f32>, mut x0: &mut Vec<f32>, diff: f32, dt: f32) {
+    //see what does a
     let a: f32 = dt * diff * ((N - 2) * (N - 2)) as f32;
-    lin_solve(b, x, x0, a, (1 as f32) + (6 as f32) * a);
+    println!("diffuse; a = {}, b = {}", a, b);
+    //see why it is 1 and 6 -> maybe the saids that are around it
+    // so it should be 4
+
+    lin_solve(b, x, x0, a, (1 as f32) + (4 as f32) * a);
 }
 
 fn lin_solve(b: u32, mut x: &mut Vec<f32>, mut x0: &mut Vec<f32>, a: f32, c: f32) {
+    //See what is cRecip
     let cRecip: f32 = 1.0 / c;
-
+    //C IS THE COEFICIENT FROM amount
     for k in (0..iter) {
         for j in (1..N - 1) {
             for i in (1..N - 1) {
@@ -149,6 +161,7 @@ fn project(
     mut p: &mut Vec<f32>,
     mut div: &mut Vec<f32>,
 ) {
+    //here is the bound from where it id not possible to have x=0 y =0
     for j in (1..N - 1) {
         for i in (1..N - 1) {
             div[IX(i, j) as usize] = -0.5
@@ -162,7 +175,8 @@ fn project(
 
     set_bnd(0, div);
     set_bnd(0, p);
-    lin_solve(0, p, div, 1.0, 6.0);
+    //changed c from 6.0 to 4.0
+    lin_solve(0, p, div, 1.0, 4.0);
 
     for j in 1..N - 1 {
         for i in 1..N - 1 {
@@ -185,8 +199,10 @@ fn advect(b: u32, d: &mut Vec<f32>, d0: &Vec<f32>, velocX: &Vec<f32>, velocY: &V
 
     let [mut s0, mut s1, mut t0, mut t1] = [0.; 4];
     let [mut tmp1, mut tmp2, mut x, mut y] = [0.; 4];
+    
 
     let N_float: f32 = N as f32;
+    //see this for the range of density
     let [mut ifloat, mut jfloat] = [1.; 2];
 
     for j in (1..N - 1) {
@@ -235,7 +251,7 @@ fn advect(b: u32, d: &mut Vec<f32>, d0: &Vec<f32>, velocX: &Vec<f32>, velocY: &V
 
     set_bnd(b, d);
 }
-
+//keeps the sumilation from overflowing
 fn set_bnd(b: u32, mut x: &mut Vec<f32>) {
     for i in 1..N - 1 {
         x[IX(i, 0) as usize] = if b == 2 {

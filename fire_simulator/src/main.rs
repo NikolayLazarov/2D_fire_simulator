@@ -19,60 +19,25 @@ fn main() {
         .add_plugin(EguiPlugin)
         .add_startup_system(startup_systems::configure_visuals)
         .add_startup_system(startup_systems::configure_ui_state)
-        // .add_startup_system(setup)
         .add_system(UiState::ui_state)
-        // .add_system(all_elements_system)
-        // .add_system(systems::collision_system)
         .add_system(systems::fluid_sys)
-        // .add_system(systems::fluid_sys)
-        // .add_system(material_fetch_system)
-        // .add_system(fire_fetch_system)
         .run();
 }
 
-#[derive(Debug, Component, Clone)]
-pub struct Fire {
-    name: String,
-    width: f32,
-    height: f32,
-    position_x: f32,
-    position_y: f32,
-    speed: f32,
-    range: f32,
-    direction: String,
-    clicked: bool,
-}
-
-impl Default for Fire {
-    fn default() -> Self {
-        Self {
-            name: String::from("Fire_1"),
-            width: 4.0,
-            height: 4.0,
-            position_x: 4.0,
-            position_y: 4.0,
-            speed: 5.0,
-            range: 2.0,
-            direction: String::from("UP"),
-            clicked: false,
-        }
-    }
-}
-
 #[derive(Component, Debug, Clone)]
-pub struct Material {
+pub struct Materials {
     name_type: String,
     flamability: f32,
     color: Color,
     width: f32,
     height: f32,
-    position_x: f32,
-    position_y: f32,
+    position_x: u32,
+    position_y: u32,
     clicked: bool,
     fuel: f32,
 }
 
-impl Default for Material {
+impl Default for Materials {
     fn default() -> Self {
         Self {
             name_type: String::from("Material"),
@@ -80,8 +45,8 @@ impl Default for Material {
             color: Color::BEIGE,
             width: 4.0,
             height: 5.0,
-            position_x: 5.0,
-            position_y: 5.0,
+            position_x: 5,
+            position_y: 5,
             clicked: false,
             fuel: 1000.0,
         }
