@@ -58,6 +58,7 @@ fn render_density(
     density: &Vec<f32>,
     mut query_materials: Query<&mut Materials>,
     mut commands: Commands,
+    frames: u32,
     // ui_state: ResMut<UiState::UiState>,
 ) {
     // // ui.add( );
@@ -88,9 +89,14 @@ fn render_density(
     for i in 0..N - 1 {
         ui.horizontal_top(|ui| {
             for j in 0..N - 1 {
+                // if frames == 0{
+                //     create_rect(ui, 0 , 0, 0);
+                //     continue;
+                // }
+                    
                 let x: u32 = i;
                 let y: u32 = j;
-                let d = density[Fluid::IX(x, y) as usize];
+                let mut d = density[Fluid::IX(x, y) as usize];
 
                 let mut material_flag: bool = false;
                 for mut material in query_materials.iter_mut() {
@@ -98,7 +104,7 @@ fn render_density(
                     {
                         material.fuel -= d;
                         if material.fuel <= 0. {
-                            create_rect(ui, d as u8, 0, 0);
+                            create_rect(ui, (255 - d as u8) , 0, 0);
                         } else {
                             // let mut fluid_x: u32 = ui_state.fluid.fluid_x;
                             // let mut fluid_y: u32 = ui_state.fluid.fluid_y;
@@ -115,8 +121,16 @@ fn render_density(
                 if material_flag == true {
                     continue;
                 }
+                
+                if d > 255.0 || d <= 0.{
+                    d = 0.0;
+                    create_rect(ui, d  as u8 , 0, 0);
+                }
+                else{
+                    create_rect(ui, (255 - d  as u8) , 0, 0);
 
-                create_rect(ui, d as u8, 0, 0);
+                }
+                
             }
         });
     }
@@ -182,6 +196,7 @@ pub fn fluid_sys(
                 ui_state.fluid.get_density(),
                 query_materials,
                 commands,
+                frames
                 // ui_state,
             );
         });
