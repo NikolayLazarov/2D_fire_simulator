@@ -56,19 +56,19 @@ pub fn ui_state(
                 if ui.button("Increment").clicked() {
                     ui_state.material.height += 1.0;
                 }
-
+                //do not why x and y are swapped so I Swapp them
                 ui.add(
-                    egui::Slider::new(&mut ui_state.material.position_x, 0..=N - 1).text("X axys"),
-                );
-                if ui.button("Increment").clicked() {
-                    ui_state.material.position_x += 1;
-                }
-
-                ui.add(
-                    egui::Slider::new(&mut ui_state.material.position_y, 0..=N - 1).text("Y axys"),
+                    egui::Slider::new(&mut ui_state.material.position_y, 0..=N - 1).text("X axys"),
                 );
                 if ui.button("Increment").clicked() {
                     ui_state.material.position_y += 1;
+                }
+
+                ui.add(
+                    egui::Slider::new(&mut ui_state.material.position_x, 0..=N - 1).text("Y axys"),
+                );
+                if ui.button("Increment").clicked() {
+                    ui_state.material.position_x += 1;
                 }
 
                 ui.separator();
@@ -82,11 +82,11 @@ pub fn ui_state(
 
                 ui.separator();
 
-                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_y, 0..=N - 2).text("Fluid X"));
+                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_x, 0..=N - 2).text("Fluid X"));
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.fluid_x += 1;
                 }
-                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_x, 0..=N - 2).text("Fluid Y"));
+                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_y, 0..=N - 2).text("Fluid Y"));
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.fluid_y += 1;
                 }

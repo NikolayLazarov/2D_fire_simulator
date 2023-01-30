@@ -199,7 +199,6 @@ fn advect(b: u32, d: &mut Vec<f32>, d0: &Vec<f32>, velocX: &Vec<f32>, velocY: &V
 
     let [mut s0, mut s1, mut t0, mut t1] = [0.; 4];
     let [mut tmp1, mut tmp2, mut x, mut y] = [0.; 4];
-    
 
     let N_float: f32 = N as f32;
     //see this for the range of density

@@ -30,16 +30,15 @@ use crate::UiState;
 // }
 // }
 
-fn create_rect(ui: &mut Ui, r:u8,g:u8,b:u8){
-    let (rect, Response) =
-                            ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
-                        ui.painter().rect(
-                            rect,
-                            0.0,
-                            // egui::Color32::BLUE,
-                           egui::Color32::from_rgb(r, g, b) ,
-                            egui::Stroke::new(9.0, egui::Color32::from_rgb(r, g, b)),
-                        );
+fn create_rect(ui: &mut Ui, r: u8, g: u8, b: u8) {
+    let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+    ui.painter().rect(
+        rect,
+        0.0,
+        // egui::Color32::BLUE,
+        egui::Color32::from_rgb(r, g, b),
+        egui::Stroke::new(9.0, egui::Color32::from_rgb(r, g, b)),
+    );
 }
 
 fn check_if_material_at_position(
@@ -54,7 +53,13 @@ fn check_if_material_at_position(
     return false;
 }
 
-fn render_density(ui: &mut Ui, density: &Vec<f32>, mut query_materials: Query<&mut Materials>, mut commands: Commands,) {
+fn render_density(
+    ui: &mut Ui,
+    density: &Vec<f32>,
+    mut query_materials: Query<&mut Materials>,
+    mut commands: Commands,
+    // ui_state: ResMut<UiState::UiState>,
+) {
     // // ui.add( );
 
     // ui.horizontal(|ui|{
@@ -86,19 +91,23 @@ fn render_density(ui: &mut Ui, density: &Vec<f32>, mut query_materials: Query<&m
                 let x: u32 = i;
                 let y: u32 = j;
                 let d = density[Fluid::IX(x, y) as usize];
-               
+
                 let mut material_flag: bool = false;
                 for mut material in query_materials.iter_mut() {
-                    if check_if_material_at_position(x,y, material.position_x,material.position_y){
-                            
+                    if check_if_material_at_position(x, y, material.position_x, material.position_y)
+                    {
                         material.fuel -= d;
-                        //somehow remove the material from the scene
-                        if material.fuel<=0.{
-                            //commands.entity(material ).despawn();
+                        if material.fuel <= 0. {
                             create_rect(ui, d as u8, 0, 0);
-                        } 
-                        else{
-                            create_rect(ui,0,0,255);
+                        } else {
+                            // let mut fluid_x: u32 = ui_state.fluid.fluid_x;
+                            // let mut fluid_y: u32 = ui_state.fluid.fluid_y;
+                            // let mut amount: f32 = ui_state.fluid.amount;
+                            // let mut amount_x: f32 = ui_state.fluid.amount_x;
+                            // let mut amount_y: f32 = ui_state.fluid.amount_y;
+                            // ui_state.fluid.add_density(fluid_x, fluid_y, amount);
+                            // ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
+                            create_rect(ui, 0, 0, 255);
                         }
                         material_flag = true;
                     }
@@ -168,7 +177,13 @@ pub fn fluid_sys(
                     ui_state.new_fluid = false;
                 }
             }
-            render_density(ui, ui_state.fluid.get_density(), query_materials, commands);
+            render_density(
+                ui,
+                ui_state.fluid.get_density(),
+                query_materials,
+                commands,
+                // ui_state,
+            );
         });
     });
 }
