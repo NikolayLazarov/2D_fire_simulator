@@ -30,6 +30,18 @@ use crate::UiState;
 // }
 // }
 
+fn create_rect(ui: &mut Ui, r:u8,g:u8,b:u8){
+    let (rect, Response) =
+                            ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                        ui.painter().rect(
+                            rect,
+                            0.0,
+                            // egui::Color32::BLUE,
+                           egui::Color32::from_rgb(r, g, b) ,
+                            egui::Stroke::new(9.0, egui::Color32::from_rgb(r, g, b)),
+                        );
+}
+
 fn check_if_material_at_position(
     x_cord: u32,
     y_cord: u32,
@@ -42,7 +54,7 @@ fn check_if_material_at_position(
     return false;
 }
 
-fn render_density(ui: &mut Ui, density: &Vec<f32>, mut query_materials: Query<&mut Materials>) {
+fn render_density(ui: &mut Ui, density: &Vec<f32>, mut query_materials: Query<&mut Materials>, mut commands: Commands,) {
     // // ui.add( );
 
     // ui.horizontal(|ui|{
@@ -73,32 +85,29 @@ fn render_density(ui: &mut Ui, density: &Vec<f32>, mut query_materials: Query<&m
             for j in 0..N - 1 {
                 let x: u32 = i;
                 let y: u32 = j;
+                let d = density[Fluid::IX(x, y) as usize];
+               
                 let mut material_flag: bool = false;
-                for material in query_materials.iter() {
-                    if x == material.position_x && y == material.position_y {
-                        let (rect, Response) =
-                            ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
-                        ui.painter().rect(
-                            rect,
-                            0.0,
-                            egui::Color32::BLUE,
-                            egui::Stroke::new(9.0, egui::Color32::BLUE),
-                        );
+                for mut material in query_materials.iter_mut() {
+                    if check_if_material_at_position(x,y, material.position_x,material.position_y){
+                            
+                        material.fuel -= d;
+                        //somehow remove the material from the scene
+                        if material.fuel<=0.{
+                            //commands.entity(material ).despawn();
+                            create_rect(ui, d as u8, 0, 0);
+                        } 
+                        else{
+                            create_rect(ui,0,0,255);
+                        }
                         material_flag = true;
                     }
                 }
                 if material_flag == true {
                     continue;
                 }
-                let d = density[Fluid::IX(x, y) as usize];
 
-                let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
-                ui.painter().rect(
-                    rect,
-                    0.0,
-                    egui::Color32::from_rgb(d as u8, 50, 50),
-                    egui::Stroke::new(9.0, egui::Color32::from_rgb(d as u8, 0, 0)),
-                );
+                create_rect(ui, d as u8, 0, 0);
             }
         });
     }
@@ -159,7 +168,7 @@ pub fn fluid_sys(
                     ui_state.new_fluid = false;
                 }
             }
-            render_density(ui, ui_state.fluid.get_density(), query_materials);
+            render_density(ui, ui_state.fluid.get_density(), query_materials, commands);
         });
     });
 }
