@@ -22,7 +22,7 @@ pub fn IX(mut x: u32, mut y: u32) -> u32 {
     x + y * N
 }
 
-#[derive(Default, Component)]
+#[derive(Default, Component, Clone)]
 pub struct FluidMatrix {
     size: u32,
 
@@ -52,6 +52,8 @@ pub struct FluidMatrix {
     pub amount_y: f32,
 
     pub frames: u32,
+
+    pub fire_range: u32,
 }
 
 impl FluidMatrix {
@@ -80,6 +82,7 @@ impl FluidMatrix {
             amount_x: 15.0,
             amount_y: 15.0,
             frames: 20,
+            fire_range: 2,
         }
     }
 
@@ -128,7 +131,7 @@ impl FluidMatrix {
 fn diffuse(b: u32, mut x: &mut Vec<f32>, mut x0: &mut Vec<f32>, diff: f32, dt: f32) {
     //see what does a
     let a: f32 = dt * diff * ((N - 2) * (N - 2)) as f32;
-    println!("diffuse; a = {}, b = {}", a, b);
+    // println!("diffuse; a = {}, b = {}", a, b);
     //see why it is 1 and 6 -> maybe the saids that are around it
     // so it should be 4
 

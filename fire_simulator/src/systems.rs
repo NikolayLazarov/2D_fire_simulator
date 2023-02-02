@@ -59,7 +59,7 @@ fn render_density(
     mut query_materials: Query<&mut Materials>,
     mut commands: Commands,
     frames: u32,
-    // ui_state: ResMut<UiState::UiState>,
+    mut fluids: Query<&mut FluidMatrix>, // ui_state: ResMut<UiState::UiState>,
 ) {
     // // ui.add( );
 
@@ -93,18 +93,19 @@ fn render_density(
                 //     create_rect(ui, 0 , 0, 0);
                 //     continue;
                 // }
-                    
+
                 let x: u32 = i;
                 let y: u32 = j;
                 let mut d = density[Fluid::IX(x, y) as usize];
 
                 let mut material_flag: bool = false;
+                let mut fluid_flag: bool = false;
                 for mut material in query_materials.iter_mut() {
                     if check_if_material_at_position(x, y, material.position_x, material.position_y)
                     {
                         material.fuel -= d;
                         if material.fuel <= 0. {
-                            create_rect(ui, (255 - d as u8) , 0, 0);
+                            create_rect(ui, (255 - d as u8), 0, 0);
                         } else {
                             // let mut fluid_x: u32 = ui_state.fluid.fluid_x;
                             // let mut fluid_y: u32 = ui_state.fluid.fluid_y;
@@ -121,16 +122,28 @@ fn render_density(
                 if material_flag == true {
                     continue;
                 }
-                
-                if d > 255.0 || d <= 0.{
-                    d = 0.0;
-                    create_rect(ui, d  as u8 , 0, 0);
-                }
-                else{
-                    create_rect(ui, (255 - d  as u8) , 0, 0);
 
+                for fluid in fluids.iter() {
+                    // println!("loop");
+                    if fluid.fluid_x == x && fluid.fluid_y == y && fluid_flag == false {
+                        // println!("fluid loop");
+                        create_rect(ui, 0, 255, 0);
+                        fluid_flag = true;
+                    }
+
+                    // commands.entity(fluid).despawn();
                 }
-                
+                if fluid_flag == true {
+                    fluid_flag = false;
+                    continue;
+                }
+
+                if d > 255.0 || d <= 0. {
+                    d = 0.0;
+                    create_rect(ui, d as u8, 0, 0);
+                } else {
+                    create_rect(ui, (255 - d as u8), 0, 0);
+                }
             }
         });
     }
@@ -168,20 +181,20 @@ pub fn fluid_sys(
                 ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
                 ui_state.fluid.step();
                 //prints density
-                let mut vector: Vec<(u32, u32, f32)> = vec![];
-                for i in 0..N - 1 {
-                    for j in 0..N - 1 {
-                        let x: u32 = i;
-                        let y: u32 = j;
-                        let d = ui_state.fluid.get_density()[Fluid::IX(x, y) as usize];
-                        // print!("{} ", d);
-                        if d > 1.0 {
-                            vector.push((x, y, d));
-                        }
-                    }
-                    println!();
-                }
-                println!("Out of bound: {:?}", vector);
+                // let mut vector: Vec<(u32, u32, f32)> = vec![];
+                // for i in 0..N - 1 {
+                //     for j in 0..N - 1 {
+                //         let x: u32 = i;
+                //         let y: u32 = j;
+                //         let d = ui_state.fluid.get_density()[Fluid::IX(x, y) as usize];
+                //         // print!("{} ", d);
+                //         if d > 1.0 {
+                //             vector.push((x, y, d));
+                //         }
+                //     }
+                //     println!();
+                // }
+                // println!("Out of bound: {:?}", vector);
 
                 thread::sleep(ten_millis);
                 assert!(now.elapsed() >= ten_millis);
@@ -191,13 +204,14 @@ pub fn fluid_sys(
                     ui_state.new_fluid = false;
                 }
             }
+            // println!("Entity_ fluid = {:?}", query_fluid);
             render_density(
                 ui,
                 ui_state.fluid.get_density(),
                 query_materials,
                 commands,
-                frames
-                // ui_state,
+                frames,
+                query_fluid, // ui_state,
             );
         });
     });

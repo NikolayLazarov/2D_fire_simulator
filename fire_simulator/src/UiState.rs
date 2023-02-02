@@ -95,6 +95,11 @@ pub fn ui_state(
                     ui_state.fluid.amount += 1.0;
                 }
 
+                ui.add(egui::Slider::new(&mut ui_state.fluid.fire_range, 0..=10).text("Range"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fluid.fire_range += 1;
+                }
+
                 ui.add(
                     egui::Slider::new(&mut ui_state.fluid.amount_x, 0.0..=200.0).text("Velocity X"),
                 );
@@ -165,5 +170,8 @@ pub fn ui_state(
     if ui_state.new_material {
         commands.spawn(ui_state.material.clone());
         ui_state.new_material = false;
+    }
+    if ui_state.new_fluid {
+        commands.spawn(ui_state.fluid.clone());
     }
 }
