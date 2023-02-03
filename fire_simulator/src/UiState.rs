@@ -19,6 +19,7 @@ pub struct UiState {
     pub new_fluid: bool,
     pub material: Materials,
     pub fluid: Fluid::FluidMatrix,
+    pub start_simulation: bool,
 }
 
 pub fn ui_state(
@@ -133,6 +134,7 @@ pub fn ui_state(
                             }
                             println!();
                         }
+                        ui_state.start_simulation = true;
                         ui_state.new_fluid = true;
                         update_fluid_density = false;
                     }

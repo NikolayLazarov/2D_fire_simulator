@@ -124,17 +124,45 @@ fn render_density(
                 }
 
                 for fluid in fluids.iter() {
-                    // println!("loop");
-                    if fluid.fluid_x == x && fluid.fluid_y == y && fluid_flag == false {
-                        // println!("fluid loop");
-                        create_rect(ui, 0, 255, 0);
+                    // println!("count =  {}",count);
+                    // // println!("loop");
+                    // if fluid.fluid_x == x && fluid.fluid_y == y && fluid_flag == false {
+                    //     // println!("fluid loop");
+                    //     // create_rect(ui, (255-d as u8), 0,0 );
+                    //     create_rect(ui, (255 as u8), d as u8,0 );
+
+                    //     fluid_flag = true;
+                    // }
+                    //rect // fluid
+                    let collision = collide(
+                        Vec3 {
+                            x: fluid.fluid_x as f32,
+                            y: fluid.fluid_y as f32,
+                            z: 0.,
+                        },
+                        Vec2 {
+                            x: fluid.fire_range as f32,
+                            y: fluid.fire_range as f32,
+                        },
+                        Vec3 {
+                            x: x as f32,
+                            y: y as f32,
+                            z: 0.,
+                        },
+                        Vec2 { x: 1., y: 1. },
+                    );
+
+                    if let Some(_) = collision {
+                        create_rect(ui, 70, 70, 70);
                         fluid_flag = true;
+                        continue;
                     }
 
                     // commands.entity(fluid).despawn();
                 }
                 if fluid_flag == true {
-                    fluid_flag = false;
+                    println!("fluid flag here {}", fluid_flag);
+                    //  fluid_flag = false;
                     continue;
                 }
 
@@ -160,7 +188,8 @@ pub fn fluid_sys(
     let ten_millis = time::Duration::from_millis(500);
     let now = time::Instant::now();
     let mut frames = 0;
-    if ui_state.new_fluid {
+
+    if ui_state.start_simulation {
         frames = ui_state.fluid.frames;
     }
 
@@ -171,6 +200,8 @@ pub fn fluid_sys(
             ui.label("Fluid");
 
             if frames > 0 {
+                ui_state.new_fluid = false;
+                // ui_state.start_simulation = true;
                 let mut fluid_x: u32 = ui_state.fluid.fluid_x;
                 let mut fluid_y: u32 = ui_state.fluid.fluid_y;
                 let mut amount: f32 = ui_state.fluid.amount;
@@ -181,28 +212,13 @@ pub fn fluid_sys(
                 ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
                 ui_state.fluid.step();
                 //prints density
-                // let mut vector: Vec<(u32, u32, f32)> = vec![];
-                // for i in 0..N - 1 {
-                //     for j in 0..N - 1 {
-                //         let x: u32 = i;
-                //         let y: u32 = j;
-                //         let d = ui_state.fluid.get_density()[Fluid::IX(x, y) as usize];
-                //         // print!("{} ", d);
-                //         if d > 1.0 {
-                //             vector.push((x, y, d));
-                //         }
-                //     }
-                //     println!();
-                // }
-                // println!("Out of bound: {:?}", vector);
-
                 thread::sleep(ten_millis);
                 assert!(now.elapsed() >= ten_millis);
 
                 ui_state.fluid.frames -= 1;
-                if ui_state.fluid.frames == 0 {
-                    ui_state.new_fluid = false;
-                }
+                // if ui_state.fluid.frames == 0 {
+                //     ui_state.new_fluid = false;
+                // }
             }
             // println!("Entity_ fluid = {:?}", query_fluid);
             render_density(
