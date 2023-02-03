@@ -216,9 +216,9 @@ pub fn fluid_sys(
                 assert!(now.elapsed() >= ten_millis);
 
                 ui_state.fluid.frames -= 1;
-                // if ui_state.fluid.frames == 0 {
-                //     ui_state.new_fluid = false;
-                // }
+                if ui_state.fluid.frames == 0 {
+                    ui_state.start_simulation = false;
+                }
             }
             // println!("Entity_ fluid = {:?}", query_fluid);
             render_density(
