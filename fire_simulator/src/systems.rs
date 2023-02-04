@@ -151,26 +151,32 @@ fn render_density(
                         },
                         Vec2 { x: 1., y: 1. },
                     );
-
-                    if let Some(_) = collision {
-                        create_rect(ui, 70, 70, 70);
-                        fluid_flag = true;
-                        continue;
+                    
+                    if fluid_flag == false{
+                        if let Some(_) = collision{
+                            // fluid_false == false
+                            create_rect(ui,255 - d as u8, 0, 0);
+                            fluid_flag = true;
+                            continue;
+                        }
                     }
-
                     // commands.entity(fluid).despawn();
                 }
                 if fluid_flag == true {
-                    println!("fluid flag here {}", fluid_flag);
-                    //  fluid_flag = false;
                     continue;
                 }
 
                 if d > 255.0 || d <= 0. {
+                    //black for where there is not density or is over
                     d = 0.0;
                     create_rect(ui, d as u8, 0, 0);
                 } else {
-                    create_rect(ui, (255 - d as u8), 0, 0);
+                    //colored depending on the intensity of the d
+                    // create_rect(ui, (255 - d as u8), d as u8, 0);
+                    
+                    //works at the end
+                    create_rect(ui, (255 - d as u8), d as u8, 0);
+                
                 }
             }
         });
