@@ -99,6 +99,7 @@ pub fn ui_state(
                 ui.add(egui::Slider::new(&mut ui_state.fluid.fire_range, 0..=10).text("Range"));
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.fire_range += 1;
+                    ui_state.fluid.counter_range  += ui_state.fluid.fire_range * ui_state.fluid.fire_range; 
                 }
 
                 ui.add(

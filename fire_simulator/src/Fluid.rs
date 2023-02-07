@@ -54,6 +54,8 @@ pub struct FluidMatrix {
     pub frames: u32,
 
     pub fire_range: u32,
+
+    pub counter_range: u32,
 }
 
 impl FluidMatrix {
@@ -83,6 +85,8 @@ impl FluidMatrix {
             amount_y: 15.0,
             frames: 20,
             fire_range: 2,
+
+            counter_range: 0,
         }
     }
 
@@ -145,6 +149,7 @@ fn lin_solve(b: u32, mut x: &mut Vec<f32>, mut x0: &mut Vec<f32>, a: f32, c: f32
     for k in (0..iter) {
         for j in (1..N - 1) {
             for i in (1..N - 1) {
+                
                 x[IX(i, j) as usize] = (x0[IX(i, j) as usize]
                     + a * (x[IX(i + 1, j) as usize]
                         + x[IX(i - 1, j) as usize]
@@ -281,6 +286,7 @@ fn set_bnd(b: u32, mut x: &mut Vec<f32>) {
             x[IX(N - 2, j) as usize]
         };
     }
+    //why is 0.5 and not 0.33 -> because there are two dimensions
 
     x[IX(0, 0) as usize] = 0.5 * (x[IX(1, 0) as usize] + x[IX(0, 1) as usize]);
 

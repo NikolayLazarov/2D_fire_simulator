@@ -31,7 +31,7 @@ use crate::UiState;
 // }
 
 fn create_rect(ui: &mut Ui, r: u8, g: u8, b: u8) {
-    let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+    let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::click());
     ui.painter().rect(
         rect,
         0.0,
@@ -39,7 +39,9 @@ fn create_rect(ui: &mut Ui, r: u8, g: u8, b: u8) {
         egui::Color32::from_rgb(r, g, b),
         egui::Stroke::new(9.0, egui::Color32::from_rgb(r, g, b)),
     );
-}
+    if Response.clicked(){
+        println!("Responce = {:?}", Response);
+    }
 
 fn check_if_material_at_position(
     x_cord: u32,
@@ -154,9 +156,33 @@ fn render_density(
                     
                     if fluid_flag == false{
                         if let Some(_) = collision{
+                            if d > 255.{
+                                d = 255.;
+                            }
+                            // println!("{} ", d);
                             // fluid_false == false
-                            create_rect(ui,255 - d as u8, 0, 0);
+//put the renge to be in red 
+// the center in yellow
+//counter
+//if count =1  -> yellow
+// else if  count -> red
+                            if fluid.fire_range%2 == 1{
+                                if fluid.counter_range ==fluid.fire_range/2{
+                                    create_rect(ui, 255-d as u8, 255 - d as u8, 0);
+                                }
+                                else {
+                                    create_rect(ui, 255-d as u8, d as u8, 0);
+                                }
+                            }
+                            else if fluid.fire_range%2 == 0{
+                                    create_rect(ui, 255-d as u8, d as u8, 0);
+                                // else if fluid.counter_range == fluid.fire_range{
+
+                                // }
+                            }
+                             
                             fluid_flag = true;
+                            //see if this stops others from emiting
                             continue;
                         }
                     }
@@ -175,7 +201,16 @@ fn render_density(
                     // create_rect(ui, (255 - d as u8), d as u8, 0);
                     
                     //works at the end
-                    create_rect(ui, (255 - d as u8), d as u8, 0);
+                    
+                    let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+    ui.painter().rect(
+        rect,
+        0.0,
+        // egui::Color32::BLUE,
+        egui::Color32::from_gray(d as u8),
+        egui::Stroke::new(9.0, egui::Color32::from_gray(255- d as u8))//from_rgb(r, g, b)),
+    );
+                    // create_rect(ui, (255 - d as u8), d as u8, 0);
                 
                 }
             }
@@ -191,7 +226,7 @@ pub fn fluid_sys(
     mut commands: Commands,
     mut ui_state: ResMut<UiState::UiState>,
 ) {
-    let ten_millis = time::Duration::from_millis(500);
+    let ten_millis = time::Duration::from_millis(1000/24);
     let now = time::Instant::now();
     let mut frames = 0;
 
