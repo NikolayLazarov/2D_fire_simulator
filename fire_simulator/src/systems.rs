@@ -42,6 +42,7 @@ fn create_rect(ui: &mut Ui, r: u8, g: u8, b: u8) {
     if Response.clicked(){
         println!("Responce = {:?}", Response);
     }
+}
 
 fn check_if_material_at_position(
     x_cord: u32,
