@@ -1,3 +1,4 @@
+use bevy::render::view::window;
 use bevy::ui;
 use bevy::{prelude::*, sprite::collide_aabb::collide};
 use bevy_egui::egui::epaint::RectShape;
@@ -9,7 +10,8 @@ use bevy_egui::{egui, EguiContext, EguiPlugin};
 use crate::Fluid::N;
 use crate::Fluid::{self, FluidMatrix};
 use crate::Materials;
-use crate::UiState;
+use crate::UiState::{self, ui_state};
+use crate::Windows;
 
 // fn functionCheckCollision(  list_materials:  <>){
 // for mut material in query_material.iter_mut() {
@@ -30,7 +32,7 @@ use crate::UiState;
 // }
 // }
 
-fn create_rect(ui: &mut Ui, r: u8, g: u8, b: u8) {
+fn create_rect(ui: &mut Ui, r: u8, g: u8, b: u8, windows: &mut ResMut<Windows::Windows>) {
     let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::click());
     ui.painter().rect(
         rect,
@@ -39,9 +41,40 @@ fn create_rect(ui: &mut Ui, r: u8, g: u8, b: u8) {
         egui::Color32::from_rgb(r, g, b),
         egui::Stroke::new(9.0, egui::Color32::from_rgb(r, g, b)),
     );
+    let mut clicked_rect = false;
     if Response.clicked(){
-        println!("Responce = {:?}", Response);
+        windows.side_panel_modify = true;
     }
+
+    if clicked_rect {
+        windows.side_panel_modify = true;
+    }
+
+    
+        
+        // println!("Responce = {:?}", Response);
+        if windows.side_panel_modify == true{
+            egui::SidePanel::right("Side_panel_m")
+            .default_width(200.0)
+            .resizable(true)
+            .show(ui.ctx() , |ui| {
+                ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
+                     
+                    ui.allocate_space(ui.available_size());
+                    ui.heading("Param tam");
+                    
+                    
+                    if ui.button("This is button").clicked(){
+                    ui.label("Clicked");    
+                    }
+                    else{
+                        ui.label("not clicked");
+                        windows.side_panel_modify = false;}
+                });   
+            });
+        }
+        
+    
 }
 
 fn check_if_material_at_position(
@@ -62,7 +95,8 @@ fn render_density(
     mut query_materials: Query<&mut Materials>,
     mut commands: Commands,
     frames: u32,
-    mut fluids: Query<&mut FluidMatrix>, // ui_state: ResMut<UiState::UiState>,
+    mut fluids: Query<&mut FluidMatrix>,
+    windows: &mut ResMut<Windows::Windows> // ui_state: ResMut<UiState::UiState>,
 ) {
     // // ui.add( );
 
@@ -108,7 +142,7 @@ fn render_density(
                     {
                         material.fuel -= d;
                         if material.fuel <= 0. {
-                            create_rect(ui, (255 - d as u8), 0, 0);
+                            create_rect(ui, (255 - d as u8), 0, 0, windows);
                         } else {
                             // let mut fluid_x: u32 = ui_state.fluid.fluid_x;
                             // let mut fluid_y: u32 = ui_state.fluid.fluid_y;
@@ -117,7 +151,7 @@ fn render_density(
                             // let mut amount_y: f32 = ui_state.fluid.amount_y;
                             // ui_state.fluid.add_density(fluid_x, fluid_y, amount);
                             // ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
-                            create_rect(ui, 0, 0, 255);
+                            create_rect(ui, 0, 0, 255,windows);
                         }
                         material_flag = true;
                     }
@@ -169,14 +203,14 @@ fn render_density(
 // else if  count -> red
                             if fluid.fire_range%2 == 1{
                                 if fluid.counter_range ==fluid.fire_range/2{
-                                    create_rect(ui, 255-d as u8, 255 - d as u8, 0);
+                                    create_rect(ui, 255-d as u8, 255 - d as u8, 0,windows);
                                 }
                                 else {
-                                    create_rect(ui, 255-d as u8, d as u8, 0);
+                                    create_rect(ui, 255-d as u8, d as u8, 0,windows);
                                 }
                             }
                             else if fluid.fire_range%2 == 0{
-                                    create_rect(ui, 255-d as u8, d as u8, 0);
+                                    create_rect(ui, 255-d as u8, d as u8, 0,windows);
                                 // else if fluid.counter_range == fluid.fire_range{
 
                                 // }
@@ -196,7 +230,7 @@ fn render_density(
                 if d > 255.0 || d <= 0. {
                     //black for where there is not density or is over
                     d = 0.0;
-                    create_rect(ui, d as u8, 0, 0);
+                    create_rect(ui, d as u8, 0, 0,windows);
                 } else {
                     //colored depending on the intensity of the d
                     // create_rect(ui, (255 - d as u8), d as u8, 0);
@@ -226,6 +260,7 @@ pub fn fluid_sys(
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
     mut ui_state: ResMut<UiState::UiState>,
+    mut windows:  ResMut<Windows::Windows>,
 ) {
     let ten_millis = time::Duration::from_millis(1000/24);
     let now = time::Instant::now();
@@ -269,7 +304,9 @@ pub fn fluid_sys(
                 query_materials,
                 commands,
                 frames,
-                query_fluid, // ui_state,
+                query_fluid,
+                &mut windows,
+                // ui_state,
             );
         });
     });

@@ -7,6 +7,7 @@ use bevy_egui::{egui, EguiContext, EguiPlugin};
 use crate::Fluid;
 use crate::Materials;
 use crate::UiState;
+use crate::Windows;
 
 pub fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
     egui_ctx.ctx_mut().set_visuals(egui::Visuals {
@@ -26,4 +27,8 @@ pub fn configure_ui_state(mut ui_state: ResMut<UiState::UiState>) {
     ui_state.material_window = false;
     ui_state.fire_window = false;
     ui_state.fluid_window = false;
+}
+
+pub fn configure_windows(mut windows: ResMut<Windows::Windows >){
+    windows.side_panel_modify = false;
 }
