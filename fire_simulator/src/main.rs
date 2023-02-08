@@ -8,9 +8,9 @@ use bevy_egui::{
 };
 mod Fluid;
 mod UiState;
+mod Windows;
 mod startup_systems;
 mod systems;
-mod Windows;
 
 use crate::Fluid::N;
 fn main() {
@@ -21,7 +21,7 @@ fn main() {
         .add_plugin(EguiPlugin)
         .add_startup_system(startup_systems::configure_visuals)
         .add_startup_system(startup_systems::configure_ui_state)
-        .add_startup_system(startup_systems::configure_windows )
+        .add_startup_system(startup_systems::configure_windows)
         .add_system(UiState::ui_state)
         .add_system(systems::fluid_sys)
         .run();

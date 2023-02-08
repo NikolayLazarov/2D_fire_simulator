@@ -2,6 +2,7 @@
 use crate::Fluid;
 use crate::Fluid::N;
 use crate::Materials;
+use crate::Windows;
 use bevy::prelude::*;
 use bevy_egui::{
     egui::{self, pos2},
@@ -20,16 +21,31 @@ pub struct UiState {
     pub material: Materials,
     pub fluid: Fluid::FluidMatrix,
     pub start_simulation: bool,
+
+    pub window_change_materials: bool,
 }
 
 pub fn ui_state(
     mut egui_ctx: ResMut<EguiContext>,
     mut ui_state: ResMut<UiState>,
     mut commands: Commands,
+    mut windows: ResMut<Windows::Windows>,
 ) {
     let mut new_material_button = false;
     let mut material_button = false;
     let mut fluid_button = false;
+
+    if windows.side_panel_modify {
+        let mut close_window = false;
+        egui::SidePanel::right("Side_panel_for_modifications")
+            .default_width(200.0)
+            .resizable(true)
+            .show(egui_ctx.ctx_mut(), |ui| {
+                ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
+                    ui.allocate_space(ui.available_size());
+                });
+            });
+    }
 
     egui::SidePanel::right("side_panel")
         .default_width(200.0)
@@ -99,7 +115,8 @@ pub fn ui_state(
                 ui.add(egui::Slider::new(&mut ui_state.fluid.fire_range, 0..=10).text("Range"));
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.fire_range += 1;
-                    ui_state.fluid.counter_range  += ui_state.fluid.fire_range * ui_state.fluid.fire_range; 
+                    ui_state.fluid.counter_range +=
+                        ui_state.fluid.fire_range * ui_state.fluid.fire_range;
                 }
 
                 ui.add(

@@ -149,7 +149,6 @@ fn lin_solve(b: u32, mut x: &mut Vec<f32>, mut x0: &mut Vec<f32>, a: f32, c: f32
     for k in (0..iter) {
         for j in (1..N - 1) {
             for i in (1..N - 1) {
-                
                 x[IX(i, j) as usize] = (x0[IX(i, j) as usize]
                     + a * (x[IX(i + 1, j) as usize]
                         + x[IX(i - 1, j) as usize]

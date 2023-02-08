@@ -41,40 +41,15 @@ fn create_rect(ui: &mut Ui, r: u8, g: u8, b: u8, windows: &mut ResMut<Windows::W
         egui::Color32::from_rgb(r, g, b),
         egui::Stroke::new(9.0, egui::Color32::from_rgb(r, g, b)),
     );
-    let mut clicked_rect = false;
-    if Response.clicked(){
+    // let mut clicked_rect = false;
+    if Response.clicked() {
         windows.side_panel_modify = true;
     }
 
-    if clicked_rect {
-        windows.side_panel_modify = true;
-    }
-
-    
-        
-        // println!("Responce = {:?}", Response);
-        if windows.side_panel_modify == true{
-            egui::SidePanel::right("Side_panel_m")
-            .default_width(200.0)
-            .resizable(true)
-            .show(ui.ctx() , |ui| {
-                ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
-                     
-                    ui.allocate_space(ui.available_size());
-                    ui.heading("Param tam");
-                    
-                    
-                    if ui.button("This is button").clicked(){
-                    ui.label("Clicked");    
-                    }
-                    else{
-                        ui.label("not clicked");
-                        windows.side_panel_modify = false;}
-                });   
-            });
-        }
-        
-    
+    // if clicked_rect {
+    //     windows.side_panel_modify = true;
+    // }
+    // println!("Responce = {:?}", Response)
 }
 
 fn check_if_material_at_position(
@@ -96,7 +71,7 @@ fn render_density(
     mut commands: Commands,
     frames: u32,
     mut fluids: Query<&mut FluidMatrix>,
-    windows: &mut ResMut<Windows::Windows> // ui_state: ResMut<UiState::UiState>,
+    windows: &mut ResMut<Windows::Windows>, // ui_state: ResMut<UiState::UiState>,
 ) {
     // // ui.add( );
 
@@ -151,7 +126,7 @@ fn render_density(
                             // let mut amount_y: f32 = ui_state.fluid.amount_y;
                             // ui_state.fluid.add_density(fluid_x, fluid_y, amount);
                             // ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
-                            create_rect(ui, 0, 0, 255,windows);
+                            create_rect(ui, 0, 0, 255, windows);
                         }
                         material_flag = true;
                     }
@@ -188,34 +163,32 @@ fn render_density(
                         },
                         Vec2 { x: 1., y: 1. },
                     );
-                    
-                    if fluid_flag == false{
-                        if let Some(_) = collision{
-                            if d > 255.{
+
+                    if fluid_flag == false {
+                        if let Some(_) = collision {
+                            if d > 255. {
                                 d = 255.;
                             }
                             // println!("{} ", d);
                             // fluid_false == false
-//put the renge to be in red 
-// the center in yellow
-//counter
-//if count =1  -> yellow
-// else if  count -> red
-                            if fluid.fire_range%2 == 1{
-                                if fluid.counter_range ==fluid.fire_range/2{
-                                    create_rect(ui, 255-d as u8, 255 - d as u8, 0,windows);
+                            //put the renge to be in red
+                            // the center in yellow
+                            //counter
+                            //if count =1  -> yellow
+                            // else if  count -> red
+                            if fluid.fire_range % 2 == 1 {
+                                if fluid.counter_range == fluid.fire_range / 2 {
+                                    create_rect(ui, 255 - d as u8, 255 - d as u8, 0, windows);
+                                } else {
+                                    create_rect(ui, 255 - d as u8, d as u8, 0, windows);
                                 }
-                                else {
-                                    create_rect(ui, 255-d as u8, d as u8, 0,windows);
-                                }
-                            }
-                            else if fluid.fire_range%2 == 0{
-                                    create_rect(ui, 255-d as u8, d as u8, 0,windows);
+                            } else if fluid.fire_range % 2 == 0 {
+                                create_rect(ui, 255 - d as u8, d as u8, 0, windows);
                                 // else if fluid.counter_range == fluid.fire_range{
 
                                 // }
                             }
-                             
+
                             fluid_flag = true;
                             //see if this stops others from emiting
                             continue;
@@ -230,23 +203,23 @@ fn render_density(
                 if d > 255.0 || d <= 0. {
                     //black for where there is not density or is over
                     d = 0.0;
-                    create_rect(ui, d as u8, 0, 0,windows);
+                    create_rect(ui, d as u8, 0, 0, windows);
                 } else {
                     //colored depending on the intensity of the d
                     // create_rect(ui, (255 - d as u8), d as u8, 0);
-                    
+
                     //works at the end
-                    
-                    let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
-    ui.painter().rect(
-        rect,
-        0.0,
-        // egui::Color32::BLUE,
-        egui::Color32::from_gray(d as u8),
-        egui::Stroke::new(9.0, egui::Color32::from_gray(255- d as u8))//from_rgb(r, g, b)),
-    );
+
+                    let (rect, Response) =
+                        ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                    ui.painter().rect(
+                        rect,
+                        0.0,
+                        // egui::Color32::BLUE,
+                        egui::Color32::from_gray(d as u8),
+                        egui::Stroke::new(9.0, egui::Color32::from_gray(255 - d as u8)), //from_rgb(r, g, b)),
+                    );
                     // create_rect(ui, (255 - d as u8), d as u8, 0);
-                
                 }
             }
         });
@@ -260,9 +233,9 @@ pub fn fluid_sys(
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
     mut ui_state: ResMut<UiState::UiState>,
-    mut windows:  ResMut<Windows::Windows>,
+    mut windows: ResMut<Windows::Windows>,
 ) {
-    let ten_millis = time::Duration::from_millis(1000/24);
+    let ten_millis = time::Duration::from_millis(1000 / 24);
     let now = time::Instant::now();
     let mut frames = 0;
 
@@ -308,7 +281,29 @@ pub fn fluid_sys(
                 &mut windows,
                 // ui_state,
             );
+
+            // if windows.side_panel_modify == true{
+            //     println!("it was here");
+
+            //     egui::Window::new("Window")
+            // .vscroll(true)
+            // .open(&mut ui_state.window_change_materials)
+            // .show(ui.ctx(), |ui| {
+            //     println!("Now is here");
+            //     ui.label("Windows can be moved by dragging them.");
+            //     ui.label("They are automatically sized based on contents.");
+            //     ui.label("You can turn on resizing and scrolling if you like.");
+            //     ui.label("You would normally chose either panels OR windows.");
+            // });
+
+            //  }
         });
+
+        // egui::Window::new("Window")
+        // .open(&mut ui_state.window_change_materials)
+        // .show(egui_ctx.ctx_mut(), |ui|{
+
+        // })
     });
 }
 

@@ -27,8 +27,9 @@ pub fn configure_ui_state(mut ui_state: ResMut<UiState::UiState>) {
     ui_state.material_window = false;
     ui_state.fire_window = false;
     ui_state.fluid_window = false;
+    ui_state.window_change_materials = false;
 }
 
-pub fn configure_windows(mut windows: ResMut<Windows::Windows >){
+pub fn configure_windows(mut windows: ResMut<Windows::Windows>) {
     windows.side_panel_modify = false;
 }
