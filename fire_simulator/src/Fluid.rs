@@ -2,7 +2,7 @@
 
 use bevy::prelude::Component;
 
-pub static N: u32 = 25 * 2;
+pub static N: u32 = 25 * 4;
 static iter: u32 = 16;
 
 pub fn IX(mut x: u32, mut y: u32) -> u32 {
@@ -22,7 +22,7 @@ pub fn IX(mut x: u32, mut y: u32) -> u32 {
     x + y * N
 }
 
-#[derive(Default, Component)]
+#[derive(Default, Component, Clone)]
 pub struct FluidMatrix {
     size: u32,
 
@@ -52,6 +52,10 @@ pub struct FluidMatrix {
     pub amount_y: f32,
 
     pub frames: u32,
+
+    pub fire_range: u32,
+
+    pub counter_range: u32,
 }
 
 impl FluidMatrix {
@@ -80,6 +84,9 @@ impl FluidMatrix {
             amount_x: 15.0,
             amount_y: 15.0,
             frames: 20,
+            fire_range: 2,
+
+            counter_range: 0,
         }
     }
 
@@ -128,7 +135,7 @@ impl FluidMatrix {
 fn diffuse(b: u32, mut x: &mut Vec<f32>, mut x0: &mut Vec<f32>, diff: f32, dt: f32) {
     //see what does a
     let a: f32 = dt * diff * ((N - 2) * (N - 2)) as f32;
-    println!("diffuse; a = {}, b = {}", a, b);
+    // println!("diffuse; a = {}, b = {}", a, b);
     //see why it is 1 and 6 -> maybe the saids that are around it
     // so it should be 4
 
@@ -199,7 +206,6 @@ fn advect(b: u32, d: &mut Vec<f32>, d0: &Vec<f32>, velocX: &Vec<f32>, velocY: &V
 
     let [mut s0, mut s1, mut t0, mut t1] = [0.; 4];
     let [mut tmp1, mut tmp2, mut x, mut y] = [0.; 4];
-    
 
     let N_float: f32 = N as f32;
     //see this for the range of density
@@ -279,6 +285,7 @@ fn set_bnd(b: u32, mut x: &mut Vec<f32>) {
             x[IX(N - 2, j) as usize]
         };
     }
+    //why is 0.5 and not 0.33 -> because there are two dimensions
 
     x[IX(0, 0) as usize] = 0.5 * (x[IX(1, 0) as usize] + x[IX(0, 1) as usize]);
 
