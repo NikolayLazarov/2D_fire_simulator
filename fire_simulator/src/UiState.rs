@@ -99,12 +99,13 @@ pub fn ui_state(
 
                     if change_material_button == true {
                         commands.spawn(windows.material_for_change.clone());
+                        close_window = true;
+                        windows.material_change_flag = false;
                     }
 
                     ////
                 }
                 if windows.fire_change_flag {
-                    let fire = &windows.fluid_for_change;
                     ui.label("Change fluid");
 
                     ui.separator();
@@ -165,8 +166,23 @@ pub fn ui_state(
                     if ui.button("Increment").clicked() {
                         windows.fluid_for_change.frames += 1;
                     }
+
+                    ui.horizontal(|ui| {
+                        ui.label("Add density");
+                        let mut change_fire = ui.button("Add Density").clicked();
+
+                        if change_fire == true {
+                            commands.spawn(windows.fluid_for_change.clone());
+                            close_window = true;
+                            windows.fire_change_flag = false;
+                        }
+
+                        //    ui_state.start_simulation = true;
+                        //  ui_state.new_fluid = true;
+                        //update_fluid_density = false;
+                    });
                 }
-                close_window = ui.button("Change").clicked();
+                // close_window = ui.button("Change").clicked();
 
                 ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                     ui.allocate_space(ui.available_size());
@@ -174,8 +190,8 @@ pub fn ui_state(
             });
         if close_window {
             windows.side_panel_modify = false;
-            windows.fire_change_flag = false;
-            windows.material_change_flag = false;
+            // windows.fire_change_flag = false;
+            // windows.material_change_flag = false;
         }
     }
 
