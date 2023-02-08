@@ -41,10 +41,16 @@ pub fn ui_state(
             .default_width(200.0)
             .resizable(true)
             .show(egui_ctx.ctx_mut(), |ui| {
+                ui.label("here is a material");
+                close_window = ui.button("Change").clicked();
+
                 ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                     ui.allocate_space(ui.available_size());
                 });
             });
+        if close_window {
+            windows.side_panel_modify = false;
+        }
     }
 
     egui::SidePanel::right("side_panel")
