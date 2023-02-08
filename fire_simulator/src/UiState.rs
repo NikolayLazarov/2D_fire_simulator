@@ -4,6 +4,7 @@ use crate::Fluid::N;
 use crate::Materials;
 use crate::Windows;
 use bevy::prelude::*;
+use bevy_egui::egui::Ui;
 use bevy_egui::{
     egui::{self, pos2},
     EguiContext, EguiPlugin,
@@ -41,7 +42,130 @@ pub fn ui_state(
             .default_width(200.0)
             .resizable(true)
             .show(egui_ctx.ctx_mut(), |ui| {
-                ui.label("here is a material");
+                if windows.material_change_flag {
+                    // let material = & windows.material_for_change;
+                    // ui.label(format!("Material =  {}",  material.name_type));
+                    // ui.label(format!("Material x =  {}",  material.position_x));
+                    // ui.label(format!("Material y =  {}",  material.position_y));
+                    // ui.label(format!("Material flamability =  {}",  material.flamability));
+
+                    ////
+                    let mut change_material_button = false;
+                    ui.heading("Material");
+
+                    ui.horizontal(|ui| {
+                        ui.label("Your material: ");
+                        ui.text_edit_singleline(&mut windows.material_for_change.name_type);
+                    });
+
+                    ui.add(
+                        egui::Slider::new(&mut windows.material_for_change.width, 0.0..=30.0)
+                            .text("Width"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        windows.material_for_change.width += 1.0;
+                    }
+
+                    ui.add(
+                        egui::Slider::new(&mut windows.material_for_change.height, 0.0..=30.0)
+                            .text("Height"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        windows.material_for_change.height += 1.0;
+                    }
+                    //do not why x and y are swapped so I Swapp them
+                    ui.add(
+                        egui::Slider::new(&mut windows.material_for_change.position_y, 0..=N - 1)
+                            .text("X axys"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        windows.material_for_change.position_y += 1;
+                    }
+
+                    ui.add(
+                        egui::Slider::new(&mut windows.material_for_change.position_x, 0..=N - 1)
+                            .text("Y axys"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        windows.material_for_change.position_x += 1;
+                    }
+
+                    ui.separator();
+
+                    ui.horizontal(|ui| {
+                        ui.label("addDensity");
+                        change_material_button = ui.button("Change").clicked();
+                    });
+
+                    if change_material_button == true {
+                        commands.spawn(windows.material_for_change.clone());
+                    }
+
+                    ////
+                }
+                if windows.fire_change_flag {
+                    let fire = &windows.fluid_for_change;
+                    ui.label("Change fluid");
+
+                    ui.separator();
+
+                    ui.add(
+                        egui::Slider::new(&mut windows.fluid_for_change.fluid_x, 0..=N - 2)
+                            .text("Fluid X"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        windows.fluid_for_change.fluid_x += 1;
+                    }
+                    ui.add(
+                        egui::Slider::new(&mut windows.fluid_for_change.fluid_y, 0..=N - 2)
+                            .text("Fluid Y"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        windows.fluid_for_change.fluid_y += 1;
+                    }
+                    ui.add(
+                        egui::Slider::new(&mut windows.fluid_for_change.amount, 0.0..=200.0)
+                            .text("Power"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        windows.fluid_for_change.amount += 1.0;
+                    }
+
+                    ui.add(
+                        egui::Slider::new(&mut windows.fluid_for_change.fire_range, 0..=10)
+                            .text("Range"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        windows.fluid_for_change.fire_range += 1;
+                        windows.fluid_for_change.counter_range +=
+                            windows.fluid_for_change.fire_range
+                                * windows.fluid_for_change.fire_range;
+                    }
+
+                    ui.add(
+                        egui::Slider::new(&mut windows.fluid_for_change.amount_x, 0.0..=200.0)
+                            .text("Velocity X"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        windows.fluid_for_change.amount_x += 1.0;
+                    }
+
+                    ui.add(
+                        egui::Slider::new(&mut windows.fluid_for_change.amount_y, 0.0..=200.0)
+                            .text("Velocity Y"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        windows.fluid_for_change.amount_y += 1.0;
+                    }
+
+                    ui.add(
+                        egui::Slider::new(&mut windows.fluid_for_change.frames, 0..=100)
+                            .text("Frames"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        windows.fluid_for_change.frames += 1;
+                    }
+                }
                 close_window = ui.button("Change").clicked();
 
                 ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
@@ -50,6 +174,8 @@ pub fn ui_state(
             });
         if close_window {
             windows.side_panel_modify = false;
+            windows.fire_change_flag = false;
+            windows.material_change_flag = false;
         }
     }
 

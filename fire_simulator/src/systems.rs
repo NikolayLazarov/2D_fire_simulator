@@ -32,7 +32,14 @@ use crate::Windows;
 // }
 // }
 
-fn create_rect(ui: &mut Ui, r: u8, g: u8, b: u8, windows: &mut ResMut<Windows::Windows>,object_flag:bool) {
+fn create_rect(
+    ui: &mut Ui,
+    r: u8,
+    g: u8,
+    b: u8,
+    windows: &mut ResMut<Windows::Windows>,
+    object_flag: bool,
+) -> bool {
     let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::click());
     ui.painter().rect(
         rect,
@@ -42,8 +49,11 @@ fn create_rect(ui: &mut Ui, r: u8, g: u8, b: u8, windows: &mut ResMut<Windows::W
         egui::Stroke::new(9.0, egui::Color32::from_rgb(r, g, b)),
     );
     // let mut clicked_rect = false;
-    if Response.clicked() && object_flag{
+    if Response.clicked() && object_flag {
         windows.side_panel_modify = true;
+        true
+    } else {
+        false
     }
 
     // if clicked_rect {
@@ -118,7 +128,7 @@ fn render_density(
                         material.fuel -= d;
                         if material.fuel <= 0. {
                             //false because it changes during the simulation
-                            create_rect(ui, (255 - d as u8), 0, 0, windows,false);
+                            create_rect(ui, (255 - d as u8), 0, 0, windows, false);
                         } else {
                             // let mut fluid_x: u32 = ui_state.fluid.fluid_x;
                             // let mut fluid_y: u32 = ui_state.fluid.fluid_y;
@@ -127,7 +137,11 @@ fn render_density(
                             // let mut amount_y: f32 = ui_state.fluid.amount_y;
                             // ui_state.fluid.add_density(fluid_x, fluid_y, amount);
                             // ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
-                            create_rect(ui, 0, 0, 255, windows,true);
+                            if create_rect(ui, 0, 0, 255, windows, true) {
+                                windows.material_for_change = material.clone();
+                                windows.material_change_flag = true;
+                                // commands.entity(&material).despawn();
+                            }
                         }
                         material_flag = true;
                     }
@@ -179,12 +193,28 @@ fn render_density(
                             // else if  count -> red
                             if fluid.fire_range % 2 == 1 {
                                 if fluid.counter_range == fluid.fire_range / 2 {
-                                    create_rect(ui, 255 - d as u8, 255 - d as u8, 0, windows, true);
+                                    if create_rect(
+                                        ui,
+                                        255 - d as u8,
+                                        255 - d as u8,
+                                        0,
+                                        windows,
+                                        true,
+                                    ) {
+                                        windows.fluid_for_change = fluid.clone();
+                                        windows.material_change_flag = true;
+                                    }
                                 } else {
-                                    create_rect(ui, 255 - d as u8, d as u8, 0, windows, true);
+                                    if create_rect(ui, 255 - d as u8, d as u8, 0, windows, true) {
+                                        windows.fluid_for_change = fluid.clone();
+                                        windows.fire_change_flag = true;
+                                    }
                                 }
                             } else if fluid.fire_range % 2 == 0 {
-                                create_rect(ui, 255 - d as u8, d as u8, 0, windows, true);
+                                if create_rect(ui, 255 - d as u8, d as u8, 0, windows, true) {
+                                    windows.fluid_for_change = fluid.clone();
+                                    windows.fire_change_flag = true;
+                                }
                                 // else if fluid.counter_range == fluid.fire_range{
 
                                 // }
@@ -204,7 +234,7 @@ fn render_density(
                 if d > 255.0 || d <= 0. {
                     //black for where there is not density or is over
                     d = 0.0;
-                    create_rect(ui, d as u8, 0, 0, windows,false);
+                    create_rect(ui, d as u8, 0, 0, windows, false);
                 } else {
                     //colored depending on the intensity of the d
                     // create_rect(ui, (255 - d as u8), d as u8, 0);

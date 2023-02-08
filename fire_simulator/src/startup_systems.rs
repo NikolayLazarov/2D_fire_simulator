@@ -32,4 +32,6 @@ pub fn configure_ui_state(mut ui_state: ResMut<UiState::UiState>) {
 
 pub fn configure_windows(mut windows: ResMut<Windows::Windows>) {
     windows.side_panel_modify = false;
+    windows.fluid_for_change = Fluid::FluidMatrix::new(1., 0., 0.);
+    windows.material_for_change = Materials::default();
 }
