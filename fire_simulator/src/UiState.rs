@@ -300,16 +300,22 @@ pub fn ui_state(
                             }
                             println!();
                         }
-                        ui_state.start_simulation = true;
                         ui_state.new_fluid = true;
-                        update_fluid_density = false;
+                        // update_fluid_density = false;
                     }
                 });
+            }
+            
+            if ui.button("start simulation").clicked(){
+                ui_state.start_simulation = true;
+
             }
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                 ui.allocate_space(ui.available_size());
             });
+
+            
         });
 
     egui::TopBottomPanel::top("top_panel").show(egui_ctx.ctx_mut(), |ui| {
