@@ -78,11 +78,17 @@ fn render_density(
     ui: &mut Ui,
     density: &Vec<f32>,
     mut query_materials: Query<&mut Materials>,
+    // mut query: Query<Entity, With<&mut Materials> >,
     mut commands: Commands,
     frames: u32,
     mut fluids: Query<&mut FluidMatrix>,
     windows: &mut ResMut<Windows::Windows>, // ui_state: ResMut<UiState::UiState>,
 ) {
+    //remove comments latter
+    // for material in query_materials.iter(){
+    //     println!("material = {:?}", material);
+    //     // commands.entity(material).despawn();
+    // }
     // // ui.add( );
 
     // ui.horizontal(|ui|{
@@ -122,7 +128,7 @@ fn render_density(
 
                 let mut material_flag: bool = false;
                 let mut fluid_flag: bool = false;
-                for mut material in query_materials.iter_mut() {
+                for (id, mut material) in query_materials.iter_mut().enumerate() {
                     if check_if_material_at_position(x, y, material.position_x, material.position_y)
                     {
                         material.fuel -= d;
@@ -259,10 +265,9 @@ pub fn fluid_sys(
     mut ui_state: ResMut<UiState::UiState>,
     mut windows: ResMut<Windows::Windows>,
 ) {
-
     //let ten_millis = time::Duration::from_millis(1000 / 24);
     let ten_millis = time::Duration::from_millis(100);
-    
+
     let now = time::Instant::now();
     let mut frames = 0;
 

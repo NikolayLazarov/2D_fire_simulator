@@ -12,6 +12,8 @@ mod Windows;
 mod startup_systems;
 mod systems;
 
+pub static mut materials_list: Vec<(u32, u32)> = vec![];
+
 use crate::Fluid::N;
 fn main() {
     App::new()
