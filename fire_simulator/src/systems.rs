@@ -130,17 +130,10 @@ fn render_density(
                             //false because it changes during the simulation
                             create_rect(ui, (255 - d as u8), 0, 0, windows, false);
                         } else {
-                            // let mut fluid_x: u32 = ui_state.fluid.fluid_x;
-                            // let mut fluid_y: u32 = ui_state.fluid.fluid_y;
-                            // let mut amount: f32 = ui_state.fluid.amount;
-                            // let mut amount_x: f32 = ui_state.fluid.amount_x;
-                            // let mut amount_y: f32 = ui_state.fluid.amount_y;
-                            // ui_state.fluid.add_density(fluid_x, fluid_y, amount);
-                            // ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
                             if create_rect(ui, 0, 0, 255, windows, true) {
                                 windows.material_for_change = material.clone();
                                 windows.material_change_flag = true;
-                                // commands.entity(&material).despawn();
+                                // commands.entity(material).despawn();
                             }
                         }
                         material_flag = true;
@@ -266,7 +259,10 @@ pub fn fluid_sys(
     mut ui_state: ResMut<UiState::UiState>,
     mut windows: ResMut<Windows::Windows>,
 ) {
-    let ten_millis = time::Duration::from_millis(1000 / 24);
+
+    //let ten_millis = time::Duration::from_millis(1000 / 24);
+    let ten_millis = time::Duration::from_millis(100);
+    
     let now = time::Instant::now();
     let mut frames = 0;
 
