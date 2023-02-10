@@ -171,6 +171,20 @@ fn lin_solve(
     for k in (0..iter) {
         for j in (1..N - 1) {
             for i in (1..N - 1) {
+                let mut material_flag = false;
+
+                for material in materials_cords {
+                    if material.0 == i && material.1 == j {
+                        material_flag = true;
+                        break;
+                    }
+                }
+
+                if material_flag {
+                    // x[IX(i,j)as usize] = - x[IX(i, j)as usize];
+                    x[IX(i, j) as usize] = 0.;
+                    continue;
+                }
                 x[IX(i, j) as usize] = (x0[IX(i, j) as usize]
                     + a * (x[IX(i + 1, j) as usize]
                         + x[IX(i - 1, j) as usize]
@@ -194,12 +208,27 @@ fn project(
     //here is the bound from where it id not possible to have x=0 y =0
     for j in (1..N - 1) {
         for i in (1..N - 1) {
+            let mut material_flag = false;
+            for material in materials_cords {
+                if material.0 == i && material.1 == j {
+                    material_flag = true;
+                    break;
+                }
+            }
+            p[IX(i, j) as usize] = 0.;
+
+            if material_flag {
+                //either div[] = - div[]
+                //or everething becomes with the opposite value
+                div[IX(i, j) as usize] = 0.;
+                continue;
+            }
+
             div[IX(i, j) as usize] = -0.5
                 * (velocX[IX(i + 1, j) as usize] - velocX[IX(i - 1, j) as usize]
                     + velocY[IX(i, j + 1) as usize]
                     - velocY[IX(i, j - 1) as usize]) as f32
                 / N as f32;
-            p[IX(i, j) as usize] = 0.;
         }
     }
 
@@ -210,6 +239,19 @@ fn project(
 
     for j in 1..N - 1 {
         for i in 1..N - 1 {
+            let mut material_flag = false;
+            for material in materials_cords {
+                if material.0 == i && material.1 == j {
+                    material_flag = true;
+                    break;
+                }
+            }
+            if material_flag {
+                velocX[IX(i, j) as usize] = 0.;
+                velocY[IX(i, j) as usize] = 0.;
+                continue;
+            }
+
             velocX[IX(i, j) as usize] -=
                 0.5 * (p[IX(i + 1, j) as usize] - p[IX(i - 1, j) as usize]) as f32 * N as f32;
             velocY[IX(i, j) as usize] -=
@@ -244,6 +286,17 @@ fn advect(
 
     for j in (1..N - 1) {
         for i in (1..N - 1) {
+            let mut material_flag = false;
+            for material in materials_cords {
+                if material.0 == i && material.1 == j {
+                    material_flag = true;
+                    break;
+                }
+            }
+            if material_flag {
+                d[IX(i, j) as usize] = 0.;
+                continue;
+            }
             tmp1 = dtx * velocX[IX(i, j) as usize];
             tmp2 = dty * velocY[IX(i, j) as usize];
             x = ifloat - tmp1;
@@ -280,6 +333,11 @@ fn advect(
                 + (t1 * d0[IX(i0i, j1i) as usize])
                 + s1 * (t0 * d0[IX(i1i, j0i) as usize])
                 + (t1 * d0[IX(i1i, j1i) as usize]);
+
+            if d[IX(i, j) as usize] > 1. {
+                d[IX(i, j) as usize] = 1.;
+                // println!("cords = {},{} value = {}", i,j, d[IX(i,j)as usize]);
+            }
             ifloat += 1.;
         }
         ifloat = 1.;
@@ -318,29 +376,21 @@ fn set_bnd(b: u32, mut x: &mut Vec<f32>, materials_cords: &Vec<(u32, u32)>) {
     }
     //why is 0.5 and not 0.33 -> because there are two dimensions
 
-    for i in 1..N - 1 {
-        for j in 1..N - 1 {
-            for cordinates in materials_cords {
-                // println!("cord1 = {}, cord2 = {}", cordinates.0, cordinates.1)
-                x[IX(i, j) as usize] = if (i == cordinates.0 && j == cordinates.1) {
-                    -x[IX(i, j) as usize]
-                } else {
-                    x[IX(i, j) as usize]
-                }
-                // x[IX(i, 0) as usize] = if b == 2 {
-                //     -x[IX(i, 1) as usize]
-                // } else {
-                //     x[IX(i, 1) as usize]
-                // };
-
-                // x[IX(i, N - 1) as usize] = if b == 2 {
-                //     -x[IX(i, N - 2) as usize]
-                // } else {
-                //     x[IX(i, N - 2) as usize]
-                // };
-            }
-        }
-    }
+    // for i in 1..N - 1 {
+    //     for j in 1..N - 1 {
+    //         for cordinates in materials_cords {
+    //             // println!("cord1 = {}, cord2 = {}", cordinates.0, cordinates.1)
+    //         //    println!("")
+    //             x[IX(i, j) as usize] = if (i == cordinates.0 && j == cordinates.1) {
+    //                 // println!("it has value 1 = {}, value 2 = {}", x[IX(i, j) as usize], - x[IX(i, j) as usize]);
+    //                 -x[IX(i, j) as usize]
+    //             } else {
+    //                 x[IX(i, j) as usize]
+    //             };
+    //             // println!("x [i,j] = {}", x[IX(i, j) as usize]);
+    //         }
+    //     }
+    // }
 
     x[IX(0, 0) as usize] = 0.5 * (x[IX(1, 0) as usize] + x[IX(0, 1) as usize]);
 

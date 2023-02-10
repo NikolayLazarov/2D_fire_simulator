@@ -143,6 +143,7 @@ fn render_density(
                             }
                         }
                         material_flag = true;
+                        // println!("material fuel {} = {}", id, material.fuel);
                     }
                 }
                 if material_flag == true {
