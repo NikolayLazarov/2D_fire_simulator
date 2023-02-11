@@ -56,11 +56,6 @@ fn create_rect(
     } else {
         false
     }
-
-    // if clicked_rect {
-    //     windows.side_panel_modify = true;
-    // }
-    // println!("Responce = {:?}", Response)
 }
 
 fn check_if_material_at_position(
@@ -79,12 +74,10 @@ fn render_density(
     ui: &mut Ui,
     density: &Vec<f32>,
     mut query_materials: Query<&mut Materials>,
-    // mut query: Query<Entity, With<&mut Materials> >,
     mut commands: Commands,
     frames: u32,
     mut fluids: Query<&mut FluidMatrix>,
-    windows: &mut ResMut<Windows::Windows>, // ui_state: ResMut<UiState::UiState>,
-) {
+    windows: &mut ResMut<Windows::Windows>) {
     //remove comments latter
     // for material in query_materials.iter(){
     //     println!("material = {:?}", material);
@@ -114,15 +107,12 @@ fn render_density(
     // });
 
     // });
+    // i -> y Axis
+    // j -> x Axis
 
     for i in 0..N - 1 {
         ui.horizontal_top(|ui| {
             for j in 0..N - 1 {
-                // if frames == 0{
-                //     create_rect(ui, 0 , 0, 0);
-                //     continue;
-                // }
-
                 let x: u32 = i;
                 let y: u32 = j;
                 let mut d = density[Fluid::IX(x, y) as usize];
@@ -247,7 +237,11 @@ fn render_density(
                                     }
                                 }
                             } else if fluid.fire_range % 2 == 0 {
-                                if create_rect(ui, 255 - d as u8, d as u8, 0, windows, true) {
+                                
+                                //let blue = 255 - 50;
+                                 
+                                if create_rect(ui, 255, 255, 0, windows, true) {
+                                // if create_rect(ui, 255 - d as u8, d as u8, 0, windows, true) {
                                     windows.fluid_for_change = fluid.clone();
                                     windows.fire_change_flag = true;
                                 }

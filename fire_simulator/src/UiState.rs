@@ -76,9 +76,11 @@ pub fn ui_state(
                         windows.material_for_change.height += 1.0;
                     }
                     //do not why x and y are swapped so I Swapp them
+                    //found the ptoblem -> fix them properrly 
+                    //if still a problem look at i and j in render density
                     ui.add(
                         egui::Slider::new(&mut windows.material_for_change.position_y, 0..=N - 1)
-                            .text("X axys"),
+                            .text("Y axys"),
                     );
                     if ui.button("Increment").clicked() {
                         windows.material_for_change.position_y += 1;
@@ -86,7 +88,7 @@ pub fn ui_state(
 
                     ui.add(
                         egui::Slider::new(&mut windows.material_for_change.position_x, 0..=N - 1)
-                            .text("Y axys"),
+                            .text("X axys"),
                     );
                     if ui.button("Increment").clicked() {
                         windows.material_for_change.position_x += 1;
@@ -136,7 +138,7 @@ pub fn ui_state(
                         windows.fluid_for_change.fluid_y += 1;
                     }
                     ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.amount, 0.0..=200.0)
+                        egui::Slider::new(&mut windows.fluid_for_change.amount, 0.0..=2.0)
                             .text("Power"),
                     );
                     if ui.button("Increment").clicked() {
@@ -360,5 +362,6 @@ pub fn ui_state(
     }
     if ui_state.new_fluid {
         commands.spawn(ui_state.fluid.clone());
+        ui_state.new_fluid = false;
     }
 }
