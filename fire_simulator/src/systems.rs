@@ -69,7 +69,26 @@ fn check_if_material_at_position(
     }
     return false;
 }
+fn check_if_in_range(   
+     x_cord: i32,
+    y_cord: i32,
+    x_material: i32,
+    y_material: i32,
+    range:i32
+) -> bool{
+        let down_range = -range;
+        let mut flag_x = false;
+        let mut flag_y = false;
 
+        if  x_material - x_cord <= range && x_material - x_cord >= down_range {
+            flag_x = true;
+        }
+        if  y_material - y_cord <= range && y_material - y_cord >= down_range {
+            flag_y = true;
+        }
+        
+        flag_y && flag_x
+}
 fn render_density(
     ui: &mut Ui,
     density: &Vec<f32>,
@@ -180,7 +199,7 @@ fn render_density(
                     continue;
                 }
 
-                for fluid in fluids.iter() {
+                for mut fluid in fluids.iter_mut() {
                     // if fluid.fluid_x == x && fluid.fluid_y == y && fluid_flag == false {
                     //     // println!("fluid loop");
                     //     // create_rect(ui, (255-d as u8), 0,0 );
@@ -209,33 +228,99 @@ fn render_density(
 
                     if fluid_flag == false {
                         if let Some(_) = collision {
-                            if d > 255. {
-                                d = 255.;
-                            }
+                            // if d > 255. {
+                            //     d = 255.;
+                            // }
+
                             //put the renge to be in red
                             // the center in yellow
                             //counter
                             //if count =1  -> yellow
                             // else if  count -> red
                             if fluid.fire_range % 2 == 1 {
-                                if fluid.counter_range == fluid.fire_range / 2 {
+                                if x == fluid.fluid_x && y == fluid.fluid_y{
+                                    //central pixel of the fire
                                     if create_rect(
                                         ui,
-                                        255 - d as u8,
-                                        255 - d as u8,
-                                        0,
+                                        255 as u8,
+                                        255 - (fluid.amount)  as u8,
+                                        fluid.amount as u8,
                                         windows,
                                         true,
                                     ) {
                                         windows.fluid_for_change = fluid.clone();
                                         windows.material_change_flag = true;
+                                        fluid.counter_range = 1;
                                     }
-                                } else {
-                                    if create_rect(ui, 255 - d as u8, d as u8, 0, windows, true) {
-                                        windows.fluid_for_change = fluid.clone();
-                                        windows.fire_change_flag = true;
-                                    }
+                                    // continue;
                                 }
+                                //fix check if in range
+                                else if fluid.fire_range > 1 && check_if_in_range(x as i32, y as i32, fluid.fluid_x as i32, fluid.fluid_y as i32, fluid.counter_range as i32) {
+                                    println!("range 3");    
+                                    if create_rect(
+                                            ui,
+                                            255 as u8,
+                                            fluid.amount  as u8,
+                                            0,
+                                            windows,
+                                            true,
+                                        ) {
+                                            windows.fluid_for_change = fluid.clone();
+                                            windows.material_change_flag = true;
+                                        // fluid.counter_range = 2;
+
+                                        }
+                                    
+                                }
+                                //fix it 
+                                // else if fluid.fire_range == 5 && !check_if_in_range(x as i32, y as i32, fluid.fluid_x as i32, fluid.fluid_y as i32, fluid.counter_range as i32){
+                                //     println!("range 5");
+                                //     if create_rect(
+                                //         ui,
+                                //         0 ,
+                                //        //maybe here use only the amount -> see how much green makes orange or yellow
+                                //         0,
+                                //         255,
+                                //         windows,
+                                //         true,
+                                //     ) {
+                                //         windows.fluid_for_change = fluid.clone();
+                                //         windows.material_change_flag = true;
+                                //     }
+                                // }
+                                else{
+                                        if create_rect(
+                                            ui,
+                                            0 ,
+                                           //maybe here use only the amount -> see how much green makes orange or yellow
+                                            0,
+                                            255,
+                                            windows,
+                                            true,
+                                        ) {
+                                            windows.fluid_for_change = fluid.clone();
+                                            windows.material_change_flag = true;
+                                        }
+                                    }
+                                
+                                // if fluid.counter_range == fluid.fire_range / 2 {
+                                //     if create_rect(
+                                //         ui,
+                                //         255 - d as u8,
+                                //         255 - d as u8,
+                                //         0,
+                                //         windows,
+                                //         true,
+                                //     ) {
+                                //         windows.fluid_for_change = fluid.clone();
+                                //         windows.material_change_flag = true;
+                                //     }
+                                // } else {
+                                //     if create_rect(ui, 255 - d as u8, d as u8, 0, windows, true) {
+                                //         windows.fluid_for_change = fluid.clone();
+                                //         windows.fire_change_flag = true;
+                                //     }
+                                // }
                             } else if fluid.fire_range % 2 == 0 {
                                 
                                 //let blue = 255 - 50;
