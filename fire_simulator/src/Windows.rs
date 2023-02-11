@@ -14,4 +14,5 @@ pub struct Windows {
     pub fluid_for_change: Fluid::FluidMatrix,
     pub material_change_flag: bool,
     pub fire_change_flag: bool,
+    pub materials_entities_id: Vec<Entity>,
 }

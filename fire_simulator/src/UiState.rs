@@ -10,6 +10,8 @@ use bevy_egui::{
     EguiContext, EguiPlugin,
 };
 
+use crate::materials_list;
+
 #[derive(Default, Resource)]
 pub struct UiState {
     pub is_window_open: bool,
@@ -98,7 +100,16 @@ pub fn ui_state(
                     });
 
                     if change_material_button == true {
-                        commands.spawn(windows.material_for_change.clone());
+                        let mut vector = (
+                            windows.material_for_change.position_x.clone(),
+                            windows.material_for_change.position_y.clone(),
+                        );
+                        // materials_list.push(vector);
+                        let entity = commands.spawn(windows.material_for_change.clone()).id();
+                        // windows.materials_entities.push(entity);
+                        ui_state.fluid.materials_entities_id.push(entity);
+                        println!("Entity = {:?}", ui_state.fluid.materials_entities_id);
+
                         close_window = true;
                         windows.material_change_flag = false;
                     }
@@ -172,7 +183,7 @@ pub fn ui_state(
                         let mut change_fire = ui.button("Add Density").clicked();
 
                         if change_fire == true {
-                            commands.spawn(windows.fluid_for_change.clone());
+                            let entity = commands.spawn(windows.fluid_for_change.clone()).id();
                             close_window = true;
                             windows.fire_change_flag = false;
                         }
@@ -300,11 +311,14 @@ pub fn ui_state(
                             }
                             println!();
                         }
-                        ui_state.start_simulation = true;
                         ui_state.new_fluid = true;
-                        update_fluid_density = false;
+                        // update_fluid_density = false;
                     }
                 });
+            }
+
+            if ui.button("start simulation").clicked() {
+                ui_state.start_simulation = true;
             }
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
@@ -336,7 +350,12 @@ pub fn ui_state(
     }
 
     if ui_state.new_material {
-        commands.spawn(ui_state.material.clone());
+        let entity = commands.spawn(ui_state.material.clone()).id();
+        ui_state.fluid.materials_entities_id.push(entity);
+        let x = ui_state.material.position_x;
+        let y = ui_state.material.position_y;
+        ui_state.fluid.materials_cords.push((x, y));
+        // println!("Entitiryes = {:?}", ui_state.fluid.materials_entities);
         ui_state.new_material = false;
     }
     if ui_state.new_fluid {

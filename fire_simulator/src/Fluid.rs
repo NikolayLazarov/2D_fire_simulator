@@ -1,6 +1,8 @@
 // use crate::{iter, N};
 
+use bevy::ecs::system::EntityCommands;
 use bevy::prelude::Component;
+use bevy::prelude::*;
 
 pub static N: u32 = 25 * 4;
 static iter: u32 = 16;
@@ -56,6 +58,9 @@ pub struct FluidMatrix {
     pub fire_range: u32,
 
     pub counter_range: u32,
+
+    pub materials_entities_id: Vec<Entity>,
+    pub materials_cords: Vec<(u32, u32)>,
 }
 
 impl FluidMatrix {
@@ -87,6 +92,9 @@ impl FluidMatrix {
             fire_range: 2,
 
             counter_range: 0,
+            //new
+            materials_entities_id: vec![],
+            materials_cords: vec![],
         }
     }
 
@@ -101,18 +109,18 @@ impl FluidMatrix {
         let s: &mut Vec<f32> = &mut self.s;
         let density: &mut Vec<f32> = &mut self.density;
 
-        diffuse(1, Vx0, Vx, visc, dt);
-        diffuse(2, Vy0, Vy, visc, dt);
+        diffuse(1, Vx0, Vx, visc, dt, &self.materials_cords);
+        diffuse(2, Vy0, Vy, visc, dt, &self.materials_cords);
 
-        project(Vx0, Vy0, Vx, Vy);
+        project(Vx0, Vy0, Vx, Vy, &self.materials_cords);
 
-        advect(1, Vx, Vx0, Vx0, Vy0, dt);
-        advect(2, Vy, Vy0, Vx0, Vy0, dt);
+        advect(1, Vx, Vx0, Vx0, Vy0, dt, &self.materials_cords);
+        advect(2, Vy, Vy0, Vx0, Vy0, dt, &self.materials_cords);
 
-        project(Vx, Vy, Vx0, Vy0);
+        project(Vx, Vy, Vx0, Vy0, &self.materials_cords);
 
-        diffuse(0, s, density, diff, dt);
-        advect(0, density, s, Vx, Vy, dt);
+        diffuse(0, s, density, diff, dt, &self.materials_cords);
+        advect(0, density, s, Vx, Vy, dt, &self.materials_cords);
     }
 
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {
@@ -132,23 +140,51 @@ impl FluidMatrix {
     }
 }
 
-fn diffuse(b: u32, mut x: &mut Vec<f32>, mut x0: &mut Vec<f32>, diff: f32, dt: f32) {
+fn diffuse(
+    b: u32,
+    mut x: &mut Vec<f32>,
+    mut x0: &mut Vec<f32>,
+    diff: f32,
+    dt: f32,
+    materials_cords: &Vec<(u32, u32)>,
+) {
     //see what does a
     let a: f32 = dt * diff * ((N - 2) * (N - 2)) as f32;
     // println!("diffuse; a = {}, b = {}", a, b);
     //see why it is 1 and 6 -> maybe the saids that are around it
     // so it should be 4
 
-    lin_solve(b, x, x0, a, (1 as f32) + (4 as f32) * a);
+    lin_solve(b, x, x0, a, (1 as f32) + (4 as f32) * a, materials_cords);
 }
 
-fn lin_solve(b: u32, mut x: &mut Vec<f32>, mut x0: &mut Vec<f32>, a: f32, c: f32) {
+fn lin_solve(
+    b: u32,
+    mut x: &mut Vec<f32>,
+    mut x0: &mut Vec<f32>,
+    a: f32,
+    c: f32,
+    materials_cords: &Vec<(u32, u32)>,
+) {
     //See what is cRecip
     let cRecip: f32 = 1.0 / c;
     //C IS THE COEFICIENT FROM amount
     for k in (0..iter) {
         for j in (1..N - 1) {
             for i in (1..N - 1) {
+                let mut material_flag = false;
+
+                for material in materials_cords {
+                    if material.0 == i && material.1 == j {
+                        material_flag = true;
+                        break;
+                    }
+                }
+
+                if material_flag {
+                    // x[IX(i,j)as usize] = - x[IX(i, j)as usize];
+                    x[IX(i, j) as usize] = 0.;
+                    continue;
+                }
                 x[IX(i, j) as usize] = (x0[IX(i, j) as usize]
                     + a * (x[IX(i + 1, j) as usize]
                         + x[IX(i - 1, j) as usize]
@@ -159,7 +195,7 @@ fn lin_solve(b: u32, mut x: &mut Vec<f32>, mut x0: &mut Vec<f32>, a: f32, c: f32
         }
     }
 
-    set_bnd(b, x);
+    set_bnd(b, x, materials_cords);
 }
 
 fn project(
@@ -167,26 +203,55 @@ fn project(
     mut velocY: &mut Vec<f32>,
     mut p: &mut Vec<f32>,
     mut div: &mut Vec<f32>,
+    materials_cords: &Vec<(u32, u32)>,
 ) {
     //here is the bound from where it id not possible to have x=0 y =0
     for j in (1..N - 1) {
         for i in (1..N - 1) {
+            let mut material_flag = false;
+            for material in materials_cords {
+                if material.0 == i && material.1 == j {
+                    material_flag = true;
+                    break;
+                }
+            }
+            p[IX(i, j) as usize] = 0.;
+
+            if material_flag {
+                //either div[] = - div[]
+                //or everething becomes with the opposite value
+                div[IX(i, j) as usize] = 0.;
+                continue;
+            }
+
             div[IX(i, j) as usize] = -0.5
                 * (velocX[IX(i + 1, j) as usize] - velocX[IX(i - 1, j) as usize]
                     + velocY[IX(i, j + 1) as usize]
                     - velocY[IX(i, j - 1) as usize]) as f32
                 / N as f32;
-            p[IX(i, j) as usize] = 0.;
         }
     }
 
-    set_bnd(0, div);
-    set_bnd(0, p);
+    set_bnd(0, div, materials_cords);
+    set_bnd(0, p, materials_cords);
     //changed c from 6.0 to 4.0
-    lin_solve(0, p, div, 1.0, 4.0);
+    lin_solve(0, p, div, 1.0, 4.0, materials_cords);
 
     for j in 1..N - 1 {
         for i in 1..N - 1 {
+            let mut material_flag = false;
+            for material in materials_cords {
+                if material.0 == i && material.1 == j {
+                    material_flag = true;
+                    break;
+                }
+            }
+            if material_flag {
+                velocX[IX(i, j) as usize] = 0.;
+                velocY[IX(i, j) as usize] = 0.;
+                continue;
+            }
+
             velocX[IX(i, j) as usize] -=
                 0.5 * (p[IX(i + 1, j) as usize] - p[IX(i - 1, j) as usize]) as f32 * N as f32;
             velocY[IX(i, j) as usize] -=
@@ -194,11 +259,19 @@ fn project(
         }
     }
 
-    set_bnd(1, velocX);
-    set_bnd(2, velocY);
+    set_bnd(1, velocX, materials_cords);
+    set_bnd(2, velocY, materials_cords);
 }
 
-fn advect(b: u32, d: &mut Vec<f32>, d0: &Vec<f32>, velocX: &Vec<f32>, velocY: &Vec<f32>, dt: f32) {
+fn advect(
+    b: u32,
+    d: &mut Vec<f32>,
+    d0: &Vec<f32>,
+    velocX: &Vec<f32>,
+    velocY: &Vec<f32>,
+    dt: f32,
+    materials_cords: &Vec<(u32, u32)>,
+) {
     let [mut i0, mut i1, mut j0, mut j1] = [0.; 4];
 
     let dtx: f32 = dt * (N - 2) as f32;
@@ -213,6 +286,17 @@ fn advect(b: u32, d: &mut Vec<f32>, d0: &Vec<f32>, velocX: &Vec<f32>, velocY: &V
 
     for j in (1..N - 1) {
         for i in (1..N - 1) {
+            let mut material_flag = false;
+            for material in materials_cords {
+                if material.0 == i && material.1 == j {
+                    material_flag = true;
+                    break;
+                }
+            }
+            if material_flag {
+                d[IX(i, j) as usize] = 0.;
+                continue;
+            }
             tmp1 = dtx * velocX[IX(i, j) as usize];
             tmp2 = dty * velocY[IX(i, j) as usize];
             x = ifloat - tmp1;
@@ -249,16 +333,21 @@ fn advect(b: u32, d: &mut Vec<f32>, d0: &Vec<f32>, velocX: &Vec<f32>, velocY: &V
                 + (t1 * d0[IX(i0i, j1i) as usize])
                 + s1 * (t0 * d0[IX(i1i, j0i) as usize])
                 + (t1 * d0[IX(i1i, j1i) as usize]);
+
+            if d[IX(i, j) as usize] > 1. {
+                d[IX(i, j) as usize] = 1.;
+                // println!("cords = {},{} value = {}", i,j, d[IX(i,j)as usize]);
+            }
             ifloat += 1.;
         }
         ifloat = 1.;
         jfloat += 1.;
     }
 
-    set_bnd(b, d);
+    set_bnd(b, d, materials_cords);
 }
 //keeps the sumilation from overflowing
-fn set_bnd(b: u32, mut x: &mut Vec<f32>) {
+fn set_bnd(b: u32, mut x: &mut Vec<f32>, materials_cords: &Vec<(u32, u32)>) {
     for i in 1..N - 1 {
         x[IX(i, 0) as usize] = if b == 2 {
             -x[IX(i, 1) as usize]
@@ -286,6 +375,22 @@ fn set_bnd(b: u32, mut x: &mut Vec<f32>) {
         };
     }
     //why is 0.5 and not 0.33 -> because there are two dimensions
+
+    // for i in 1..N - 1 {
+    //     for j in 1..N - 1 {
+    //         for cordinates in materials_cords {
+    //             // println!("cord1 = {}, cord2 = {}", cordinates.0, cordinates.1)
+    //         //    println!("")
+    //             x[IX(i, j) as usize] = if (i == cordinates.0 && j == cordinates.1) {
+    //                 // println!("it has value 1 = {}, value 2 = {}", x[IX(i, j) as usize], - x[IX(i, j) as usize]);
+    //                 -x[IX(i, j) as usize]
+    //             } else {
+    //                 x[IX(i, j) as usize]
+    //             };
+    //             // println!("x [i,j] = {}", x[IX(i, j) as usize]);
+    //         }
+    //     }
+    // }
 
     x[IX(0, 0) as usize] = 0.5 * (x[IX(1, 0) as usize] + x[IX(0, 1) as usize]);
 
