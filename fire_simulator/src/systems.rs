@@ -138,10 +138,19 @@ fn render_density(
                         //      |i,j+1|
 
                         if material.fuel > 0. && frames > 0 {
-                            let up = density[Fluid::IX(i, j - 1) as usize];
-                            let down = density[Fluid::IX(i, j + 1) as usize];
-                            let left = density[Fluid::IX(i - 1, j) as usize];
-                            let right = density[Fluid::IX(i + 1, j) as usize];
+                            let [mut up, mut down, mut left, mut right] = [0.; 4];
+                            if y != 0 {
+                                up = density[Fluid::IX(i, j - 1) as usize];
+                            }
+                            if x != 0 {
+                                left = density[Fluid::IX(i - 1, j) as usize];
+                            }
+                            if x != N - 1 {
+                                right = density[Fluid::IX(i + 1, j) as usize];
+                            }
+                            if j != N - 1 {
+                                down = density[Fluid::IX(i, j + 1) as usize];
+                            }
                             material.fuel -= up + down + left + right;
                         }
 
@@ -182,8 +191,6 @@ fn render_density(
                 }
 
                 for fluid in fluids.iter() {
-                    // println!("count =  {}",count);
-                    // // println!("loop");
                     // if fluid.fluid_x == x && fluid.fluid_y == y && fluid_flag == false {
                     //     // println!("fluid loop");
                     //     // create_rect(ui, (255-d as u8), 0,0 );
@@ -215,8 +222,6 @@ fn render_density(
                             if d > 255. {
                                 d = 255.;
                             }
-                            // println!("{} ", d);
-                            // fluid_false == false
                             //put the renge to be in red
                             // the center in yellow
                             //counter
@@ -281,7 +286,8 @@ fn render_density(
                         egui::Color32::from_gray(d as u8),
                         egui::Stroke::new(
                             9.0,
-                            egui::Color32::from_gray((d * (frames as f32)) as u8),
+                            // egui::Color32::from_gray((d * (frames as f32)) as u8),
+                            egui::Color32::from_gray(255 - (d * (frames as f32)) as u8),
                         ), //from_rgb(r, g, b)),
                     );
                     // create_rect(ui, (255 - d as u8), d as u8, 0);
@@ -348,49 +354,6 @@ pub fn fluid_sys(
                 &mut windows,
                 // ui_state,
             );
-
-            // if windows.side_panel_modify == true{
-            //     println!("it was here");
-
-            //     egui::Window::new("Window")
-            // .vscroll(true)
-            // .open(&mut ui_state.window_change_materials)
-            // .show(ui.ctx(), |ui| {
-            //     println!("Now is here");
-            //     ui.label("Windows can be moved by dragging them.");
-            //     ui.label("They are automatically sized based on contents.");
-            //     ui.label("You can turn on resizing and scrolling if you like.");
-            //     ui.label("You would normally chose either panels OR windows.");
-            // });
-
-            //  }
-        });
-
-        // egui::Window::new("Window")
-        // .open(&mut ui_state.window_change_materials)
-        // .show(egui_ctx.ctx_mut(), |ui|{
-
-        // })
-    });
-}
-
-pub fn material_fetch_system(
-    mut query: Query<&Materials>,
-    mut egui_ctx: ResMut<EguiContext>,
-    mut commands: Commands,
-) {
-    egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
-        ui.label("Scene");
-
-        egui::Area::new("Central Area").show(ui.ctx(), |ui| {
-            for mut material in &mut query {
-                let mut button = false;
-                ui.label(format!(
-                    "Material = {}, width = {}, height = {} ",
-                    material.name_type, material.width, material.height
-                ));
-                button = ui.button(material.name_type.to_string()).clicked();
-            }
         });
     });
 }

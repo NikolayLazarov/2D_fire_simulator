@@ -54,7 +54,7 @@ impl Default for Materials {
             position_x: 5,
             position_y: 5,
             clicked: false,
-            fuel: 600.0,
+            fuel: 300.0,
             // entity_id: Entity::index(Entity),
         }
     }
