@@ -34,5 +34,5 @@ pub fn configure_windows(mut windows: ResMut<Windows::Windows>) {
     windows.side_panel_modify = false;
     windows.fluid_for_change = Fluid::FluidMatrix::new(1., 0., 0.);
     windows.material_for_change = Materials::default();
-    windows.materials_entities = vec![];
+    windows.materials_entities_id = vec![];
 }

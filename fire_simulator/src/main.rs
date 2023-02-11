@@ -40,6 +40,7 @@ pub struct Materials {
     position_y: u32,
     clicked: bool,
     fuel: f32,
+    // entity_id: Entity,
 }
 
 impl Default for Materials {
@@ -53,7 +54,8 @@ impl Default for Materials {
             position_x: 5,
             position_y: 5,
             clicked: false,
-            fuel: 1000.0,
+            fuel: 600.0,
+            // entity_id: Entity::index(Entity),
         }
     }
 }

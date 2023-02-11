@@ -107,8 +107,8 @@ pub fn ui_state(
                         // materials_list.push(vector);
                         let entity = commands.spawn(windows.material_for_change.clone()).id();
                         // windows.materials_entities.push(entity);
-                        ui_state.fluid.materials_entities.push(entity);
-                        println!("Entity = {:?}", ui_state.fluid.materials_entities);
+                        ui_state.fluid.materials_entities_id.push(entity);
+                        println!("Entity = {:?}", ui_state.fluid.materials_entities_id);
 
                         close_window = true;
                         windows.material_change_flag = false;
@@ -351,11 +351,11 @@ pub fn ui_state(
 
     if ui_state.new_material {
         let entity = commands.spawn(ui_state.material.clone()).id();
-        ui_state.fluid.materials_entities.push(entity);
+        ui_state.fluid.materials_entities_id.push(entity);
         let x = ui_state.material.position_x;
         let y = ui_state.material.position_y;
         ui_state.fluid.materials_cords.push((x, y));
-        println!("Entitiryes = {:?}", ui_state.fluid.materials_entities);
+        // println!("Entitiryes = {:?}", ui_state.fluid.materials_entities);
         ui_state.new_material = false;
     }
     if ui_state.new_fluid {

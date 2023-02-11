@@ -59,7 +59,7 @@ pub struct FluidMatrix {
 
     pub counter_range: u32,
 
-    pub materials_entities: Vec<Entity>,
+    pub materials_entities_id: Vec<Entity>,
     pub materials_cords: Vec<(u32, u32)>,
 }
 
@@ -93,7 +93,7 @@ impl FluidMatrix {
 
             counter_range: 0,
             //new
-            materials_entities: vec![],
+            materials_entities_id: vec![],
             materials_cords: vec![],
         }
     }
