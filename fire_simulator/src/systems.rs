@@ -138,32 +138,55 @@ fn render_density(
 
                 let mut material_flag: bool = false;
                 let mut fluid_flag: bool = false;
+
                 for mut material in query_materials.iter_mut() {
                     if check_if_material_at_position(x, y, material.position_x, material.position_y)
                     {
-                        // println!("collides");
-                        //      |i,j-1|
-                        // i-1,j| i,j |i+1,j
-                        //      |i,j+1|
 
-                        if material.fuel > 0. && frames > 0 {
-                            let [mut up, mut down, mut left, mut right] = [0.; 4];
-                            if y != 0 {
-                                up = density[Fluid::IX(i, j - 1) as usize];
+                        if material.fuel > 0. && frames >0{
+                            for fluid in fluids.iter(){
+                                let material_in_fire_range = collide(
+                                    Vec3 {
+                                        x: fluid.fluid_x as f32,
+                                        y: fluid.fluid_y as f32,
+                                        z: 0.,
+                                    },
+                                    Vec2 {
+                                        x: fluid.fire_range as f32,
+                                        y: fluid.fire_range as f32,
+                                    },
+                                    Vec3 {
+                                        x: material.position_x as f32,
+                                        y: material.position_y as f32,
+                                        z: 0.,
+                                    },
+                                    //put the sizes parameters when you implement them
+                                    Vec2 { x: 1., y: 1. },
+                                );
+                                if let Some(_) = material_in_fire_range{
+                                    material.fuel -= fluid.amount;
+                                }
                             }
-                            if x != 0 {
-                                left = density[Fluid::IX(i - 1, j) as usize];
-                            }
-                            if x != N - 1 {
-                                right = density[Fluid::IX(i + 1, j) as usize];
-                            }
-                            if j != N - 1 {
-                                down = density[Fluid::IX(i, j + 1) as usize];
-                            }
-                            material.fuel -= up + down + left + right;
+                            
                         }
+                        // if material.fuel > 0. && frames > 0 {
+                        //     let [mut up, mut down, mut left, mut right] = [0.; 4];
+                        //     if y != 0 {
+                        //         up = density[Fluid::IX(i, j - 1) as usize];
+                        //     }
+                        //     if x != 0 {
+                        //         left = density[Fluid::IX(i - 1, j) as usize];
+                        //     }
+                        //     if x != N - 1 {
+                        //         right = density[Fluid::IX(i + 1, j) as usize];
+                        //     }
+                        //     if j != N - 1 {
+                        //         down = density[Fluid::IX(i, j + 1) as usize];
+                        //     }
+                        //     material.fuel -= up + down + left + right;
+                        // }
 
-                        // println!("material fuel {} = {}", id, material.fuel);
+                        println!("material fuel = {} ", material.fuel);
                         if material.fuel <= 0. {
                             // let mut entity_ids =
                             let mut cords_flag = false;
@@ -228,15 +251,6 @@ fn render_density(
 
                     if fluid_flag == false {
                         if let Some(_) = collision {
-                            // if d > 255. {
-                            //     d = 255.;
-                            // }
-
-                            //put the renge to be in red
-                            // the center in yellow
-                            //counter
-                            //if count =1  -> yellow
-                            // else if  count -> red
                             if fluid.fire_range % 2 == 1 {
                                 if x == fluid.fluid_x && y == fluid.fluid_y{
                                     //central pixel of the fire
@@ -303,24 +317,6 @@ fn render_density(
                                         }
                                     }
                                 
-                                // if fluid.counter_range == fluid.fire_range / 2 {
-                                //     if create_rect(
-                                //         ui,
-                                //         255 - d as u8,
-                                //         255 - d as u8,
-                                //         0,
-                                //         windows,
-                                //         true,
-                                //     ) {
-                                //         windows.fluid_for_change = fluid.clone();
-                                //         windows.material_change_flag = true;
-                                //     }
-                                // } else {
-                                //     if create_rect(ui, 255 - d as u8, d as u8, 0, windows, true) {
-                                //         windows.fluid_for_change = fluid.clone();
-                                //         windows.fire_change_flag = true;
-                                //     }
-                                // }
                             } else if fluid.fire_range % 2 == 0 {
                                 
                                 //let blue = 255 - 50;
@@ -413,7 +409,6 @@ pub fn fluid_sys(
                 ui_state.fluid.add_density(fluid_x, fluid_y, amount);
                 ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
                 ui_state.fluid.step();
-                //prints density
                 thread::sleep(ten_millis);
                 assert!(now.elapsed() >= ten_millis);
 
@@ -422,7 +417,6 @@ pub fn fluid_sys(
                     ui_state.start_simulation = false;
                 }
             }
-            // println!("Entity_ fluid = {:?}", query_fluid);
             render_density(
                 ui,
                 ui_state.fluid.get_density(),
