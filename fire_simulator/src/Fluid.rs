@@ -26,8 +26,6 @@ pub fn IX(mut x: u32, mut y: u32) -> u32 {
 
 #[derive(Default, Component, Clone)]
 pub struct FluidMatrix {
-    
-
     //timestep
     dt: f32,
     //diffusion_amount -> controls how the velocity and the vector diffuse

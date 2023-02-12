@@ -14,25 +14,6 @@ use crate::Materials;
 use crate::UiState::{self, ui_state};
 use crate::Windows;
 
-// fn functionCheckCollision(  list_materials:  <>){
-// for mut material in query_material.iter_mut() {
-//     let collision = collide(
-//         Vec3::new(x as f32, y as f32, 1.0),
-//         Vec2::new(1.0, 1.0),
-//         Vec3::new(material.position_x, material.position_y, 1.0),
-//         Vec2::new(material.width, material.height),
-//     );
-//     if let Some(_) = collision {
-//         if material.fuel <= 0.0 {
-//             continue;
-//         }
-//         material.fuel = material.fuel - d;
-
-//         ui.label("Material collides with Fire");
-//     }
-// }
-// }
-
 fn create_rect(
     ui: &mut Ui,
     r: u8,
@@ -98,53 +79,47 @@ fn render_density(
     mut fluids: Query<&mut FluidMatrix>,
     windows: &mut ResMut<Windows::Windows>,
 ) {
-    //remove comments latter
-    // for material in query_materials.iter(){
-    //     println!("material = {:?}", material);
-    //     // commands.entity(material).despawn();
-    // }
-    // // ui.add( );
-
-    // ui.horizontal(|ui|{
-
-    //     egui::Frame::canvas(ui.style()  )
-    // .fill(egui::Color32::RED)
-    // .show(ui, |ui| {
-
-    //     // ui.add(
-
-    //     // );
-
-    //     let (response, painter) = ui.allocate_painter(ui .available_size_before_wrap(), egui::Sense::hover());
-    //     // let (rect) = ui.allocate ( egui::Rect{ min: Pos2 { x: 2., y: 2. }, max: Pos2 { x: 4., y: 4. }} , egui::Sense::hover());
-    //     let mut rect = response.rect;
-    //     // rect.min = Pos2 { x: 2., y: 2. };
-    //     // rect.max = Pos2 { x: 4., y: 4. };
-    //     // height() = ;
-    //     painter.add( egui::Shape::Rect(RectShape { rect: egui::Rect{ min: Pos2 { x: 2., y: 2. }, max: Pos2 { x: 4., y: 4. } } , rounding: Rounding::none(), fill: egui::Color32::BLUE, stroke: egui::Stroke::new(3.5,egui::Color32::RED)} ) );
-    //     // painter.add(egui::Shape::Rect(RectShape { rect: rect,  rounding: Rounding::none(), fill: egui::Color32::BLUE, stroke: egui::Stroke::new(3.5,egui::Color32::RED) }) );
-
-    // });
-
-    // });
-    // i -> y Axis
-    // j -> x Axis
-
+    //x
     for i in 0..N - 1 {
         ui.horizontal_top(|ui| {
+            //y
             for j in 0..N - 1 {
                 let x: u32 = i;
                 let y: u32 = j;
                 let mut d = density[Fluid::IX(x, y) as usize];
 
+                //flag if current cell is a material
                 let mut material_flag: bool = false;
+                //flag if current cell is a fluid
                 let mut fluid_flag: bool = false;
 
                 for mut material in query_materials.iter_mut() {
-                    if check_if_material_at_position(x, y, material.position_x, material.position_y) {
+                    //checks if there is material at the given position
+                    if check_if_material_at_position(x, y, material.position_x, material.position_y)
+                    {
+                        //if the material has not burned out yet and the simulation has started
+
+                        // if frames == 0{
+                        //     if material is not burnt{
+                        //         show normal
+                        //     }else{
+                        //         show black
+                        //     }
+                        // }else {
+                        //     if material is in cords{
+                        //         if in range{
+                        //             burn it
+                        //         }
+                        //         show it
+                        //     }else{
+
+                        //     }
+
+                        // }
+
                         if material.fuel > 0. && frames > 0 {
                             for mut fluid in fluids.iter_mut() {
-                                // println!("range = {}", (fluid.fire_size + fluid.fire_range));
+                                //flag to check if material is in the range of the fire
                                 let material_in_fire_range = collide(
                                     Vec3 {
                                         x: fluid.fluid_x as f32,
@@ -163,63 +138,68 @@ fn render_density(
                                     //put the sizes parameters when you implement them
                                     Vec2 { x: 1., y: 1. },
                                 );
+                                //if the material is in range -> burn it
                                 if let Some(_) = material_in_fire_range {
                                     material.fuel -= fluid.amount;
                                     let burn_power = fluid.amount;
                                     let burn_speed_x = fluid.amount_x;
                                     let burn_speed_y = fluid.amount_y;
-
-                                    fluid.add_density(material.position_x, material.position_y, burn_power);
-                                    fluid.add_velocity(material.position_x, material.position_y, burn_speed_x, burn_speed_y);
+                                    //not sure if this works
+                                    fluid.add_density(
+                                        material.position_x,
+                                        material.position_y,
+                                        burn_power,
+                                    );
+                                    fluid.add_velocity(
+                                        material.position_x,
+                                        material.position_y,
+                                        burn_speed_x,
+                                        burn_speed_y,
+                                    );
                                     fluid.step();
                                 }
                             }
                         }
-                        // if material.fuel > 0. && frames > 0 {
-                        //     let [mut up, mut down, mut left, mut right] = [0.; 4];
-                        //     if y != 0 {
-                        //         up = density[Fluid::IX(i, j - 1) as usize];
-                        //     }
-                        //     if x != 0 {
-                        //         left = density[Fluid::IX(i - 1, j) as usize];
-                        //     }
-                        //     if x != N - 1 {
-                        //         right = density[Fluid::IX(i + 1, j) as usize];
-                        //     }
-                        //     if j != N - 1 {
-                        //         down = density[Fluid::IX(i, j + 1) as usize];
-                        //     }
-                        //     material.fuel -= up + down + left + right;
-                        // }
 
-                        // println!("material fuel = {} ", material.fuel);
+                        //if the material has been burnt
                         if material.fuel <= 0. {
-                            // let mut entity_ids =
+                            // let mut entity_ids ={}
                             let mut cords_flag = false;
                             for mut fluid in fluids.iter_mut() {
+                                //check if material is still in the material list
                                 for cords in fluid.materials_cords.iter() {
                                     if cords.0 == x && cords.1 == y {
                                         cords_flag = true;
                                     }
                                 }
+                                //removes the material from the cords list
                                 if cords_flag {
                                     //here should be a new black rect or one that is goig to be filled with something
                                     fluid.materials_cords.retain(|&f| f == (x, y));
                                 }
                             }
-                            //remove from kords --ok
                             //despawn
                             //
                             //false because it changes during the simulation
                             // create_rect(ui, (255 - d as u8), 0, 0, windows, false);
+                            //should change this to be more efficient at some point
+                            // create_rect(ui, 0, 0, 0, windows, false);
+                            // break;
                         } else {
                             let coeficient = material.fuel / 10.;
-
-                            if create_rect(ui, 255, coeficient as u8, 255 -( coeficient as u8) , windows, true) {
+                            // if material.fuel == 1000.{
+                            //     if create_rect(ui, 139,69,19 , windows, true) {
+                            //         windows.material_for_change = material.clone();
+                            //         windows.material_change_flag = true;
+                            //         // commands.entity(material).despawn();
+                            //     }
+                            // }else{
+                            if create_rect(ui, 255, 255 - (coeficient as u8), 0, windows, true) {
                                 windows.material_for_change = material.clone();
                                 windows.material_change_flag = true;
                                 // commands.entity(material).despawn();
                             }
+                            // }
                         }
                         material_flag = true;
                     }
@@ -301,29 +281,30 @@ fn render_density(
                                     }
                                 }
                                 //fix it
-                                else if fluid.fire_size == 5 && !check_if_in_range(x as i32, y as i32, fluid.fluid_x as i32, fluid.fluid_y as i32, fluid.counter_range as i32){
-                                    
+                                else if fluid.fire_size == 5
+                                    && !check_if_in_range(
+                                        x as i32,
+                                        y as i32,
+                                        fluid.fluid_x as i32,
+                                        fluid.fluid_y as i32,
+                                        fluid.counter_range as i32,
+                                    )
+                                {
                                     if create_rect(
-                                        ui,
-                                        255 ,
-                                       //maybe here use only the amount -> see how much green makes orange or yellow
-                                        0,
-                                        0,
-                                        windows,
-                                        true,
+                                        ui, 255,
+                                        //maybe here use only the amount -> see how much green makes orange or yellow
+                                        0, 0, windows, true,
                                     ) {
                                         windows.fluid_for_change = fluid.clone();
                                         windows.material_change_flag = true;
                                     }
-                                }
-                                else {
+                                } else {
                                     // println!("range else");
                                     if create_rect(
                                         ui, 255,
                                         //maybe here use only the amount -> see how much green makes orange or yellow
                                         0, 0, windows, true,
                                     ) {
-                                    
                                         windows.fluid_for_change = fluid.clone();
                                         windows.material_change_flag = true;
                                     }
@@ -352,7 +333,7 @@ fn render_density(
                     continue;
                 }
 
-                if d > 255.0 || d <= 0. {
+                if d > 255.0 || d < 0. {
                     //black for where there is not density or is over
                     d = 0.0;
                     create_rect(ui, d as u8, 0, 0, windows, false);
@@ -417,7 +398,9 @@ pub fn fluid_sys(
                 let mut amount_y: f32 = ui_state.fluid.amount_y;
 
                 ui_state.fluid.add_density(fluid_x, fluid_y, amount);
-                ui_state.fluid.add_velocity(fluid_x, fluid_y, amount_x, amount_y);
+                ui_state
+                    .fluid
+                    .add_velocity(fluid_x, fluid_y, amount_x, amount_y);
                 ui_state.fluid.step();
                 thread::sleep(ten_millis);
                 assert!(now.elapsed() >= ten_millis);
