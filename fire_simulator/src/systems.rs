@@ -141,19 +141,19 @@ fn render_density(
                 let mut fluid_flag: bool = false;
 
                 for mut material in query_materials.iter_mut() {
-                    if check_if_material_at_position(x, y, material.position_x, material.position_y)
-                    {
+                    if check_if_material_at_position(x, y, material.position_x, material.position_y) {
                         if material.fuel > 0. && frames > 0 {
                             for fluid in fluids.iter() {
-                                let material_in_fire_size = collide(
+                                println!("range = {}", (fluid.fire_size + fluid.fire_range));
+                                let material_in_fire_range = collide(
                                     Vec3 {
                                         x: fluid.fluid_x as f32,
                                         y: fluid.fluid_y as f32,
                                         z: 0.,
                                     },
                                     Vec2 {
-                                        x: fluid.fire_size as f32,
-                                        y: fluid.fire_size as f32,
+                                        x: (fluid.fire_size + fluid.fire_range) as f32,
+                                        y: (fluid.fire_size + fluid.fire_range) as f32,
                                     },
                                     Vec3 {
                                         x: material.position_x as f32,
@@ -163,7 +163,7 @@ fn render_density(
                                     //put the sizes parameters when you implement them
                                     Vec2 { x: 1., y: 1. },
                                 );
-                                if let Some(_) = material_in_fire_size {
+                                if let Some(_) = material_in_fire_range {
                                     material.fuel -= fluid.amount;
                                 }
                             }
