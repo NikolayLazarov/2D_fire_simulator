@@ -149,8 +149,18 @@ pub fn ui_state(
                     );
                     if ui.button("Increment").clicked() {
                         windows.fluid_for_change.fire_size += 1;
-                        windows.fluid_for_change.counter_range +=
-                            windows.fluid_for_change.fire_size * windows.fluid_for_change.fire_size;
+                        // windows.fluid_for_change.counter_range +=
+                        //     windows.fluid_for_change.fire_size * windows.fluid_for_change.fire_size;
+                    }
+
+                    ui.add(
+                        egui::Slider::new(&mut windows.fluid_for_change.fire_range, 0..=10)
+                            .text("Fire range"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        windows.fluid_for_change.fire_range += 1;
+                        // windows.fluid_for_change.counter_range +=
+                        //     windows.fluid_for_change.fire_size * windows.fluid_for_change.fire_size;
                     }
 
                     ui.add(
@@ -273,8 +283,18 @@ pub fn ui_state(
                 ui.add(egui::Slider::new(&mut ui_state.fluid.fire_size, 0..=10).text("Size"));
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.fire_size += 1;
-                    ui_state.fluid.counter_range +=
-                        ui_state.fluid.fire_size * ui_state.fluid.fire_size;
+                    // ui_state.fluid.counter_range +=
+                    //     ui_state.fluid.fire_size * ui_state.fluid.fire_size;
+                }
+
+                ui.add(
+                    egui::Slider::new(&mut windows.fluid_for_change.fire_range, 0..=10)
+                        .text("Fire range"),
+                );
+                if ui.button("Increment").clicked() {
+                    windows.fluid_for_change.fire_range += 1;
+                    // windows.fluid_for_change.counter_range +=
+                    //     windows.fluid_for_change.fire_size * windows.fluid_for_change.fire_size;
                 }
 
                 ui.add(

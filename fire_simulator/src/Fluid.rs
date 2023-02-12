@@ -26,7 +26,7 @@ pub fn IX(mut x: u32, mut y: u32) -> u32 {
 
 #[derive(Default, Component, Clone)]
 pub struct FluidMatrix {
-    size: u32,
+    
 
     //timestep
     dt: f32,
@@ -56,6 +56,7 @@ pub struct FluidMatrix {
     pub frames: u32,
 
     pub fire_size: u32,
+    pub fire_range: u32,
 
     pub counter_range: u32,
 
@@ -69,7 +70,6 @@ impl FluidMatrix {
         viscosity_given_value: f32,
     ) -> Self {
         Self {
-            size: N,
             dt: dt_given_value,
             diffuusion: diffusion_given_value,
             viscosity: viscosity_given_value,
@@ -89,8 +89,9 @@ impl FluidMatrix {
             amount_y: 15.0,
             frames: 20,
             fire_size: 2,
+            fire_range: 5,
 
-            counter_range: 0,
+            counter_range: 1,
             //new
             materials_cords: vec![],
         }

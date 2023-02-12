@@ -250,8 +250,10 @@ fn render_density(
                     if fluid_flag == false {
                         if let Some(_) = collision {
                             if fluid.fire_size % 2 == 1 {
+                                println!("size = {}", fluid.fire_size);
                                 if x == fluid.fluid_x && y == fluid.fluid_y {
                                     //central pixel of the fire
+                                    // println!("center");
                                     if create_rect(
                                         ui,
                                         255 as u8,
@@ -262,7 +264,7 @@ fn render_density(
                                     ) {
                                         windows.fluid_for_change = fluid.clone();
                                         windows.material_change_flag = true;
-                                        fluid.counter_range = 1;
+                                        // fluid.counter_range = 1;
                                     }
                                     // continue;
                                 }
@@ -276,6 +278,7 @@ fn render_density(
                                         fluid.counter_range as i32,
                                     )
                                 {
+                                    println!("range > 1");
                                     if create_rect(
                                         ui,
                                         255 as u8,
@@ -290,27 +293,29 @@ fn render_density(
                                     }
                                 }
                                 //fix it
-                                // else if fluid.fire_size == 5 && !check_if_in_range(x as i32, y as i32, fluid.fluid_x as i32, fluid.fluid_y as i32, fluid.counter_range as i32){
-                                //     println!("range 5");
-                                //     if create_rect(
-                                //         ui,
-                                //         0 ,
-                                //        //maybe here use only the amount -> see how much green makes orange or yellow
-                                //         0,
-                                //         255,
-                                //         windows,
-                                //         true,
-                                //     ) {
-                                //         windows.fluid_for_change = fluid.clone();
-                                //         windows.material_change_flag = true;
-                                //     }
-                                // }
-                                else {
+                                else if fluid.fire_size == 5 && !check_if_in_range(x as i32, y as i32, fluid.fluid_x as i32, fluid.fluid_y as i32, fluid.counter_range as i32){
+                                    
                                     if create_rect(
-                                        ui, 0,
-                                        //maybe here use only the amount -> see how much green makes orange or yellow
-                                        0, 255, windows, true,
+                                        ui,
+                                        255 ,
+                                       //maybe here use only the amount -> see how much green makes orange or yellow
+                                        0,
+                                        0,
+                                        windows,
+                                        true,
                                     ) {
+                                        windows.fluid_for_change = fluid.clone();
+                                        windows.material_change_flag = true;
+                                    }
+                                }
+                                else {
+                                    println!("range else");
+                                    if create_rect(
+                                        ui, 255,
+                                        //maybe here use only the amount -> see how much green makes orange or yellow
+                                        0, 0, windows, true,
+                                    ) {
+                                    
                                         windows.fluid_for_change = fluid.clone();
                                         windows.material_change_flag = true;
                                     }
