@@ -143,8 +143,8 @@ fn render_density(
                 for mut material in query_materials.iter_mut() {
                     if check_if_material_at_position(x, y, material.position_x, material.position_y) {
                         if material.fuel > 0. && frames > 0 {
-                            for fluid in fluids.iter() {
-                                println!("range = {}", (fluid.fire_size + fluid.fire_range));
+                            for mut fluid in fluids.iter_mut() {
+                                // println!("range = {}", (fluid.fire_size + fluid.fire_range));
                                 let material_in_fire_range = collide(
                                     Vec3 {
                                         x: fluid.fluid_x as f32,
@@ -165,6 +165,13 @@ fn render_density(
                                 );
                                 if let Some(_) = material_in_fire_range {
                                     material.fuel -= fluid.amount;
+                                    let burn_power = fluid.amount;
+                                    let burn_speed_x = fluid.amount_x;
+                                    let burn_speed_y = fluid.amount_y;
+
+                                    fluid.add_density(material.position_x, material.position_y, burn_power);
+                                    fluid.add_velocity(material.position_x, material.position_y, burn_speed_x, burn_speed_y);
+                                    fluid.step();
                                 }
                             }
                         }
@@ -196,6 +203,7 @@ fn render_density(
                                     }
                                 }
                                 if cords_flag {
+                                    //here should be a new black rect or one that is goig to be filled with something
                                     fluid.materials_cords.retain(|&f| f == (x, y));
                                 }
                             }
@@ -207,7 +215,7 @@ fn render_density(
                         } else {
                             let coeficient = material.fuel / 10.;
 
-                            if create_rect(ui, 0, coeficient as u8, 255, windows, true) {
+                            if create_rect(ui, 255, coeficient as u8, 255 -( coeficient as u8) , windows, true) {
                                 windows.material_for_change = material.clone();
                                 windows.material_change_flag = true;
                                 // commands.entity(material).despawn();
@@ -250,7 +258,7 @@ fn render_density(
                     if fluid_flag == false {
                         if let Some(_) = collision {
                             if fluid.fire_size % 2 == 1 {
-                                println!("size = {}", fluid.fire_size);
+                                // println!("size = {}", fluid.fire_size);
                                 if x == fluid.fluid_x && y == fluid.fluid_y {
                                     //central pixel of the fire
                                     // println!("center");
@@ -278,7 +286,7 @@ fn render_density(
                                         fluid.counter_range as i32,
                                     )
                                 {
-                                    println!("range > 1");
+                                    // println!("range > 1");
                                     if create_rect(
                                         ui,
                                         255 as u8,
@@ -309,7 +317,7 @@ fn render_density(
                                     }
                                 }
                                 else {
-                                    println!("range else");
+                                    // println!("range else");
                                     if create_rect(
                                         ui, 255,
                                         //maybe here use only the amount -> see how much green makes orange or yellow
@@ -364,7 +372,7 @@ fn render_density(
                         egui::Stroke::new(
                             9.0,
                             // egui::Color32::from_gray((d * (frames as f32)) as u8),
-                            egui::Color32::from_gray(255 - (d * (frames as f32)) as u8),
+                            egui::Color32::from_gray((d * (frames as f32)) as u8),
                         ), //from_rgb(r, g, b)),
                     );
                     // create_rect(ui, (255 - d as u8), d as u8, 0);
@@ -384,7 +392,7 @@ pub fn fluid_sys(
     mut windows: ResMut<Windows::Windows>,
 ) {
     //let ten_millis = time::Duration::from_millis(1000 / 24);
-    let ten_millis = time::Duration::from_millis(100);
+    let ten_millis = time::Duration::from_millis(200);
 
     let now = time::Instant::now();
     let mut frames = 0;
@@ -409,7 +417,7 @@ pub fn fluid_sys(
                 let mut amount_y: f32 = ui_state.fluid.amount_y;
 
                 ui_state.fluid.add_density(fluid_x, fluid_y, amount);
-                ui_state.fluid.add_velocity(fluid_x, fluid_y, 200.0, 200.0);
+                ui_state.fluid.add_velocity(fluid_x, fluid_y, amount_x, amount_y);
                 ui_state.fluid.step();
                 thread::sleep(ten_millis);
                 assert!(now.elapsed() >= ten_millis);
