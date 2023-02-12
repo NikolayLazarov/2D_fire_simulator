@@ -76,7 +76,7 @@ pub fn ui_state(
                         windows.material_for_change.height += 1.0;
                     }
                     //do not why x and y are swapped so I Swapp them
-                    //found the ptoblem -> fix them properrly 
+                    //found the ptoblem -> fix them properrly
                     //if still a problem look at i and j in render density
                     ui.add(
                         egui::Slider::new(&mut windows.material_for_change.position_y, 0..=N - 1)
@@ -107,10 +107,8 @@ pub fn ui_state(
                             windows.material_for_change.position_y.clone(),
                         );
                         // materials_list.push(vector);
-                        let entity = commands.spawn(windows.material_for_change.clone()).id();
+                        commands.spawn(windows.material_for_change.clone());
                         // windows.materials_entities.push(entity);
-                        ui_state.fluid.materials_entities_id.push(entity);
-                        println!("Entity = {:?}", ui_state.fluid.materials_entities_id);
 
                         close_window = true;
                         windows.material_change_flag = false;
@@ -146,14 +144,13 @@ pub fn ui_state(
                     }
 
                     ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.fire_range, 0..=10)
-                            .text("Range"),
+                        egui::Slider::new(&mut windows.fluid_for_change.fire_size, 0..=10)
+                            .text("Body size"),
                     );
                     if ui.button("Increment").clicked() {
-                        windows.fluid_for_change.fire_range += 1;
+                        windows.fluid_for_change.fire_size += 1;
                         windows.fluid_for_change.counter_range +=
-                            windows.fluid_for_change.fire_range
-                                * windows.fluid_for_change.fire_range;
+                            windows.fluid_for_change.fire_size * windows.fluid_for_change.fire_size;
                     }
 
                     ui.add(
@@ -273,11 +270,11 @@ pub fn ui_state(
                     ui_state.fluid.amount += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.fluid.fire_range, 0..=10).text("Range"));
+                ui.add(egui::Slider::new(&mut ui_state.fluid.fire_size, 0..=10).text("Size"));
                 if ui.button("Increment").clicked() {
-                    ui_state.fluid.fire_range += 1;
+                    ui_state.fluid.fire_size += 1;
                     ui_state.fluid.counter_range +=
-                        ui_state.fluid.fire_range * ui_state.fluid.fire_range;
+                        ui_state.fluid.fire_size * ui_state.fluid.fire_size;
                 }
 
                 ui.add(
@@ -352,8 +349,8 @@ pub fn ui_state(
     }
 
     if ui_state.new_material {
-        let entity = commands.spawn(ui_state.material.clone()).id();
-        ui_state.fluid.materials_entities_id.push(entity);
+        commands.spawn(ui_state.material.clone());
+
         let x = ui_state.material.position_x;
         let y = ui_state.material.position_y;
         ui_state.fluid.materials_cords.push((x, y));

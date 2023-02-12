@@ -55,11 +55,10 @@ pub struct FluidMatrix {
 
     pub frames: u32,
 
-    pub fire_range: u32,
+    pub fire_size: u32,
 
     pub counter_range: u32,
 
-    pub materials_entities_id: Vec<Entity>,
     pub materials_cords: Vec<(u32, u32)>,
 }
 
@@ -89,11 +88,10 @@ impl FluidMatrix {
             amount_x: 15.0,
             amount_y: 15.0,
             frames: 20,
-            fire_range: 2,
+            fire_size: 2,
 
             counter_range: 0,
             //new
-            materials_entities_id: vec![],
             materials_cords: vec![],
         }
     }
