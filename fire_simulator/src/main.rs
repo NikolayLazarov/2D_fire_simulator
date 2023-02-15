@@ -8,7 +8,7 @@ use bevy_egui::{
 };
 mod Fluid;
 mod UiState;
-mod Windows;
+mod MaterialChangability;
 mod startup_systems;
 mod systems;
 
@@ -18,7 +18,7 @@ use crate::Fluid::N;
 fn main() {
     App::new()
         .init_resource::<UiState::UiState>()
-        .init_resource::<Windows::Windows>()
+        .init_resource::<MaterialChangability::MaterialChangebility>()
         .add_plugins(DefaultPlugins)
         .add_plugin(EguiPlugin)
         .add_startup_system(startup_systems::configure_visuals)

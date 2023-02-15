@@ -2,7 +2,7 @@
 use crate::Fluid;
 use crate::Fluid::N;
 use crate::Materials;
-use crate::Windows;
+use crate::MaterialChangability;
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
 use bevy_egui::{
@@ -32,7 +32,7 @@ pub fn ui_state(
     mut egui_ctx: ResMut<EguiContext>,
     mut ui_state: ResMut<UiState>,
     mut commands: Commands,
-    mut windows: ResMut<Windows::Windows>,
+    mut windows: ResMut<MaterialChangability::MaterialChangebility>,
 ) {
     let mut new_material_button = false;
     let mut material_button = false;
@@ -259,7 +259,7 @@ pub fn ui_state(
                 ui.separator();
 
                 ui.horizontal(|ui| {
-                    ui.label("addDensity");
+                    ui.label("Add Material");
                     new_material_button = ui.button("New").clicked();
                 });
             } else if ui_state.fluid_window {
@@ -317,8 +317,8 @@ pub fn ui_state(
                 }
 
                 ui.horizontal(|ui| {
-                    ui.label("Add density");
-                    let mut update_fluid_density = ui.button("Add Density").clicked();
+                    ui.label("Add Fire");
+                    let mut update_fluid_density = ui.button("New").clicked();
 
                     if update_fluid_density {
                         for i in 0..N - 1 {
@@ -336,7 +336,7 @@ pub fn ui_state(
                 });
             }
 
-            if ui.button("start simulation").clicked() {
+            if ui.button("Start simulation").clicked() {
                 ui_state.start_simulation = true;
             }
 

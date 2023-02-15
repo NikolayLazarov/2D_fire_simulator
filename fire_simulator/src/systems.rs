@@ -12,14 +12,14 @@ use crate::Fluid::N;
 use crate::Fluid::{self, FluidMatrix};
 use crate::Materials;
 use crate::UiState::{self, ui_state};
-use crate::Windows;
+use crate::MaterialChangability;
 
 fn create_rect(
     ui: &mut Ui,
     r: u8,
     g: u8,
     b: u8,
-    windows: &mut ResMut<Windows::Windows>,
+    windows: &mut ResMut<MaterialChangability::MaterialChangebility>,
     object_flag: bool,
 ) -> bool {
     let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::click());
@@ -77,7 +77,7 @@ fn render_density(
     mut commands: Commands,
     frames: u32,
     mut fluids: Query<&mut FluidMatrix>,
-    windows: &mut ResMut<Windows::Windows>,
+    windows: &mut ResMut<MaterialChangability::MaterialChangebility>,
 ) {
     //x
     for i in 0..N - 1 {
@@ -98,24 +98,6 @@ fn render_density(
                     if check_if_material_at_position(x, y, material.position_x, material.position_y)
                     {
                         //if the material has not burned out yet and the simulation has started
-
-                        // if frames == 0{
-                        //     if material is not burnt{
-                        //         show normal
-                        //     }else{
-                        //         show black
-                        //     }
-                        // }else {
-                        //     if material is in cords{
-                        //         if in range{
-                        //             burn it
-                        //         }
-                        //         show it
-                        //     }else{
-
-                        //     }
-
-                        // }
 
                         if material.fuel > 0. && frames > 0 {
                             for mut fluid in fluids.iter_mut() {
@@ -370,7 +352,7 @@ pub fn fluid_sys(
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
     mut ui_state: ResMut<UiState::UiState>,
-    mut windows: ResMut<Windows::Windows>,
+    mut windows: ResMut<MaterialChangability::MaterialChangebility>,
 ) {
     //let ten_millis = time::Duration::from_millis(1000 / 24);
     let ten_millis = time::Duration::from_millis(200);

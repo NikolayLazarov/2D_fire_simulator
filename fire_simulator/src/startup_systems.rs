@@ -7,7 +7,7 @@ use bevy_egui::{egui, EguiContext, EguiPlugin};
 use crate::Fluid;
 use crate::Materials;
 use crate::UiState;
-use crate::Windows;
+use crate::MaterialChangability;
 
 pub fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
     egui_ctx.ctx_mut().set_visuals(egui::Visuals {
@@ -30,7 +30,7 @@ pub fn configure_ui_state(mut ui_state: ResMut<UiState::UiState>) {
     ui_state.window_change_materials = false;
 }
 
-pub fn configure_windows(mut windows: ResMut<Windows::Windows>) {
+pub fn configure_windows(mut windows: ResMut<MaterialChangability::MaterialChangebility>) {
     windows.side_panel_modify = false;
     windows.fluid_for_change = Fluid::FluidMatrix::new(1., 0., 0.);
     windows.material_for_change = Materials::default();
