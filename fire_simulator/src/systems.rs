@@ -335,7 +335,7 @@ fn render_density(
                         egui::Stroke::new(
                             9.0,
                             // egui::Color32::from_gray((d * (frames as f32)) as u8),
-                            egui::Color32::from_gray((d * (frames as f32)) as u8),
+                            egui::Color32::from_gray((d * 100.0) as u8),
                         ), //from_rgb(r, g, b)),
                     );
                     // create_rect(ui, (255 - d as u8), d as u8, 0);

@@ -155,7 +155,7 @@ pub fn ui_state(
                     }
 
                     ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.fire_range, 0..=10)
+                        egui::Slider::new(&mut windows.fluid_for_change.fire_range, 0..=(N-1)/2)
                             .text("Fire range"),
                     );
                     if ui.button("Increment").clicked() {
@@ -282,11 +282,11 @@ pub fn ui_state(
                     ui_state.fluid.viscosity += 0.0000001;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_x, 0..=N - 2).text("Fluid X"));
+                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_x, 1..=N - 2).text("Fluid Y"));
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.fluid_x += 1;
                 }
-                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_y, 0..=N - 2).text("Fluid Y"));
+                ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_y, 1..=N - 2).text("Fluid X"));
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.fluid_y += 1;
                 }
@@ -303,7 +303,7 @@ pub fn ui_state(
                 }
 
                 ui.add(
-                    egui::Slider::new(&mut windows.fluid_for_change.fire_range, 0..=10)
+                    egui::Slider::new(&mut windows.fluid_for_change.fire_range, 0..=(N-1)/2)
                         .text("Fire range"),
                 );
                 if ui.button("Increment").clicked() {
@@ -313,14 +313,14 @@ pub fn ui_state(
                 }
 
                 ui.add(
-                    egui::Slider::new(&mut ui_state.fluid.amount_x, 0.0..=200.0).text("Velocity X"),
+                    egui::Slider::new(&mut ui_state.fluid.amount_x, -200.0..=200.0).text("Velocity Y"),
                 );
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.amount_x += 1.0;
                 }
 
                 ui.add(
-                    egui::Slider::new(&mut ui_state.fluid.amount_y, 0.0..=200.0).text("Velocity Y"),
+                    egui::Slider::new(&mut ui_state.fluid.amount_y, -200.0..=200.0).text("Velocity X"),
                 );
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.amount_y += 1.0;
