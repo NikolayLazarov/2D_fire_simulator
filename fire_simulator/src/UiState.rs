@@ -268,13 +268,13 @@ pub fn ui_state(
 
                 ui.separator();
 
-                ui.add(egui::Slider::new(&mut ui_state.fluid.dt, 0.0..= 10.0).text("Timestep"));
+                ui.add(egui::Slider::new(&mut ui_state.fluid.delta_time, 0.0..= 1.0).text("Timestep"));
                 if ui.button("Increment").clicked() {
-                    ui_state.fluid.dt += 0.1;
+                    ui_state.fluid.delta_time += 0.1;
                 }
                 ui.add(egui::Slider::new(&mut ui_state.fluid.diffusion, 0.0..= 10.0).text("Diffusion"));
                 if ui.button("Increment").clicked() {
-                    ui_state.fluid.diffusion += 0.1;
+                    ui_state.fluid.diffusion += 0.001;
                 }
 
                 ui.add(egui::Slider::new(&mut ui_state.fluid.viscosity, 0.0..= 1.0).text("Viscosity"));

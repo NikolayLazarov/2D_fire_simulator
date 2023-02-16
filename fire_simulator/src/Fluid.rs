@@ -27,7 +27,7 @@ pub fn IX(mut x: u32, mut y: u32) -> u32 {
 #[derive(Default, Component, Clone)]
 pub struct FluidMatrix {
     //timestep
-    pub dt: f32,
+    pub delta_time: f32,
     //diffusion_amount -> controls how the velocity and the vector diffuse
     pub diffusion: f32,
     //viscosity -> thikcness
@@ -68,8 +68,8 @@ impl FluidMatrix {
         // viscosity_given_value: f32,
     ) -> Self {
         Self {
-            dt: 0.1,
-            diffusion: 0.,
+            delta_time: 0.1,
+            diffusion: 0.001,
             viscosity: 0.0000001,
             // dt: dt_given_value,
             // diffuusion: diffusion_given_value,
@@ -83,8 +83,8 @@ impl FluidMatrix {
             Vx0: vec![0.; N.pow(2) as usize],
             Vy0: vec![0.; N.pow(2) as usize],
 
-            fluid_x: 0,
-            fluid_y: 0,
+            fluid_x: 5,
+            fluid_y: 5,
             amount: 25.0,
             amount_x: 15.0,
             amount_y: 15.0,
@@ -101,7 +101,7 @@ impl FluidMatrix {
     pub fn step(&mut self) {
         let visc: f32 = self.viscosity;
         let diff: f32 = self.diffusion;
-        let dt: f32 = self.dt;
+        let delta_time: f32 = self.delta_time;
         let Vx: &mut Vec<f32> = &mut self.Vx;
         let Vy: &mut Vec<f32> = &mut self.Vy;
         let Vx0: &mut Vec<f32> = &mut self.Vx0;
@@ -109,18 +109,18 @@ impl FluidMatrix {
         let s: &mut Vec<f32> = &mut self.s;
         let density: &mut Vec<f32> = &mut self.density;
 
-        diffuse(1, Vx0, Vx, visc, dt, &self.materials_cords);
-        diffuse(2, Vy0, Vy, visc, dt, &self.materials_cords);
+        diffuse(1, Vx0, Vx, visc, delta_time, &self.materials_cords);
+        diffuse(2, Vy0, Vy, visc, delta_time, &self.materials_cords);
 
         project(Vx0, Vy0, Vx, Vy, &self.materials_cords);
 
-        advect(1, Vx, Vx0, Vx0, Vy0, dt, &self.materials_cords);
-        advect(2, Vy, Vy0, Vx0, Vy0, dt, &self.materials_cords);
+        advect(1, Vx, Vx0, Vx0, Vy0, delta_time, &self.materials_cords);
+        advect(2, Vy, Vy0, Vx0, Vy0, delta_time, &self.materials_cords);
 
         project(Vx, Vy, Vx0, Vy0, &self.materials_cords);
 
-        diffuse(0, s, density, diff, dt, &self.materials_cords);
-        advect(0, density, s, Vx, Vy, dt, &self.materials_cords);
+        diffuse(0, s, density, diff, delta_time, &self.materials_cords);
+        advect(0, density, s, Vx, Vy, delta_time, &self.materials_cords);
     }
 
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {
