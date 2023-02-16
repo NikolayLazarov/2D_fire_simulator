@@ -27,11 +27,11 @@ pub fn IX(mut x: u32, mut y: u32) -> u32 {
 #[derive(Default, Component, Clone)]
 pub struct FluidMatrix {
     //timestep
-    dt: f32,
+    pub dt: f32,
     //diffusion_amount -> controls how the velocity and the vector diffuse
-    diffuusion: f32,
+    pub diffusion: f32,
     //viscosity -> thikcness
-    viscosity: f32,
+    pub viscosity: f32,
     //maybe previoeus density
     s: Vec<f32>,
     density: Vec<f32>,
@@ -63,14 +63,17 @@ pub struct FluidMatrix {
 
 impl FluidMatrix {
     pub fn new(
-        dt_given_value: f32,
-        diffusion_given_value: f32,
-        viscosity_given_value: f32,
+        // dt_given_value: f32,
+        // diffusion_given_value: f32,
+        // viscosity_given_value: f32,
     ) -> Self {
         Self {
-            dt: dt_given_value,
-            diffuusion: diffusion_given_value,
-            viscosity: viscosity_given_value,
+            dt: 0.1,
+            diffusion: 0.,
+            viscosity: 0.0000001,
+            // dt: dt_given_value,
+            // diffuusion: diffusion_given_value,
+            // viscosity: viscosity_given_value,
             s: vec![0.; N.pow(2) as usize],
             density: vec![0.; N.pow(2) as usize],
 
@@ -97,7 +100,7 @@ impl FluidMatrix {
 
     pub fn step(&mut self) {
         let visc: f32 = self.viscosity;
-        let diff: f32 = self.diffuusion;
+        let diff: f32 = self.diffusion;
         let dt: f32 = self.dt;
         let Vx: &mut Vec<f32> = &mut self.Vx;
         let Vy: &mut Vec<f32> = &mut self.Vy;

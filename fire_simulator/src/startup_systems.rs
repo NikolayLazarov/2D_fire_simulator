@@ -19,7 +19,7 @@ pub fn configure_visuals(mut egui_ctx: ResMut<EguiContext>) {
 pub fn configure_ui_state(mut ui_state: ResMut<UiState::UiState>) {
     ui_state.is_window_open = true;
     ui_state.material = Materials::default();
-    ui_state.fluid = Fluid::FluidMatrix::new(0.1, 0., 0.0000001);
+    ui_state.fluid = Fluid::FluidMatrix::new(); //(0.1, 0., 0.0000001);
     ui_state.new_material = false;
     ui_state.new_fire = false;
     ui_state.new_fluid = false;
@@ -32,7 +32,7 @@ pub fn configure_ui_state(mut ui_state: ResMut<UiState::UiState>) {
 
 pub fn configure_windows(mut windows: ResMut<MaterialChangability::MaterialChangebility>) {
     windows.side_panel_modify = false;
-    windows.fluid_for_change = Fluid::FluidMatrix::new(1., 0., 0.);
+    windows.fluid_for_change = Fluid::FluidMatrix::new();// (1., 0., 0.);
     windows.material_for_change = Materials::default();
     windows.materials_entities_id = vec![];
 }

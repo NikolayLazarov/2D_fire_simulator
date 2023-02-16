@@ -44,6 +44,7 @@ pub fn ui_state(
             .default_width(200.0)
             .resizable(true)
             .show(egui_ctx.ctx_mut(), |ui| {
+                ui.heading("Change Window");
                 if windows.material_change_flag {
                     // let material = & windows.material_for_change;
                     // ui.label(format!("Material =  {}",  material.name_type));
@@ -97,7 +98,7 @@ pub fn ui_state(
                     ui.separator();
 
                     ui.horizontal(|ui| {
-                        ui.label("addDensity");
+                        ui.label("Change Material");
                         change_material_button = ui.button("Change").clicked();
                     });
 
@@ -117,7 +118,7 @@ pub fn ui_state(
                     ////
                 }
                 if windows.fire_change_flag {
-                    ui.label("Change fluid");
+                    ui.label("Fire");
 
                     ui.separator();
 
@@ -188,8 +189,8 @@ pub fn ui_state(
                     }
 
                     ui.horizontal(|ui| {
-                        ui.label("Add density");
-                        let mut change_fire = ui.button("Add Density").clicked();
+                        ui.label("Change Fire");
+                        let mut change_fire = ui.button("Change").clicked();
 
                         if change_fire == true {
                             let entity = commands.spawn(windows.fluid_for_change.clone()).id();
@@ -221,7 +222,7 @@ pub fn ui_state(
         .show(egui_ctx.ctx_mut(), |ui| {
             ui.horizontal(|ui| {
                 material_button = ui.button("Material").clicked();
-                fluid_button = ui.button("Update_fluid").clicked();
+                fluid_button = ui.button("Fire").clicked();
             });
 
             if ui_state.material_window {
@@ -263,9 +264,23 @@ pub fn ui_state(
                     new_material_button = ui.button("New").clicked();
                 });
             } else if ui_state.fluid_window {
-                ui.label("Change fluid");
+                ui.heading("Fire");
 
                 ui.separator();
+
+                ui.add(egui::Slider::new(&mut ui_state.fluid.dt, 0.0..= 10.0).text("Timestep"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fluid.dt += 0.1;
+                }
+                ui.add(egui::Slider::new(&mut ui_state.fluid.diffusion, 0.0..= 10.0).text("Diffusion"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fluid.diffusion += 0.1;
+                }
+
+                ui.add(egui::Slider::new(&mut ui_state.fluid.viscosity, 0.0..= 1.0).text("Viscosity"));
+                if ui.button("Increment").clicked() {
+                    ui_state.fluid.viscosity += 0.0000001;
+                }
 
                 ui.add(egui::Slider::new(&mut ui_state.fluid.fluid_x, 0..=N - 2).text("Fluid X"));
                 if ui.button("Increment").clicked() {
@@ -346,11 +361,11 @@ pub fn ui_state(
         });
 
     egui::TopBottomPanel::top("top_panel").show(egui_ctx.ctx_mut(), |ui| {
-        ui.label("Top pannel");
+        // ui.label("Top pannel");
     });
 
     egui::TopBottomPanel::bottom("bottom_panel").show(egui_ctx.ctx_mut(), |ui| {
-        ui.label("Bottom pannel");
+        // ui.label("Bottom pannel");
     });
 
     if new_material_button {

@@ -365,10 +365,10 @@ pub fn fluid_sys(
     }
 
     egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
-        ui.label("Scene");
+        // ui.label("Scene");
 
         egui::Area::new("Fluid").show(ui.ctx(), |ui| {
-            ui.label("Fluid");
+            ui.label("Scene");
 
             if frames > 0 {
                 ui_state.new_fluid = false;
