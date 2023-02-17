@@ -7,8 +7,8 @@ use bevy_egui::{
     EguiPlugin,
 };
 mod Fluid;
-mod UiState;
 mod MaterialChangability;
+mod UiState;
 mod startup_systems;
 mod systems;
 

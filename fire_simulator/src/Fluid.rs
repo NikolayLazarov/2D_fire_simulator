@@ -26,28 +26,20 @@ pub fn IX(mut x: u32, mut y: u32) -> u32 {
 
 #[derive(Default, Component, Clone)]
 pub struct FluidMatrix {
-    //timestep
     pub delta_time: f32,
-    //diffusion_amount -> controls how the velocity and the vector diffuse
     pub diffusion: f32,
-    //viscosity -> thikcness
     pub viscosity: f32,
-    //maybe previoeus density
     old_density: Vec<f32>,
     density: Vec<f32>,
 
-    //velocity X -> current
     Vx: Vec<f32>,
-    //velocity y -> current
     Vy: Vec<f32>,
 
     Vx0: Vec<f32>,
     Vy0: Vec<f32>,
-    //for adding new values
-    pub fluid_x: u32,
-    pub fluid_y: u32,
+    pub fire_x: u32,
+    pub fire_y: u32,
     pub amount: f32,
-    //power velocity
     pub amount_x: f32,
     pub amount_y: f32,
 
@@ -62,18 +54,12 @@ pub struct FluidMatrix {
 }
 
 impl FluidMatrix {
-    pub fn new(
-        // dt_given_value: f32,
-        // diffusion_given_value: f32,
-        // viscosity_given_value: f32,
-    ) -> Self {
+    pub fn new() -> Self {
         Self {
             delta_time: 0.1,
             diffusion: 0.001,
             viscosity: 0.0000001,
-            // dt: dt_given_value,
-            // diffuusion: diffusion_given_value,
-            // viscosity: viscosity_given_value,
+
             old_density: vec![0.; N.pow(2) as usize],
             density: vec![0.; N.pow(2) as usize],
 
@@ -83,17 +69,18 @@ impl FluidMatrix {
             Vx0: vec![0.; N.pow(2) as usize],
             Vy0: vec![0.; N.pow(2) as usize],
 
-            fluid_x: 5,
-            fluid_y: 5,
+            fire_x: 5,
+            fire_y: 5,
+
             amount: 25.0,
             amount_x: 15.0,
             amount_y: 15.0,
+
             frames: 20,
             fire_size: 2,
             fire_range: 5,
-
             counter_range: 1,
-            //new
+
             materials_cords: vec![],
         }
     }
@@ -119,8 +106,23 @@ impl FluidMatrix {
 
         project(Vx, Vy, Vx0, Vy0, &self.materials_cords);
 
-        diffuse(0, old_density, density, diff, delta_time, &self.materials_cords);
-        advect(0, density, old_density, Vx, Vy, delta_time, &self.materials_cords);
+        diffuse(
+            0,
+            old_density,
+            density,
+            diff,
+            delta_time,
+            &self.materials_cords,
+        );
+        advect(
+            0,
+            density,
+            old_density,
+            Vx,
+            Vy,
+            delta_time,
+            &self.materials_cords,
+        );
     }
 
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {

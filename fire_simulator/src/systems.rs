@@ -10,9 +10,9 @@ use bevy_egui::{egui, EguiContext, EguiPlugin};
 
 use crate::Fluid::N;
 use crate::Fluid::{self, FluidMatrix};
+use crate::MaterialChangability;
 use crate::Materials;
 use crate::UiState::{self, ui_state};
-use crate::MaterialChangability;
 
 fn create_rect(
     ui: &mut Ui,
@@ -104,8 +104,8 @@ fn render_density(
                                 //flag to check if material is in the range of the fire
                                 let material_in_fire_range = collide(
                                     Vec3 {
-                                        x: fluid.fluid_x as f32,
-                                        y: fluid.fluid_y as f32,
+                                        x: fluid.fire_x as f32,
+                                        y: fluid.fire_y as f32,
                                         z: 0.,
                                     },
                                     Vec2 {
@@ -122,7 +122,7 @@ fn render_density(
                                 );
                                 //if the material is in range -> burn it
                                 if let Some(_) = material_in_fire_range {
-                                    material.fuel -= fluid.amount; 
+                                    material.fuel -= fluid.amount;
                                     let burn_power = fluid.amount;
                                     let burn_speed_x = fluid.amount_x;
                                     let burn_speed_y = fluid.amount_y;
@@ -201,8 +201,8 @@ fn render_density(
                     //rect // fluid
                     let collision = collide(
                         Vec3 {
-                            x: fluid.fluid_x as f32,
-                            y: fluid.fluid_y as f32,
+                            x: fluid.fire_x as f32,
+                            y: fluid.fire_y as f32,
                             z: 0.,
                         },
                         Vec2 {
@@ -221,7 +221,7 @@ fn render_density(
                         if let Some(_) = collision {
                             if fluid.fire_size % 2 == 1 {
                                 // println!("size = {}", fluid.fire_size);
-                                if x == fluid.fluid_x && y == fluid.fluid_y {
+                                if x == fluid.fire_x && y == fluid.fire_y {
                                     //central pixel of the fire
                                     // println!("center");
                                     if create_rect(
@@ -243,8 +243,8 @@ fn render_density(
                                     && check_if_in_range(
                                         x as i32,
                                         y as i32,
-                                        fluid.fluid_x as i32,
-                                        fluid.fluid_y as i32,
+                                        fluid.fire_x as i32,
+                                        fluid.fire_y as i32,
                                         fluid.counter_range as i32,
                                     )
                                 {
@@ -267,8 +267,8 @@ fn render_density(
                                     && !check_if_in_range(
                                         x as i32,
                                         y as i32,
-                                        fluid.fluid_x as i32,
-                                        fluid.fluid_y as i32,
+                                        fluid.fire_x as i32,
+                                        fluid.fire_y as i32,
                                         fluid.counter_range as i32,
                                     )
                                 {
@@ -373,8 +373,8 @@ pub fn fluid_sys(
             if frames > 0 {
                 ui_state.new_fluid = false;
                 // ui_state.start_simulation = true;
-                let mut fluid_x: u32 = ui_state.fluid.fluid_x;
-                let mut fluid_y: u32 = ui_state.fluid.fluid_y;
+                let mut fluid_x: u32 = ui_state.fluid.fire_x;
+                let mut fluid_y: u32 = ui_state.fluid.fire_y;
                 let mut amount: f32 = ui_state.fluid.amount;
                 let mut amount_x: f32 = ui_state.fluid.amount_x;
                 let mut amount_y: f32 = ui_state.fluid.amount_y;
