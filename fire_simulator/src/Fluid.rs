@@ -33,7 +33,7 @@ pub struct FluidMatrix {
     //viscosity -> thikcness
     pub viscosity: f32,
     //maybe previoeus density
-    s: Vec<f32>,
+    old_density: Vec<f32>,
     density: Vec<f32>,
 
     //velocity X -> current
@@ -74,7 +74,7 @@ impl FluidMatrix {
             // dt: dt_given_value,
             // diffuusion: diffusion_given_value,
             // viscosity: viscosity_given_value,
-            s: vec![0.; N.pow(2) as usize],
+            old_density: vec![0.; N.pow(2) as usize],
             density: vec![0.; N.pow(2) as usize],
 
             Vx: vec![0.; N.pow(2) as usize],
@@ -106,7 +106,7 @@ impl FluidMatrix {
         let Vy: &mut Vec<f32> = &mut self.Vy;
         let Vx0: &mut Vec<f32> = &mut self.Vx0;
         let Vy0: &mut Vec<f32> = &mut self.Vy0;
-        let s: &mut Vec<f32> = &mut self.s;
+        let old_density: &mut Vec<f32> = &mut self.old_density;
         let density: &mut Vec<f32> = &mut self.density;
 
         diffuse(1, Vx0, Vx, visc, delta_time, &self.materials_cords);
@@ -119,8 +119,8 @@ impl FluidMatrix {
 
         project(Vx, Vy, Vx0, Vy0, &self.materials_cords);
 
-        diffuse(0, s, density, diff, delta_time, &self.materials_cords);
-        advect(0, density, s, Vx, Vy, delta_time, &self.materials_cords);
+        diffuse(0, old_density, density, diff, delta_time, &self.materials_cords);
+        advect(0, density, old_density, Vx, Vy, delta_time, &self.materials_cords);
     }
 
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {
@@ -144,12 +144,12 @@ fn diffuse(
     b: u32,
     mut x: &mut Vec<f32>,
     mut x0: &mut Vec<f32>,
-    diff: f32,
-    dt: f32,
+    diffusion: f32,
+    delta_time: f32,
     materials_cords: &Vec<(u32, u32)>,
 ) {
     //see what does a
-    let a: f32 = dt * diff * ((N - 2) * (N - 2)) as f32;
+    let a: f32 = delta_time * diffusion * ((N - 2) * (N - 2)) as f32;
     // println!("diffuse; a = {}, b = {}", a, b);
     //see why it is 1 and 6 -> maybe the saids that are around it
     // so it should be 4
