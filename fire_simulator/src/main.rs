@@ -33,12 +33,10 @@ fn main() {
 pub struct Materials {
     name_type: String,
     flamability: f32,
-    color: Color,
     width: f32,
     height: f32,
     position_x: u32,
     position_y: u32,
-    clicked: bool,
     fuel: f32,
     // entity_id: Entity,
 }
@@ -48,12 +46,10 @@ impl Default for Materials {
         Self {
             name_type: String::from("Material"),
             flamability: 0.5,
-            color: Color::BEIGE,
             width: 4.0,
             height: 5.0,
             position_x: 5,
             position_y: 5,
-            clicked: false,
             fuel: 1000.0,
             // entity_id: Entity::index(Entity),
         }

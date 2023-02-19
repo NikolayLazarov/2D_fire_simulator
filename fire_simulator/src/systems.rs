@@ -26,12 +26,9 @@ fn create_rect(
     ui.painter().rect(
         rect,
         0.0,
-        // egui::Color32::BLUE,
         egui::Color32::from_rgb(r, g, b),
         egui::Stroke::new(9.0, egui::Color32::from_rgb(r, g, b)),
-    );
-    // let mut clicked_rect = false;
-    if Response.clicked() && object_flag {
+    );    if Response.clicked() && object_flag {
         windows.side_panel_modify = true;
         true
     } else {

@@ -272,7 +272,7 @@ pub fn ui_state(
                 ui.separator();
 
                 ui.add(
-                    egui::Slider::new(&mut ui_state.fluid.delta_time, 0.0..=1.0).text("Timestep"),
+                    egui::Slider::new(&mut ui_state.fluid.delta_time, 0.0..=3.0).text("Timestep"),
                 );
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.delta_time += 0.1;
