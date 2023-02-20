@@ -19,13 +19,12 @@ pub struct UiState {
     pub fire_window: bool,
     pub fluid_window: bool,
     pub new_material: bool,
-    pub new_fire: bool,
     pub new_fluid: bool,
     pub material: Materials,
     pub fluid: Fluid::FluidMatrix,
-    pub start_simulation: bool,
-
+    pub created_fire:bool,
     pub window_change_materials: bool,
+    pub start_simulation: bool,
 }
 
 pub fn ui_state(
@@ -33,6 +32,7 @@ pub fn ui_state(
     mut ui_state: ResMut<UiState>,
     mut commands: Commands,
     mut windows: ResMut<MaterialChangability::MaterialChangebility>,
+    mut query_fire: Query<Entity, With< Fluid::FluidMatrix> >
 ) {
     let mut new_material_button = false;
     let mut material_button = false;
@@ -283,6 +283,7 @@ pub fn ui_state(
                     new_material_button = ui.button("New").clicked();
                 });
             } else if ui_state.fluid_window {
+
                 ui.heading("Fire");
 
                 ui.separator();
@@ -378,7 +379,7 @@ pub fn ui_state(
                 });
             }
 
-            if ui.button("Start simulation").clicked() {
+            if ui.button("Start simulation").clicked() && ui_state.created_fire{
                 ui_state.start_simulation = true;
             }
 
@@ -423,7 +424,13 @@ pub fn ui_state(
         ui_state.new_material = false;      
     }
     if ui_state.new_fluid {
+        if ui_state.created_fire{
+            for fire in &mut query_fire{
+            commands.entity(fire).despawn();
+            }
+        }
         commands.spawn(ui_state.fluid.clone());
         ui_state.new_fluid = false;
+        ui_state.created_fire = true;
     }
 }
