@@ -95,6 +95,14 @@ pub fn ui_state(
                         windows.material_for_change.position_x += 1;
                     }
 
+                    ui.add(
+                        egui::Slider::new(&mut windows.material_for_change.flammability, 0..=100)
+                            .text("Flammability"),
+                    );
+                    if ui.button("Increment").clicked() {
+                        ui_state.material.flammability += 1;
+                    }
+
                     ui.separator();
 
                     ui.horizontal(|ui| {
@@ -260,11 +268,13 @@ pub fn ui_state(
                     ui_state.material.position_x += 1;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.material.flammability , 0..=100).text("flammability"));
+                ui.add(
+                    egui::Slider::new(&mut ui_state.material.flammability, 0..=100)
+                        .text("Flammability"),
+                );
                 if ui.button("Increment").clicked() {
                     ui_state.material.flammability += 1;
                 }
-
 
                 ui.separator();
 
@@ -386,7 +396,8 @@ pub fn ui_state(
     });
 
     if new_material_button {
-        ui_state.new_material = !ui_state.new_material;
+        // ! ui_state.new_material
+        ui_state.new_material = true;
     }
 
     if material_button {
@@ -401,13 +412,15 @@ pub fn ui_state(
     }
 
     if ui_state.new_material {
-        commands.spawn(ui_state.material.clone());
-
         let x = ui_state.material.position_x;
         let y = ui_state.material.position_y;
-        ui_state.fluid.materials_cords.push((x, y));
-        // println!("Entitiryes = {:?}", ui_state.fluid.materials_entities);
-        ui_state.new_material = false;
+        
+        if !ui_state.fluid.materials_cords.contains(&(x,y)){
+            commands.spawn(ui_state.material.clone());
+            ui_state.fluid.materials_cords.push((x, y));
+            // println!("Entitiryes = {:?}", ui_state.fluid.materials_entities);
+        }  
+        ui_state.new_material = false;      
     }
     if ui_state.new_fluid {
         commands.spawn(ui_state.fluid.clone());

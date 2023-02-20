@@ -28,7 +28,8 @@ fn create_rect(
         0.0,
         egui::Color32::from_rgb(r, g, b),
         egui::Stroke::new(9.0, egui::Color32::from_rgb(r, g, b)),
-    );    if Response.clicked() && object_flag {
+    );
+    if Response.clicked() && object_flag {
         windows.side_panel_modify = true;
         true
     } else {
@@ -119,7 +120,8 @@ fn render_density(
                                 );
                                 //if the material is in range -> burn it
                                 if let Some(_) = material_in_fire_range {
-                                    material.fuel -= fluid.amount * (material.flammability as f32 /100 as f32 );
+                                    material.fuel -=
+                                        fluid.amount * (material.flammability as f32 / 100 as f32);
                                     let burn_power = fluid.amount;
                                     let burn_speed_x = fluid.amount_x;
                                     let burn_speed_y = fluid.amount_y;
@@ -146,11 +148,8 @@ fn render_density(
                             let mut cords_flag = false;
                             for mut fluid in fluids.iter_mut() {
                                 //check if material is still in the material list
-                                for cords in fluid.materials_cords.iter() {
-                                    if cords.0 == x && cords.1 == y {
-                                        cords_flag = true;
-                                    }
-                                }
+                                cords_flag = fluid.materials_cords.contains(&(x,y));
+                                
                                 //removes the material from the cords list
                                 if cords_flag {
                                     //here should be a new black rect or one that is goig to be filled with something
