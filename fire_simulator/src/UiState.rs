@@ -26,6 +26,7 @@ pub struct UiState {
     pub window_change_materials: bool,
     pub start_simulation: bool,
     pub restart_simulation:bool,
+    pub counter_fire_size:u32,
 }
 
 pub fn ui_state(

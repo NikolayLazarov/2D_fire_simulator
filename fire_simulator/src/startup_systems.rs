@@ -29,6 +29,7 @@ pub fn configure_ui_state(mut ui_state: ResMut<UiState::UiState>) {
     ui_state.created_fire = false;
     ui_state.window_change_materials = false;
     ui_state.restart_simulation = false;
+    ui_state.counter_fire_size = 1;
 }
 
 pub fn configure_windows(mut windows: ResMut<MaterialChangability::MaterialChangebility>) {

@@ -53,21 +53,34 @@ fn check_if_in_range(
     y_cord: i32,
     x_material: i32,
     y_material: i32,
-    range: i32,
+    mut range: i32,
+    type_fire: u32,
 ) -> bool {
-    let down_range = -range;
     let mut flag_x = false;
     let mut flag_y = false;
-
-    if x_material - x_cord <= range && x_material - x_cord >= down_range {
-        flag_x = true;
+    if type_fire%2==1{
+        let down_range = -range;
+        if x_material - x_cord <= range && x_material - x_cord >= down_range {
+            flag_x = true;
+        }
+        if y_material - y_cord <= range && y_material - y_cord >= down_range {
+            flag_y = true;
+        }
+    
+        flag_y && flag_x
+    
+    }else{
+        range /=  2;
+        if !(x_cord >= x_material - range && x_cord <= x_material+range && y_cord == y_material - range)  {
+             flag_x = true;
+        }
+        if !(y_cord >= y_material - range && y_cord <= y_material+range && x_cord == x_material - range){
+            flag_y = true;
+        }  
+        flag_x && flag_y
     }
-    if y_material - y_cord <= range && y_material - y_cord >= down_range {
-        flag_y = true;
-    }
-
-    flag_y && flag_x
 }
+
 fn render_density(
     ui: &mut Ui,
     density: &Vec<f32>,
@@ -218,8 +231,7 @@ fn render_density(
                             if fluid.fire_size % 2 == 1 {
                                 // println!("size = {}", fluid.fire_size);
                                 if x == fluid.fire_x && y == fluid.fire_y {
-                                    //central pixel of the fire
-                                    // println!("center");
+                                    
                                     if create_rect(
                                         ui,
                                         255 as u8,
@@ -242,6 +254,7 @@ fn render_density(
                                         fluid.fire_x as i32,
                                         fluid.fire_y as i32,
                                         fluid.counter_range as i32,
+                                        fluid.fire_size
                                     )
                                 {
                                     // println!("range > 1");
@@ -266,6 +279,7 @@ fn render_density(
                                         fluid.fire_x as i32,
                                         fluid.fire_y as i32,
                                         fluid.counter_range as i32,
+                                        fluid.fire_size
                                     )
                                 {
                                     if create_rect(
@@ -287,14 +301,40 @@ fn render_density(
                                         windows.material_change_flag = true;
                                     }
                                 }
-                            } else if fluid.fire_size % 2 == 0 {
-                                //let blue = 255 - 50;
-
-                                if create_rect(ui, 255, 255, 0, windows, true) {
-                                    // if create_rect(ui, 255 - d as u8, d as u8, 0, windows, true) {
-                                    windows.fluid_for_change = fluid.clone();
-                                    windows.fire_change_flag = true;
+                            }
+                             else if fluid.fire_size % 2 == 0 {
+                                
+                                if ((x== fluid.fire_x || x == fluid.fire_x+1) )&& ((y == fluid.fire_y)||(y== fluid.fire_y+1 )){ 
+                                    if create_rect(
+                                        ui,
+                                        255 as u8,
+                                        255 - (fluid.amount) as u8,
+                                        fluid.amount as u8,
+                                        windows,
+                                        true,
+                                    ) {
+                                        windows.fluid_for_change = fluid.clone();
+                                        windows.material_change_flag = true;
+                                    }
                                 }
+                                else if check_if_in_range(
+                                    x as i32,
+                                    y as i32,
+                                    fluid.fire_x as i32,
+                                    fluid.fire_y as i32,
+                                    fluid.fire_size as i32,
+                                    fluid.fire_size
+                                ){
+                                    if create_rect(ui, 255, fluid.amount as u8, 0, windows, true) {
+                                        // if create_rect(ui, 255 - d as u8, d as u8, 0, windows, true) {
+                                        windows.fluid_for_change = fluid.clone();
+                                        windows.fire_change_flag = true;
+                                    }
+                                }
+                                else {
+                                    continue;
+                                }
+                                
                                 // else if fluid.counter_range == fluid.fire_size{
 
                                 // }
