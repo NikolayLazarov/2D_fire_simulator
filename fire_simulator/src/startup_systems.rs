@@ -28,6 +28,7 @@ pub fn configure_ui_state(mut ui_state: ResMut<UiState::UiState>) {
     ui_state.fluid_window = false;
     ui_state.created_fire = false;
     ui_state.window_change_materials = false;
+    ui_state.restart_simulation = false;
 }
 
 pub fn configure_windows(mut windows: ResMut<MaterialChangability::MaterialChangebility>) {
