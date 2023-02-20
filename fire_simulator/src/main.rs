@@ -32,7 +32,7 @@ fn main() {
 #[derive(Component, Debug, Clone)]
 pub struct Materials {
     name_type: String,
-    flamability: f32,
+    flammability: u32,
     width: f32,
     height: f32,
     position_x: u32,
@@ -45,7 +45,7 @@ impl Default for Materials {
     fn default() -> Self {
         Self {
             name_type: String::from("Material"),
-            flamability: 0.5,
+            flammability: 50,
             width: 4.0,
             height: 5.0,
             position_x: 5,

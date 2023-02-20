@@ -119,7 +119,7 @@ fn render_density(
                                 );
                                 //if the material is in range -> burn it
                                 if let Some(_) = material_in_fire_range {
-                                    material.fuel -= fluid.amount;
+                                    material.fuel -= fluid.amount * (material.flammability as f32 /100 as f32 );
                                     let burn_power = fluid.amount;
                                     let burn_speed_x = fluid.amount_x;
                                     let burn_speed_y = fluid.amount_y;

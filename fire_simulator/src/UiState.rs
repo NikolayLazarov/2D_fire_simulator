@@ -260,6 +260,12 @@ pub fn ui_state(
                     ui_state.material.position_x += 1;
                 }
 
+                ui.add(egui::Slider::new(&mut ui_state.material.flammability , 0..=100).text("flammability"));
+                if ui.button("Increment").clicked() {
+                    ui_state.material.flammability += 1;
+                }
+
+
                 ui.separator();
 
                 ui.horizontal(|ui| {
