@@ -156,14 +156,14 @@ pub fn ui_state(
 
                     ui.add(
                         egui::Slider::new(&mut windows.fluid_for_change.fire_x, 0..=N - 2)
-                            .text("Fire X"),
+                            .text("Fire Y"),
                     );
                     if ui.button("Increment").clicked() {
                         windows.fluid_for_change.fire_x += 1;
                     }
                     ui.add(
                         egui::Slider::new(&mut windows.fluid_for_change.fire_y, 0..=N - 2)
-                            .text("Fire Y"),
+                            .text("Fire X"),
                     );
                     if ui.button("Increment").clicked() {
                         windows.fluid_for_change.fire_y += 1;
@@ -356,11 +356,11 @@ pub fn ui_state(
                 }
 
                 ui.add(
-                    egui::Slider::new(&mut windows.fluid_for_change.fire_range, 0..=(N - 1) / 2)
+                    egui::Slider::new(&mut ui_state.fluid.fire_range, 0..=(N - 1) / 2)
                         .text("Fire range"),
                 );
                 if ui.button("Increment").clicked() {
-                    windows.fluid_for_change.fire_range += 1;
+                    ui_state.fluid.fire_range += 1;
                     }
 
                 ui.add(

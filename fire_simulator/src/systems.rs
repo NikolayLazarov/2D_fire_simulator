@@ -112,6 +112,9 @@ fn render_density(
 
                         if material.fuel > 0. && frames > 0 {
                             for mut fluid in fluids.iter_mut() {
+                                println!("x = {}, size+range = {}", fluid.fire_x,(fluid.fire_size + fluid.fire_range) as f32);
+                                println!("y = {}, size+range = {}", fluid.fire_y,(fluid.fire_size + fluid.fire_range) as f32);
+
                                 //flag to check if material is in the range of the fire
                                 let material_in_fire_range = collide(
                                     Vec3 {
@@ -133,6 +136,7 @@ fn render_density(
                                 );
                                 //if the material is in range -> burn it
                                 if let Some(_) = material_in_fire_range {
+                                    println!("material {} in range", material.name_type);
                                     material.fuel -=
                                         fluid.amount * (material.flammability as f32 / 100 as f32);
                                     let burn_power = fluid.amount;
@@ -241,7 +245,7 @@ fn render_density(
                                         true,
                                     ) {
                                         windows.fluid_for_change = fluid.clone();
-                                        windows.material_change_flag = true;
+                                        windows.fire_change_flag = true;
                                         // fluid.counter_range = 1;
                                     }
                                     // continue;
@@ -267,7 +271,7 @@ fn render_density(
                                         true,
                                     ) {
                                         windows.fluid_for_change = fluid.clone();
-                                        windows.material_change_flag = true;
+                                        windows.fire_change_flag = true;
                                         // fluid.counter_range = 2;
                                     }
                                 }
@@ -288,7 +292,7 @@ fn render_density(
                                         0, 0, windows, true,
                                     ) {
                                         windows.fluid_for_change = fluid.clone();
-                                        windows.material_change_flag = true;
+                                        windows.fire_change_flag = true;
                                     }
                                 } else {
                                     // println!("range else");
@@ -298,7 +302,7 @@ fn render_density(
                                         0, 0, windows, true,
                                     ) {
                                         windows.fluid_for_change = fluid.clone();
-                                        windows.material_change_flag = true;
+                                        windows.fire_change_flag = true;
                                     }
                                 }
                             }
@@ -314,7 +318,7 @@ fn render_density(
                                         true,
                                     ) {
                                         windows.fluid_for_change = fluid.clone();
-                                        windows.material_change_flag = true;
+                                        windows.fire_change_flag = true;
                                     }
                                 }
                                 else if check_if_in_range(
