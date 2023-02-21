@@ -160,26 +160,26 @@ pub fn ui_state(
                         windows.fluid_for_change.amount += 1.0;
                     }
 
-                    ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.fire_size, 0..=10)
-                            .text("Size"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.fluid_for_change.fire_size += 1;
-                    }
+                    // ui.add(
+                    //     egui::Slider::new(&mut windows.fluid_for_change.fire_size, 0..=10)
+                    //         .text("Size"),
+                    // );
+                    // if ui.button("Increment").clicked() {
+                    //     windows.fluid_for_change.fire_size += 1;
+                    // }
 
-                    ui.add(
-                        egui::Slider::new(
-                            &mut windows.fluid_for_change.fire_range,
-                            0..=(N - 1) / 2,
-                        )
-                        .text("Fire range"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.fluid_for_change.fire_range += 1;
-                        // windows.fluid_for_change.counter_range +=
-                        //     windows.fluid_for_change.fire_size * windows.fluid_for_change.fire_size;
-                    }
+                    // ui.add(
+                    //     egui::Slider::new(
+                    //         &mut windows.fluid_for_change.fire_range,
+                    //         0..=(N - 1) / 2,
+                    //     )
+                    //     .text("Fire range"),
+                    // );
+                    // if ui.button("Increment").clicked() {
+                    //     windows.fluid_for_change.fire_range += 1;
+                    //     // windows.fluid_for_change.counter_range +=
+                    //     //     windows.fluid_for_change.fire_size * windows.fluid_for_change.fire_size;
+                    // }
 
                     ui.add(
                         egui::Slider::new(&mut windows.fluid_for_change.amount_x, 0.0..=200.0)
@@ -321,20 +321,20 @@ pub fn ui_state(
                     ui_state.fluid.amount += 1.0;
                 }
 
-                ui.add(egui::Slider::new(&mut ui_state.fluid.fire_size, 0..=10).text("Size"));
-                if ui.button("Increment").clicked() {
-                    ui_state.fluid.fire_size += 1;
-                    // ui_state.fluid.counter_range +=
-                    //     ui_state.fluid.fire_size * ui_state.fluid.fire_size;
-                }
+                // ui.add(egui::Slider::new(&mut ui_state.fluid.fire_size, 0..=10).text("Size"));
+                // if ui.button("Increment").clicked() {
+                //     ui_state.fluid.fire_size += 1;
+                //     // ui_state.fluid.counter_range +=
+                //     //     ui_state.fluid.fire_size * ui_state.fluid.fire_size;
+                // }
 
-                ui.add(
-                    egui::Slider::new(&mut ui_state.fluid.fire_range, 0..=(N - 1) / 2)
-                        .text("Fire range"),
-                );
-                if ui.button("Increment").clicked() {
-                    ui_state.fluid.fire_range += 1;
-                }
+                // ui.add(
+                //     egui::Slider::new(&mut ui_state.fluid.fire_range, 0..=(N - 1) / 2)
+                //         .text("Fire range"),
+                // );
+                // if ui.button("Increment").clicked() {
+                //     ui_state.fluid.fire_range += 1;
+                // }
 
                 ui.add(
                     egui::Slider::new(&mut ui_state.fluid.amount_x, -200.0..=200.0)

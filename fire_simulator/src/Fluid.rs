@@ -45,10 +45,10 @@ pub struct FluidMatrix {
 
     pub frames: u32,
 
-    pub fire_size: u32,
-    pub fire_range: u32,
+    // pub fire_size: u32,
+    // pub fire_range: u32,
 
-    pub counter_range: u32,
+    // pub counter_range: u32,
 
     pub materials_coords: Vec<(u32, u32)>,
 }
@@ -77,9 +77,9 @@ impl FluidMatrix {
             amount_y: 15.0,
 
             frames: 20,
-            fire_size: 2,
-            fire_range: 5,
-            counter_range: 1,
+            // fire_size: 2,
+            // fire_range: 5,
+            // counter_range: 1,
 
             materials_coords: vec![],
         }

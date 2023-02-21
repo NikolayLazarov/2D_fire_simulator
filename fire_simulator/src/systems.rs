@@ -10,9 +10,9 @@ use std::{thread, time};
 use bevy_egui::egui::{vec2, Pos2, Rounding, Ui};
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 
+use crate::ElementChangability;
 use crate::Fluid::N;
 use crate::Fluid::{self, FluidMatrix};
-use crate::ElementChangability;
 use crate::Materials;
 use crate::UiState::{self, ui_state};
 
@@ -39,16 +39,20 @@ fn create_rect(
     }
 }
 
-fn create_fire_in_range(d:f32, windows: &mut ResMut<ElementChangability::ElementChangebilityContext>,ui: &mut Ui, fluid: Mut<FluidMatrix>){
+fn create_fire_in_range(
+    d: f32,
+    windows: &mut ResMut<ElementChangability::ElementChangebilityContext>,
+    ui: &mut Ui,
+    fluid: Mut<FluidMatrix>,
+) {
     let mut red = d as u8;
     let mut yellow = d as u8;
-    
-    if d> 0.1{   
-        red = 255;
-        yellow = 255 - (d * 255. ) as u8;
-    }  
 
-    
+    if d > 0.1 {
+        red = 255;
+        yellow = 255 - (d * 255.) as u8;
+    }
+
     if create_rect(
         ui, red,
         //maybe here use only the amount -> see how much green makes orange or yellow
@@ -80,7 +84,7 @@ fn check_if_in_range(
 ) -> bool {
     let mut flag_x = false;
     let mut flag_y = false;
-    if type_fire%2==1{
+    if type_fire % 2 == 1 {
         let down_range = -range;
         if x_material - x_cord <= range && x_material - x_cord >= down_range {
             flag_x = true;
@@ -88,17 +92,22 @@ fn check_if_in_range(
         if y_material - y_cord <= range && y_material - y_cord >= down_range {
             flag_y = true;
         }
-    
+
         flag_y && flag_x
-    
-    }else{
-        range /=  2;
-        if !(x_cord >= x_material - range && x_cord <= x_material+range && y_cord == y_material - range)  {
-             flag_x = true;
+    } else {
+        range /= 2;
+        if !(x_cord >= x_material - range
+            && x_cord <= x_material + range
+            && y_cord == y_material - range)
+        {
+            flag_x = true;
         }
-        if !(y_cord >= y_material - range && y_cord <= y_material+range && x_cord == x_material - range){
+        if !(y_cord >= y_material - range
+            && y_cord <= y_material + range
+            && x_cord == x_material - range)
+        {
             flag_y = true;
-        }  
+        }
         flag_x && flag_y
     }
 }
@@ -131,47 +140,52 @@ fn render_density(
                     if check_if_material_at_position(x, y, material.position_x, material.position_y)
                     {
                         //if the material has not burned out yet and the simulation has started
-                        
+
                         if material.fuel > 0. && frames > 0 {
                             for mut fluid in fluids.iter_mut() {
+                                let [mut left, mut right, mut up, mut down] = [0.; 4];
+                                if x as i32 - 1 > 0 {
+                                    left = density[Fluid::IX(x - 1, y) as usize];
+                                }
+                                if x + 1 < N - 1 {
+                                    right = density[Fluid::IX(x + 1, y) as usize];
+                                }
+                                if y as i32 - 1 > 0 {
+                                    up = density[Fluid::IX(x, y - 1) as usize];
+                                }
+                                if y + 1 < N - 1 {
+                                    down = density[Fluid::IX(x, y + 1) as usize];
+                                }
+                                let mut material_coeficient = left + right + up + down;
 
-                                let [mut left,mut right,mut up,mut down] = [0.;4];
-                                if x-1 >= 0{
-                                left = density[Fluid::IX(x-1, y) as usize];
-
-                                }
-                                if x+1 < N-1{
-                                     right = density[Fluid::IX(x+1, y) as usize];
-                                }
-                                if y-1>= 0{
-                                    up = density[Fluid::IX(x, y-1) as usize];
-                                } 
-                                if y+1 <N-1{
-                                    down = density[Fluid::IX(x, y+1) as usize];
-                                }
-                                let mut material_coeficient = left+right+up+down; 
-                                
-                                
-                            println!("d = {}, amount = {}, flamability = {}",material_coeficient,  fluid.amount, material.flammability as f32 );
-                                material.fuel -=  material_coeficient* fluid.amount * (material.flammability as f32 / 100 as f32);
-                                println!("material fluid = {} and minus = {}", material.fuel, d * fluid.amount * (material.flammability as f32 / 100 as f32));
+                                println!(
+                                    "d = {}, amount = {}, flamability = {}",
+                                    material_coeficient, fluid.amount, material.flammability as f32
+                                );
+                                material.fuel -= material_coeficient
+                                    * fluid.amount
+                                    * (material.flammability as f32 / 100 as f32);
+                                println!(
+                                    "material fluid = {} and minus = {}",
+                                    material.fuel,
+                                    d * fluid.amount * (material.flammability as f32 / 100 as f32)
+                                );
                                 let burn_power = fluid.amount;
-                                    let burn_speed_x = fluid.amount_x;
-                                    let burn_speed_y = fluid.amount_y;
-                                    //not sure if this works
-                                    fluid.add_density(
-                                        material.position_x,
-                                        material.position_y,
-                                        burn_power,
-                                    );
-                                    fluid.add_velocity(
-                                        material.position_x,
-                                        material.position_y,
-                                        burn_speed_x,
-                                        burn_speed_y,
-                                    );
-                                    fluid.step();
-                               
+                                let burn_speed_x = fluid.amount_x;
+                                let burn_speed_y = fluid.amount_y;
+                                //not sure if this works
+                                fluid.add_density(
+                                    material.position_x,
+                                    material.position_y,
+                                    burn_power,
+                                );
+                                fluid.add_velocity(
+                                    material.position_x,
+                                    material.position_y,
+                                    burn_speed_x,
+                                    burn_speed_y,
+                                );
+                                fluid.step();
                             }
                         }
 
@@ -181,8 +195,8 @@ fn render_density(
                             let mut cords_flag = false;
                             for mut fluid in fluids.iter_mut() {
                                 //check if material is still in the material list
-                                cords_flag = fluid.materials_coords.contains(&(x,y));
-                                
+                                cords_flag = fluid.materials_coords.contains(&(x, y));
+
                                 //removes the material from the cords list
                                 if cords_flag {
                                     //here should be a new black rect or one that is goig to be filled with something
@@ -229,9 +243,8 @@ fn render_density(
                     // }
                     //rect // fluid
 
-                    if fluid_flag == false{
+                    if fluid_flag == false {
                         if x == fluid.fire_x && y == fluid.fire_y {
-                                    
                             if create_rect(
                                 ui,
                                 255 as u8,
@@ -245,23 +258,21 @@ fn render_density(
                                 // fluid.counter_range = 1;
                             }
                             // continue;
-                        }else{
-                                if d > 0.{
-                                    // let perlin = PerlinNoise::new();
-                                    // println!("We are here {}", perlin.get(132.2) );
-                                   create_fire_in_range(d, windows, ui,fluid);
-                                }else{
-                                    // fluid_flag = true;
-                                    continue;
-                                }
-                               
-                        }               
-                            fluid_flag = true;
-                            continue
-                    //         //see if this stops others from emiting
+                        } else {
+                            if d > 0. {
+                                // let perlin = PerlinNoise::new();
+                                // println!("We are here {}", perlin.get(132.2) );
+                                create_fire_in_range(d, windows, ui, fluid);
+                            } else {
+                                // fluid_flag = true;
+                                continue;
+                            }
+                        }
+                        fluid_flag = true;
+                        continue;
+                        //         //see if this stops others from emiting
                     }
-
-                    }
+                }
                 if fluid_flag == true {
                     continue;
                 }
@@ -271,18 +282,15 @@ fn render_density(
                     d = 0.0;
                     create_rect(ui, d as u8, 0, 0, windows, false);
                 } else {
-
                     let (rect, Response) =
                         ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
                     ui.painter().rect(
                         rect,
                         0.0,
                         egui::Color32::from_gray(d as u8),
-                        egui::Stroke::new(
-                            9.0, egui::Color32::from_gray((d * 100.0) as u8),
-                        ), 
+                        egui::Stroke::new(9.0, egui::Color32::from_gray((d * 100.0) as u8)),
                     );
-                    }
+                }
             }
         });
     }
