@@ -4,6 +4,8 @@ use bevy::ui;
 use bevy::{prelude::*, sprite::collide_aabb::collide};
 use bevy_egui::egui::epaint::RectShape;
 use std::{thread, time};
+// extern crate perlin_noise;
+// use perlin::PerlinNoise;
 
 use bevy_egui::egui::{vec2, Pos2, Rounding, Ui};
 use bevy_egui::{egui, EguiContext, EguiPlugin};
@@ -219,8 +221,8 @@ fn render_density(
                             z: 0.,
                         },
                         Vec2 {
-                            x: fluid.fire_size as f32,
-                            y: fluid.fire_size as f32,
+                            x: (fluid.fire_size + fluid.fire_range) as f32,
+                            y: (fluid.fire_size + fluid.fire_range) as f32,
                         },
                         Vec3 {
                             x: x as f32,
@@ -294,17 +296,47 @@ fn render_density(
                                         windows.fluid_for_change = fluid.clone();
                                         windows.fire_change_flag = true;
                                     }
-                                } else {
-                                    // println!("range else");
+                                }
+                                else if check_if_in_range(
+                                    
+                                    x as i32,
+                                    y as i32,
+                                    fluid.fire_x as i32,
+                                    fluid.fire_y as i32,
+                                    fluid.fire_range as i32,
+                                    fluid.fire_size
+                                ){
+                                    if frames >0{
+                                        // let perlin = PerlinNoise::new();
+                                        // println!("We are here {}", perlin.get(132.2) );
                                     if create_rect(
                                         ui, 255,
                                         //maybe here use only the amount -> see how much green makes orange or yellow
-                                        0, 0, windows, true,
+                                        (d * 100.0) as u8, 0, windows, true,
                                     ) {
                                         windows.fluid_for_change = fluid.clone();
                                         windows.fire_change_flag = true;
                                     }
+                                    }else{
+                                        continue;
+                                    }
+                                    
                                 }
+                                 else {
+                                    // println!("range else");
+                                    if frames == 0{
+                                        if create_rect(
+                                            ui, 255,
+                                            //maybe here use only the amount -> see how much green makes orange or yellow
+                                            0, 0, windows, true,
+                                        ) {
+                                            windows.fluid_for_change = fluid.clone();
+                                            windows.fire_change_flag = true;
+                                        }
+    
+                                    }
+                                }
+                                
                             }
                              else if fluid.fire_size % 2 == 0 {
                                 
@@ -336,6 +368,7 @@ fn render_density(
                                     }
                                 }
                                 else {
+                                    // fluid_flag = true;
                                     continue;
                                 }
                                 
