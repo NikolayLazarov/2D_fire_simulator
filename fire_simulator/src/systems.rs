@@ -259,12 +259,20 @@ fn render_density(
                             }
                             // continue;
                         } else {
-                            if d > 0. {
+                            if d >  0.2 {
                                 // let perlin = PerlinNoise::new();
                                 // println!("We are here {}", perlin.get(132.2) );
                                 create_fire_in_range(d, windows, ui, fluid);
-                            } else {
-                                // fluid_flag = true;
+                            } else if d > 0.01 && d < 0.4 {
+                                let (rect, Response) =
+                        ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                    ui.painter().rect(
+                        rect,
+                        0.0,
+                        egui::Color32::from_gray(255 -(d * 255.0) as u8),
+                        egui::Stroke::new(9.0, egui::Color32::from_gray(255- (d * 255.0) as u8)),
+                    );
+                            } else{
                                 continue;
                             }
                         }
