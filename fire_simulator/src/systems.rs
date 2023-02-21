@@ -310,24 +310,21 @@ fn render_density(
                                         // let perlin = PerlinNoise::new();
                                         // println!("We are here {}", perlin.get(132.2) );
                                         let mut red = d as u8;
-                                        if red< 1{
-                                        // println!("red = {}",red);
-                                        }
+                                        let mut yellow = d as u8;
+                                        
                                         if d> 0.1{   
-                                            red = (d * fluid.amount) as u8; 
+                                            // red = (d * fluid.amount) as u8; 
                                             red = 255;
-                                        println!("red = {}",red);    
+                                            yellow = 255 - (d * 255. ) as u8;
+                                        // println!("red = {}",red);    
                                         }  
-                                        println!("green = {}",(d * 255. ) as u8);
+                                        // println!("green = {}",(d * 255. ) as u8);
+
                                         
                                     if create_rect(
                                         ui, red,
                                         //maybe here use only the amount -> see how much green makes orange or yellow
-                                         if d == 0. {
-                                            0
-                                        }else{
-                                            255 - (d * 255. ) as u8
-                                        }, 0, windows, true,
+                                         yellow, 0, windows, true,
                                     ) {
                                         windows.fluid_for_change = fluid.clone();
                                         windows.fire_change_flag = true;
