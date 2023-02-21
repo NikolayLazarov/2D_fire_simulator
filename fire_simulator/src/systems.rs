@@ -306,13 +306,28 @@ fn render_density(
                                     fluid.fire_range as i32,
                                     fluid.fire_size
                                 ){
-                                    if frames >0{
+                                    if frames >0 && d > 0.{
                                         // let perlin = PerlinNoise::new();
                                         // println!("We are here {}", perlin.get(132.2) );
+                                        let mut red = d as u8;
+                                        if red< 1{
+                                        // println!("red = {}",red);
+                                        }
+                                        if d> 0.1{   
+                                            red = (d * fluid.amount) as u8; 
+                                            red = 255;
+                                        println!("red = {}",red);    
+                                        }  
+                                        println!("green = {}",(d * 255. ) as u8);
+                                        
                                     if create_rect(
-                                        ui, 255,
+                                        ui, red,
                                         //maybe here use only the amount -> see how much green makes orange or yellow
-                                        (d * 100.0) as u8, 0, windows, true,
+                                         if d == 0. {
+                                            0
+                                        }else{
+                                            255 - (d * 255. ) as u8
+                                        }, 0, windows, true,
                                     ) {
                                         windows.fluid_for_change = fluid.clone();
                                         windows.fire_change_flag = true;
@@ -322,20 +337,20 @@ fn render_density(
                                     }
                                     
                                 }
-                                 else {
-                                    // println!("range else");
-                                    if frames == 0{
-                                        if create_rect(
-                                            ui, 255,
-                                            //maybe here use only the amount -> see how much green makes orange or yellow
-                                            0, 0, windows, true,
-                                        ) {
-                                            windows.fluid_for_change = fluid.clone();
-                                            windows.fire_change_flag = true;
-                                        }
+                                //  else {
+                                //     // println!("range else");
+                                //     if frames == 0{
+                                //         if create_rect(
+                                //             ui, 255,
+                                //             //maybe here use only the amount -> see how much green makes orange or yellow
+                                //             0, 0, windows, true,
+                                //         ) {
+                                //             windows.fluid_for_change = fluid.clone();
+                                //             windows.fire_change_flag = true;
+                                //         }
     
-                                    }
-                                }
+                                //     }
+                                // }
                                 
                             }
                              else if fluid.fire_size % 2 == 0 {

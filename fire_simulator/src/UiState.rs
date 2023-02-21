@@ -169,8 +169,8 @@ pub fn ui_state(
                         windows.fluid_for_change.fire_y += 1;
                     }
                     ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.amount, 0.0..=2.0)
-                            .text("Power"),
+                        egui::Slider::new(&mut windows.fluid_for_change.amount, 0.0..=255.0)
+                       .text("Power"),
                     );
                     if ui.button("Increment").clicked() {
                         windows.fluid_for_change.amount += 1.0;
@@ -343,7 +343,7 @@ pub fn ui_state(
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.fire_y += 1;
                 }
-                ui.add(egui::Slider::new(&mut ui_state.fluid.amount, 0.0..=200.0).text("Power"));
+                ui.add(egui::Slider::new(&mut ui_state.fluid.amount, 0.0..=255.0).text("Power"));
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.amount += 1.0;
                 }
