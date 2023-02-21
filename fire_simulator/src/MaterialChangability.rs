@@ -8,7 +8,7 @@ use crate::Fluid;
 use crate::Materials;
 
 #[derive(Default, Resource)]
-pub struct Windows {
+pub struct MaterialChangebility {
     pub side_panel_modify: bool,
     pub material_for_change: Materials,
     pub fluid_for_change: Fluid::FluidMatrix,

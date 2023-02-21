@@ -7,8 +7,8 @@ use bevy_egui::{
     EguiPlugin,
 };
 mod Fluid;
+mod MaterialChangability;
 mod UiState;
-mod Windows;
 mod startup_systems;
 mod systems;
 
@@ -18,7 +18,7 @@ use crate::Fluid::N;
 fn main() {
     App::new()
         .init_resource::<UiState::UiState>()
-        .init_resource::<Windows::Windows>()
+        .init_resource::<MaterialChangability::MaterialChangebility>()
         .add_plugins(DefaultPlugins)
         .add_plugin(EguiPlugin)
         .add_startup_system(startup_systems::configure_visuals)
@@ -32,13 +32,11 @@ fn main() {
 #[derive(Component, Debug, Clone)]
 pub struct Materials {
     name_type: String,
-    flamability: f32,
-    color: Color,
+    flammability: u32,
     width: f32,
     height: f32,
     position_x: u32,
     position_y: u32,
-    clicked: bool,
     fuel: f32,
     // entity_id: Entity,
 }
@@ -47,14 +45,12 @@ impl Default for Materials {
     fn default() -> Self {
         Self {
             name_type: String::from("Material"),
-            flamability: 0.5,
-            color: Color::BEIGE,
+            flammability: 50,
             width: 4.0,
             height: 5.0,
             position_x: 5,
             position_y: 5,
-            clicked: false,
-            fuel: 600.0,
+            fuel: 1000.0,
             // entity_id: Entity::index(Entity),
         }
     }

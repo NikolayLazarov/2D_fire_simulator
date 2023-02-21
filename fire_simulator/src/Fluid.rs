@@ -26,55 +26,41 @@ pub fn IX(mut x: u32, mut y: u32) -> u32 {
 
 #[derive(Default, Component, Clone)]
 pub struct FluidMatrix {
-    size: u32,
-
-    //timestep
-    dt: f32,
-    //diffusion_amount -> controls how the velocity and the vector diffuse
-    diffuusion: f32,
-    //viscosity -> thikcness
-    viscosity: f32,
-    //maybe previoeus density
-    s: Vec<f32>,
+    pub delta_time: f32,
+    pub diffusion: f32,
+    pub viscosity: f32,
+    old_density: Vec<f32>,
     density: Vec<f32>,
 
-    //velocity X -> current
     Vx: Vec<f32>,
-    //velocity y -> current
     Vy: Vec<f32>,
 
     Vx0: Vec<f32>,
     Vy0: Vec<f32>,
-    //for adding new values
-    pub fluid_x: u32,
-    pub fluid_y: u32,
+    pub fire_x: u32,
+    pub fire_y: u32,
     pub amount: f32,
-    //power velocity
     pub amount_x: f32,
     pub amount_y: f32,
 
     pub frames: u32,
 
+    pub fire_size: u32,
     pub fire_range: u32,
 
     pub counter_range: u32,
 
-    pub materials_entities_id: Vec<Entity>,
     pub materials_cords: Vec<(u32, u32)>,
 }
 
 impl FluidMatrix {
-    pub fn new(
-        dt_given_value: f32,
-        diffusion_given_value: f32,
-        viscosity_given_value: f32,
-    ) -> Self {
+    pub fn new() -> Self {
         Self {
-            size: N,
-            dt: dt_given_value,
-            diffuusion: diffusion_given_value,
-            viscosity: viscosity_given_value,
-            s: vec![0.; N.pow(2) as usize],
+            delta_time: 0.1,
+            diffusion: 0.001,
+            viscosity: 0.0000001,
+
+            old_density: vec![0.; N.pow(2) as usize],
             density: vec![0.; N.pow(2) as usize],
 
             Vx: vec![0.; N.pow(2) as usize],
@@ -83,44 +69,60 @@ impl FluidMatrix {
             Vx0: vec![0.; N.pow(2) as usize],
             Vy0: vec![0.; N.pow(2) as usize],
 
-            fluid_x: 0,
-            fluid_y: 0,
+            fire_x: 5,
+            fire_y: 5,
+
             amount: 25.0,
             amount_x: 15.0,
             amount_y: 15.0,
-            frames: 20,
-            fire_range: 2,
 
-            counter_range: 0,
-            //new
-            materials_entities_id: vec![],
+            frames: 20,
+            fire_size: 2,
+            fire_range: 5,
+            counter_range: 1,
+
             materials_cords: vec![],
         }
     }
 
     pub fn step(&mut self) {
         let visc: f32 = self.viscosity;
-        let diff: f32 = self.diffuusion;
-        let dt: f32 = self.dt;
+        let diff: f32 = self.diffusion;
+        let delta_time: f32 = self.delta_time;
         let Vx: &mut Vec<f32> = &mut self.Vx;
         let Vy: &mut Vec<f32> = &mut self.Vy;
         let Vx0: &mut Vec<f32> = &mut self.Vx0;
         let Vy0: &mut Vec<f32> = &mut self.Vy0;
-        let s: &mut Vec<f32> = &mut self.s;
+        let old_density: &mut Vec<f32> = &mut self.old_density;
         let density: &mut Vec<f32> = &mut self.density;
 
-        diffuse(1, Vx0, Vx, visc, dt, &self.materials_cords);
-        diffuse(2, Vy0, Vy, visc, dt, &self.materials_cords);
+        diffuse(1, Vx0, Vx, visc, delta_time, &self.materials_cords);
+        diffuse(2, Vy0, Vy, visc, delta_time, &self.materials_cords);
 
         project(Vx0, Vy0, Vx, Vy, &self.materials_cords);
 
-        advect(1, Vx, Vx0, Vx0, Vy0, dt, &self.materials_cords);
-        advect(2, Vy, Vy0, Vx0, Vy0, dt, &self.materials_cords);
+        advect(1, Vx, Vx0, Vx0, Vy0, delta_time, &self.materials_cords);
+        advect(2, Vy, Vy0, Vx0, Vy0, delta_time, &self.materials_cords);
 
         project(Vx, Vy, Vx0, Vy0, &self.materials_cords);
 
-        diffuse(0, s, density, diff, dt, &self.materials_cords);
-        advect(0, density, s, Vx, Vy, dt, &self.materials_cords);
+        diffuse(
+            0,
+            old_density,
+            density,
+            diff,
+            delta_time,
+            &self.materials_cords,
+        );
+        advect(
+            0,
+            density,
+            old_density,
+            Vx,
+            Vy,
+            delta_time,
+            &self.materials_cords,
+        );
     }
 
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {
@@ -144,12 +146,12 @@ fn diffuse(
     b: u32,
     mut x: &mut Vec<f32>,
     mut x0: &mut Vec<f32>,
-    diff: f32,
-    dt: f32,
+    diffusion: f32,
+    delta_time: f32,
     materials_cords: &Vec<(u32, u32)>,
 ) {
     //see what does a
-    let a: f32 = dt * diff * ((N - 2) * (N - 2)) as f32;
+    let a: f32 = delta_time * diffusion * ((N - 2) * (N - 2)) as f32;
     // println!("diffuse; a = {}, b = {}", a, b);
     //see why it is 1 and 6 -> maybe the saids that are around it
     // so it should be 4
