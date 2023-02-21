@@ -33,8 +33,6 @@ fn main() {
 pub struct Materials {
     name_type: String,
     flammability: u32,
-    width: f32,
-    height: f32,
     position_x: u32,
     position_y: u32,
     fuel: f32,
@@ -46,8 +44,6 @@ impl Default for Materials {
         Self {
             name_type: String::from("Material"),
             flammability: 50,
-            width: 4.0,
-            height: 5.0,
             position_x: 5,
             position_y: 5,
             fuel: 1000.0,

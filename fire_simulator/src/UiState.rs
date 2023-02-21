@@ -66,26 +66,8 @@ pub fn ui_state(
                     });
 
                     ui.add(
-                        egui::Slider::new(&mut windows.material_for_change.width, 0.0..=30.0)
-                            .text("Width"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.material_for_change.width += 1.0;
-                    }
-
-                    ui.add(
-                        egui::Slider::new(&mut windows.material_for_change.height, 0.0..=30.0)
-                            .text("Height"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.material_for_change.height += 1.0;
-                    }
-                    //do not why x and y are swapped so I Swapp them
-                    //found the ptoblem -> fix them properrly
-                    //if still a problem look at i and j in render density
-                    ui.add(
                         egui::Slider::new(&mut windows.material_for_change.position_y, 0..=N - 1)
-                            .text("Y axys"),
+                            .text("X axys"),
                     );
                     if ui.button("Increment").clicked() {
                         windows.material_for_change.position_y += 1;
@@ -93,7 +75,7 @@ pub fn ui_state(
 
                     ui.add(
                         egui::Slider::new(&mut windows.material_for_change.position_x, 0..=N - 1)
-                            .text("X axys"),
+                            .text("Y axys"),
                     );
                     if ui.button("Increment").clicked() {
                         windows.material_for_change.position_x += 1;
@@ -271,16 +253,6 @@ pub fn ui_state(
                     ui.text_edit_singleline(&mut ui_state.material.name_type);
                 });
 
-                ui.add(egui::Slider::new(&mut ui_state.material.width, 0.0..=30.0).text("Width"));
-                if ui.button("Increment").clicked() {
-                    ui_state.material.width += 1.0;
-                }
-
-                ui.add(egui::Slider::new(&mut ui_state.material.height, 0.0..=30.0).text("Height"));
-                if ui.button("Increment").clicked() {
-                    ui_state.material.height += 1.0;
-                }
-                //do not why x and y are swapped so I Swapp them
                 ui.add(
                     egui::Slider::new(&mut ui_state.material.position_y, 0..=N - 1).text("X axys"),
                 );
