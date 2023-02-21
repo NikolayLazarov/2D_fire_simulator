@@ -131,37 +131,31 @@ fn render_density(
                     if check_if_material_at_position(x, y, material.position_x, material.position_y)
                     {
                         //if the material has not burned out yet and the simulation has started
-
+                        
                         if material.fuel > 0. && frames > 0 {
                             for mut fluid in fluids.iter_mut() {
-                                println!("x = {}, size+range = {}", fluid.fire_x,(fluid.fire_size + fluid.fire_range) as f32);
-                                println!("y = {}, size+range = {}", fluid.fire_y,(fluid.fire_size + fluid.fire_range) as f32);
 
-                                //flag to check if material is in the range of the fire
-                                let material_in_fire_range = collide(
-                                    Vec3 {
-                                        x: fluid.fire_x as f32,
-                                        y: fluid.fire_y as f32,
-                                        z: 0.,
-                                    },
-                                    Vec2 {
-                                        x: (fluid.fire_size + fluid.fire_range) as f32,
-                                        y: (fluid.fire_size + fluid.fire_range) as f32,
-                                    },
-                                    Vec3 {
-                                        x: material.position_x as f32,
-                                        y: material.position_y as f32,
-                                        z: 0.,
-                                    },
-                                    //put the sizes parameters when you implement them
-                                    Vec2 { x: 1., y: 1. },
-                                );
-                                //if the material is in range -> burn it
-                                if let Some(_) = material_in_fire_range {
-                                    println!("material {} in range", material.name_type);
-                                    material.fuel -=
-                                        fluid.amount * (material.flammability as f32 / 100 as f32);
-                                    let burn_power = fluid.amount;
+                                let [mut left,mut right,mut up,mut down] = [0.;4];
+                                if x-1 >= 0{
+                                left = density[Fluid::IX(x-1, y) as usize];
+
+                                }
+                                if x+1 < N-1{
+                                     right = density[Fluid::IX(x+1, y) as usize];
+                                }
+                                if y-1>= 0{
+                                    up = density[Fluid::IX(x, y-1) as usize];
+                                } 
+                                if y+1 <N-1{
+                                    down = density[Fluid::IX(x, y+1) as usize];
+                                }
+                                let mut material_coeficient = left+right+up+down; 
+                                
+                                
+                            println!("d = {}, amount = {}, flamability = {}",material_coeficient,  fluid.amount, material.flammability as f32 );
+                                material.fuel -=  material_coeficient* fluid.amount * (material.flammability as f32 / 100 as f32);
+                                println!("material fluid = {} and minus = {}", material.fuel, d * fluid.amount * (material.flammability as f32 / 100 as f32));
+                                let burn_power = fluid.amount;
                                     let burn_speed_x = fluid.amount_x;
                                     let burn_speed_y = fluid.amount_y;
                                     //not sure if this works
@@ -177,7 +171,7 @@ fn render_density(
                                         burn_speed_y,
                                     );
                                     fluid.step();
-                                }
+                               
                             }
                         }
 
