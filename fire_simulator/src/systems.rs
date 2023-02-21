@@ -234,157 +234,40 @@ fn render_density(
                     //     fluid_flag = true;
                     // }
                     //rect // fluid
-                    let collision = collide(
-                        Vec3 {
-                            x: fluid.fire_x as f32,
-                            y: fluid.fire_y as f32,
-                            z: 0.,
-                        },
-                        Vec2 {
-                            x: (fluid.fire_size + fluid.fire_range) as f32,
-                            y: (fluid.fire_size + fluid.fire_range) as f32,
-                        },
-                        Vec3 {
-                            x: x as f32,
-                            y: y as f32,
-                            z: 0.,
-                        },
-                        Vec2 { x: 1., y: 1. },
-                    );
 
-                    if fluid_flag == false {
-                        if let Some(_) = collision {
-                            if fluid.fire_size % 2 == 1 {
-                                // println!("size = {}", fluid.fire_size);
-                                if x == fluid.fire_x && y == fluid.fire_y {
+                    if fluid_flag == false{
+                        if x == fluid.fire_x && y == fluid.fire_y {
                                     
-                                    if create_rect(
-                                        ui,
-                                        255 as u8,
-                                        255 - (fluid.amount) as u8,
-                                        0,
-                                        windows,
-                                        true,
-                                    ) {
-                                        windows.fluid_for_change = fluid.clone();
-                                        windows.fire_change_flag = true;
-                                        // fluid.counter_range = 1;
-                                    }
-                                    // continue;
-                                }
-                                //fix check if in range
-                                else if fluid.fire_size > 1
-                                    && check_if_in_range(
-                                        x as i32,
-                                        y as i32,
-                                        fluid.fire_x as i32,
-                                        fluid.fire_y as i32,
-                                        fluid.counter_range as i32,
-                                        fluid.fire_size
-                                    )
-                                {
-                                    // println!("range > 1");
-                                    if create_rect(
-                                        ui,
-                                        255 as u8,
-                                        fluid.amount as u8,
-                                        0,
-                                        windows,
-                                        true,
-                                    ) {
-                                        windows.fluid_for_change = fluid.clone();
-                                        windows.fire_change_flag = true;
-                                        // fluid.counter_range = 2;
-                                    }
-                                }
-                                else if fluid.fire_size == 5
-                                    && check_if_in_range(
-                                        x as i32,
-                                        y as i32,
-                                        fluid.fire_x as i32,
-                                        fluid.fire_y as i32,
-                                        fluid.counter_range as i32,
-                                        fluid.fire_size
-                                    )
-                                {
-                                    if create_rect(
-                                        ui, 255,
-                                        //maybe here use only the amount -> see how much green makes orange or yellow
-                                        0, 0, windows, true,
-                                    ) {
-                                        windows.fluid_for_change = fluid.clone();
-                                        windows.fire_change_flag = true;
-                                    }
-                                }
-                                else if check_if_in_range(
-                                    
-                                    x as i32,
-                                    y as i32,
-                                    fluid.fire_x as i32,
-                                    fluid.fire_y as i32,
-                                    fluid.fire_range as i32,
-                                    fluid.fire_size
-                                ){
-                                    if frames >0 && d > 0.{
-                                        // let perlin = PerlinNoise::new();
-                                        // println!("We are here {}", perlin.get(132.2) );
-                                       create_fire_in_range(d, windows, ui,fluid);
-                                    }else{
-                                        continue;
-                                    }
-                                    
-                                }
-                                
-                                
+                            if create_rect(
+                                ui,
+                                255 as u8,
+                                255 - (fluid.amount) as u8,
+                                0,
+                                windows,
+                                true,
+                            ) {
+                                windows.fluid_for_change = fluid.clone();
+                                windows.fire_change_flag = true;
+                                // fluid.counter_range = 1;
                             }
-                             else if fluid.fire_size % 2 == 0 {
-                                
-                                if ((x== fluid.fire_x || x == fluid.fire_x+1) )&& ((y == fluid.fire_y)||(y== fluid.fire_y+1 )){ 
-                                    if create_rect(
-                                        ui,
-                                        255 as u8,
-                                        255 - (fluid.amount) as u8,
-                                        fluid.amount as u8,
-                                        windows,
-                                        true,
-                                    ) {
-                                        windows.fluid_for_change = fluid.clone();
-                                        windows.fire_change_flag = true;
-                                    }
-                                }
-                                else if check_if_in_range(
-                                    x as i32,
-                                    y as i32,
-                                    fluid.fire_x as i32,
-                                    fluid.fire_y as i32,
-                                    fluid.fire_size as i32,
-                                    fluid.fire_size
-                                ){
-                                    if frames >0 && d > 0.{
-                                        // let perlin = PerlinNoise::new();
-                                        // println!("We are here {}", perlin.get(132.2) );
-                                       create_fire_in_range(d, windows, ui,fluid);
-                                    }else{
-                                        continue;
-                                    }
-                                }
-                                else {
+                            // continue;
+                        }else{
+                                if d > 0.{
+                                    // let perlin = PerlinNoise::new();
+                                    // println!("We are here {}", perlin.get(132.2) );
+                                   create_fire_in_range(d, windows, ui,fluid);
+                                }else{
                                     // fluid_flag = true;
                                     continue;
                                 }
-                                
-                                // else if fluid.counter_range == fluid.fire_size{
-
-                                // }
-                            }
-
+                               
+                        }               
                             fluid_flag = true;
-                            //see if this stops others from emiting
-                            continue;
-                        }
+                            continue
+                    //         //see if this stops others from emiting
                     }
-                    // commands.entity(fluid).despawn();
-                }
+
+                    }
                 if fluid_flag == true {
                     continue;
                 }
