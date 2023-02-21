@@ -39,6 +39,29 @@ fn create_rect(
     }
 }
 
+fn create_fire_in_range(d:f32, windows: &mut ResMut<MaterialChangability::MaterialChangebility>,ui: &mut Ui, fluid: Mut<FluidMatrix>){
+    let mut red = d as u8;
+    let mut yellow = d as u8;
+    
+    if d> 0.1{   
+        // red = (d * fluid.amount) as u8; 
+        red = 255;
+        yellow = 255 - (d * 255. ) as u8;
+    // println!("red = {}",red);    
+    }  
+    // println!("green = {}",(d * 255. ) as u8);
+
+    
+    if create_rect(
+        ui, red,
+        //maybe here use only the amount -> see how much green makes orange or yellow
+        yellow, 0, windows, true,
+    ) {
+        windows.fluid_for_change = fluid.clone();
+        windows.fire_change_flag = true;
+    }
+}
+
 fn check_if_material_at_position(
     x_cord: u32,
     y_cord: u32,
@@ -242,7 +265,7 @@ fn render_density(
                                         ui,
                                         255 as u8,
                                         255 - (fluid.amount) as u8,
-                                        fluid.amount as u8,
+                                        0,
                                         windows,
                                         true,
                                     ) {
@@ -277,9 +300,8 @@ fn render_density(
                                         // fluid.counter_range = 2;
                                     }
                                 }
-                                //fix it
                                 else if fluid.fire_size == 5
-                                    && !check_if_in_range(
+                                    && check_if_in_range(
                                         x as i32,
                                         y as i32,
                                         fluid.fire_x as i32,
@@ -309,26 +331,7 @@ fn render_density(
                                     if frames >0 && d > 0.{
                                         // let perlin = PerlinNoise::new();
                                         // println!("We are here {}", perlin.get(132.2) );
-                                        let mut red = d as u8;
-                                        let mut yellow = d as u8;
-                                        
-                                        if d> 0.1{   
-                                            // red = (d * fluid.amount) as u8; 
-                                            red = 255;
-                                            yellow = 255 - (d * 255. ) as u8;
-                                        // println!("red = {}",red);    
-                                        }  
-                                        // println!("green = {}",(d * 255. ) as u8);
-
-                                        
-                                    if create_rect(
-                                        ui, red,
-                                        //maybe here use only the amount -> see how much green makes orange or yellow
-                                         yellow, 0, windows, true,
-                                    ) {
-                                        windows.fluid_for_change = fluid.clone();
-                                        windows.fire_change_flag = true;
-                                    }
+                                       create_fire_in_range(d, windows, ui,fluid);
                                     }else{
                                         continue;
                                     }
@@ -373,10 +376,12 @@ fn render_density(
                                     fluid.fire_size as i32,
                                     fluid.fire_size
                                 ){
-                                    if create_rect(ui, 255, fluid.amount as u8, 0, windows, true) {
-                                        // if create_rect(ui, 255 - d as u8, d as u8, 0, windows, true) {
-                                        windows.fluid_for_change = fluid.clone();
-                                        windows.fire_change_flag = true;
+                                    if frames >0 && d > 0.{
+                                        // let perlin = PerlinNoise::new();
+                                        // println!("We are here {}", perlin.get(132.2) );
+                                       create_fire_in_range(d, windows, ui,fluid);
+                                    }else{
+                                        continue;
                                     }
                                 }
                                 else {
