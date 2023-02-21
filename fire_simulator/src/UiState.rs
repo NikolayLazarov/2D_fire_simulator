@@ -1,7 +1,7 @@
 // use crate::Fire;
+use crate::ElementChangability;
 use crate::Fluid;
 use crate::Fluid::N;
-use crate::MaterialChangability;
 use crate::Materials;
 use bevy::prelude::*;
 use bevy_egui::egui::Ui;
@@ -22,21 +22,20 @@ pub struct UiState {
     pub new_fluid: bool,
     pub material: Materials,
     pub fluid: Fluid::FluidMatrix,
-    pub created_fire:bool,
+    pub created_fire: bool,
     pub window_change_materials: bool,
     pub start_simulation: bool,
-    pub restart_simulation:bool,
-    pub counter_fire_size:u32,
+    pub restart_simulation: bool,
+    pub counter_fire_size: u32,
 }
 
 pub fn ui_state(
     mut egui_ctx: ResMut<EguiContext>,
     mut ui_state: ResMut<UiState>,
     mut commands: Commands,
-    mut windows: ResMut<MaterialChangability::MaterialChangebility>,
-    mut query_fire_entity: Query<Entity, With< Fluid::FluidMatrix> >,
+    mut windows: ResMut<ElementChangability::ElementChangebilityContext>,
+    mut query_fire_entity: Query<Entity, With<Fluid::FluidMatrix>>,
     mut query_fire: Query<&mut Fluid::FluidMatrix>,
-
 ) {
     let mut new_material_button = false;
     let mut material_button = false;
@@ -117,20 +116,23 @@ pub fn ui_state(
                     ui.separator();
 
                     ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.delta_time, 0.0..=3.0).text("Timestep"),
+                        egui::Slider::new(&mut windows.fluid_for_change.delta_time, 0.0..=3.0)
+                            .text("Timestep"),
                     );
                     if ui.button("Increment").clicked() {
                         windows.fluid_for_change.delta_time += 0.1;
                     }
                     ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.diffusion, 0.0..=10.0).text("Diffusion"),
+                        egui::Slider::new(&mut windows.fluid_for_change.diffusion, 0.0..=10.0)
+                            .text("Diffusion"),
                     );
                     if ui.button("Increment").clicked() {
                         windows.fluid_for_change.diffusion += 0.001;
                     }
-    
+
                     ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.viscosity, 0.0..=1.0).text("Viscosity"),
+                        egui::Slider::new(&mut windows.fluid_for_change.viscosity, 0.0..=1.0)
+                            .text("Viscosity"),
                     );
                     if ui.button("Increment").clicked() {
                         windows.fluid_for_change.viscosity += 0.0000001;
@@ -152,7 +154,7 @@ pub fn ui_state(
                     }
                     ui.add(
                         egui::Slider::new(&mut windows.fluid_for_change.amount, 0.0..=255.0)
-                       .text("Power"),
+                            .text("Power"),
                     );
                     if ui.button("Increment").clicked() {
                         windows.fluid_for_change.amount += 1.0;
@@ -164,7 +166,7 @@ pub fn ui_state(
                     );
                     if ui.button("Increment").clicked() {
                         windows.fluid_for_change.fire_size += 1;
-                       }
+                    }
 
                     ui.add(
                         egui::Slider::new(
@@ -208,11 +210,11 @@ pub fn ui_state(
                         let mut change_fire = ui.button("Change").clicked();
 
                         if change_fire == true {
-                            for fire in query_fire_entity.iter(){
+                            for fire in query_fire_entity.iter() {
                                 commands.entity(fire).despawn();
                             }
-                                ui_state.fluid = windows.fluid_for_change.clone() ;
-                            
+                            ui_state.fluid = windows.fluid_for_change.clone();
+
                             commands.spawn(windows.fluid_for_change.clone());
                             close_window = true;
                             windows.fire_change_flag = false;
@@ -282,7 +284,6 @@ pub fn ui_state(
                     new_material_button = ui.button("New").clicked();
                 });
             } else if ui_state.fluid_window {
-
                 ui.heading("Fire");
 
                 ui.separator();
@@ -333,7 +334,7 @@ pub fn ui_state(
                 );
                 if ui.button("Increment").clicked() {
                     ui_state.fluid.fire_range += 1;
-                    }
+                }
 
                 ui.add(
                     egui::Slider::new(&mut ui_state.fluid.amount_x, -200.0..=200.0)
@@ -375,16 +376,15 @@ pub fn ui_state(
                     }
                 });
             }
-            ui.horizontal(|ui|{
-                if ui.button("Start simulation").clicked() && ui_state.created_fire{
+            ui.horizontal(|ui| {
+                if ui.button("Start simulation").clicked() && ui_state.created_fire {
                     ui_state.start_simulation = true;
                 }
 
-                if ui.button("Restart Scene").clicked(){
+                if ui.button("Restart Scene").clicked() {
                     ui_state.restart_simulation = true;
                 }
             });
-            
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                 ui.allocate_space(ui.available_size());
@@ -418,37 +418,39 @@ pub fn ui_state(
     if ui_state.new_material {
         let x = ui_state.material.position_x;
         let y = ui_state.material.position_y;
-        
-        if !ui_state.fluid.materials_cords.contains(&(x,y)){
+
+        if !ui_state.fluid.materials_coords.contains(&(x, y)) {
             commands.spawn(ui_state.material.clone());
-            ui_state.fluid.materials_cords.push((x, y));
+            ui_state.fluid.materials_coords.push((x, y));
             // println!("Entitiryes = {:?}", ui_state.fluid.materials_entities);
-        }  
-        ui_state.new_material = false;      
+        }
+        ui_state.new_material = false;
     }
-    if ui_state.new_fluid && !ui_state.created_fire /*||ui_state.restart_simulation*/ {
-        if ui_state.created_fire{
-            for fire in &mut query_fire_entity{
-            commands.entity(fire).despawn();
+    if ui_state.new_fluid && !ui_state.created_fire
+    /*||ui_state.restart_simulation*/
+    {
+        if ui_state.created_fire {
+            for fire in &mut query_fire_entity {
+                commands.entity(fire).despawn();
             }
         }
-        
+
         ui_state.new_fluid = false;
         // if ui_state.restart_simulation{
         //     ui_state.fluid = Fluid::FluidMatrix::new();
         //     ui_state.created_fire = true;
         //     ui_state.restart_simulation = false;
         // }else{
-            ui_state.created_fire = true;
+        ui_state.created_fire = true;
 
         //}
         commands.spawn(ui_state.fluid.clone());
     }
 
-    if ui_state.restart_simulation{
-        if ui_state.created_fire{
-            for fire in &mut query_fire_entity{
-            commands.entity(fire).despawn();
+    if ui_state.restart_simulation {
+        if ui_state.created_fire {
+            for fire in &mut query_fire_entity {
+                commands.entity(fire).despawn();
             }
         }
         ui_state.new_fluid = false;
@@ -457,6 +459,5 @@ pub fn ui_state(
         ui_state.restart_simulation = false;
         ui_state.start_simulation = false;
         // commands.spawn(ui_state.fluid.clone());
-
     }
 }

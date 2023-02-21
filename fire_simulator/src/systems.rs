@@ -12,7 +12,7 @@ use bevy_egui::{egui, EguiContext, EguiPlugin};
 
 use crate::Fluid::N;
 use crate::Fluid::{self, FluidMatrix};
-use crate::MaterialChangability;
+use crate::ElementChangability;
 use crate::Materials;
 use crate::UiState::{self, ui_state};
 
@@ -21,7 +21,7 @@ fn create_rect(
     r: u8,
     g: u8,
     b: u8,
-    windows: &mut ResMut<MaterialChangability::MaterialChangebility>,
+    windows: &mut ResMut<ElementChangability::ElementChangebilityContext>,
     object_flag: bool,
 ) -> bool {
     let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::click());
@@ -39,17 +39,14 @@ fn create_rect(
     }
 }
 
-fn create_fire_in_range(d:f32, windows: &mut ResMut<MaterialChangability::MaterialChangebility>,ui: &mut Ui, fluid: Mut<FluidMatrix>){
+fn create_fire_in_range(d:f32, windows: &mut ResMut<ElementChangability::ElementChangebilityContext>,ui: &mut Ui, fluid: Mut<FluidMatrix>){
     let mut red = d as u8;
     let mut yellow = d as u8;
     
     if d> 0.1{   
-        // red = (d * fluid.amount) as u8; 
         red = 255;
         yellow = 255 - (d * 255. ) as u8;
-    // println!("red = {}",red);    
     }  
-    // println!("green = {}",(d * 255. ) as u8);
 
     
     if create_rect(
@@ -113,7 +110,7 @@ fn render_density(
     mut commands: Commands,
     frames: u32,
     mut fluids: Query<&mut FluidMatrix>,
-    windows: &mut ResMut<MaterialChangability::MaterialChangebility>,
+    windows: &mut ResMut<ElementChangability::ElementChangebilityContext>,
 ) {
     //x
     for i in 0..N - 1 {
@@ -190,12 +187,12 @@ fn render_density(
                             let mut cords_flag = false;
                             for mut fluid in fluids.iter_mut() {
                                 //check if material is still in the material list
-                                cords_flag = fluid.materials_cords.contains(&(x,y));
+                                cords_flag = fluid.materials_coords.contains(&(x,y));
                                 
                                 //removes the material from the cords list
                                 if cords_flag {
                                     //here should be a new black rect or one that is goig to be filled with something
-                                    fluid.materials_cords.retain(|&f| f == (x, y));
+                                    fluid.materials_coords.retain(|&f| f == (x, y));
                                 }
                             }
                             //despawn
@@ -337,20 +334,7 @@ fn render_density(
                                     }
                                     
                                 }
-                                //  else {
-                                //     // println!("range else");
-                                //     if frames == 0{
-                                //         if create_rect(
-                                //             ui, 255,
-                                //             //maybe here use only the amount -> see how much green makes orange or yellow
-                                //             0, 0, windows, true,
-                                //         ) {
-                                //             windows.fluid_for_change = fluid.clone();
-                                //             windows.fire_change_flag = true;
-                                //         }
-    
-                                //     }
-                                // }
+                                
                                 
                             }
                              else if fluid.fire_size % 2 == 0 {
@@ -410,26 +394,18 @@ fn render_density(
                     d = 0.0;
                     create_rect(ui, d as u8, 0, 0, windows, false);
                 } else {
-                    //colored depending on the intensity of the d
-                    // create_rect(ui, (255 - d as u8), d as u8, 0);
-
-                    //works at the end
 
                     let (rect, Response) =
                         ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
                     ui.painter().rect(
                         rect,
                         0.0,
-                        // egui::Color32::BLUE,
                         egui::Color32::from_gray(d as u8),
                         egui::Stroke::new(
-                            9.0,
-                            // egui::Color32::from_gray((d * (frames as f32)) as u8),
-                            egui::Color32::from_gray((d * 100.0) as u8),
-                        ), //from_rgb(r, g, b)),
+                            9.0, egui::Color32::from_gray((d * 100.0) as u8),
+                        ), 
                     );
-                    // create_rect(ui, (255 - d as u8), d as u8, 0);
-                }
+                    }
             }
         });
     }
@@ -442,7 +418,7 @@ pub fn fluid_sys(
     mut egui_ctx: ResMut<EguiContext>,
     mut commands: Commands,
     mut ui_state: ResMut<UiState::UiState>,
-    mut windows: ResMut<MaterialChangability::MaterialChangebility>,
+    mut windows: ResMut<ElementChangability::ElementChangebilityContext>,
 ) {
     //let ten_millis = time::Duration::from_millis(1000 / 24);
     let ten_millis = time::Duration::from_millis(200);

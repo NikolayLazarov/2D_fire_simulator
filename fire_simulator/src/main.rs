@@ -6,8 +6,8 @@ use bevy_egui::{
     egui::{self, pos2},
     EguiPlugin,
 };
+mod ElementChangability;
 mod Fluid;
-mod MaterialChangability;
 mod UiState;
 mod startup_systems;
 mod systems;
@@ -18,7 +18,7 @@ use crate::Fluid::N;
 fn main() {
     App::new()
         .init_resource::<UiState::UiState>()
-        .init_resource::<MaterialChangability::MaterialChangebility>()
+        .init_resource::<ElementChangability::ElementChangebilityContext>()
         .add_plugins(DefaultPlugins)
         .add_plugin(EguiPlugin)
         .add_startup_system(startup_systems::configure_visuals)

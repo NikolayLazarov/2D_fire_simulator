@@ -4,8 +4,8 @@ use bevy::{
 };
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 
+use crate::ElementChangability;
 use crate::Fluid;
-use crate::MaterialChangability;
 use crate::Materials;
 use crate::UiState;
 
@@ -32,7 +32,7 @@ pub fn configure_ui_state(mut ui_state: ResMut<UiState::UiState>) {
     ui_state.counter_fire_size = 1;
 }
 
-pub fn configure_windows(mut windows: ResMut<MaterialChangability::MaterialChangebility>) {
+pub fn configure_windows(mut windows: ResMut<ElementChangability::ElementChangebilityContext>) {
     windows.side_panel_modify = false;
     windows.fluid_for_change = Fluid::FluidMatrix::new(); // (1., 0., 0.);
     windows.material_for_change = Materials::default();
