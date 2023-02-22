@@ -36,8 +36,7 @@ pub fn ui_state(
     mut windows: ResMut<ElementChangability::ElementChangebilityContext>,
     mut query_fire_entity: Query<Entity, With<Fluid::FluidMatrix>>,
     mut query_fire: Query<&mut Fluid::FluidMatrix>,
-    mut query_material_entity: Query<(Entity, &Transform), With<Materials>>,
-    q: Query<(Entity, &Materials), With<Materials>>,
+    mut query_materials: Query<(Entity, &Materials), With<Materials>>,
 ) {
     let mut new_material_button = false;
     let mut material_button = false;
@@ -52,7 +51,7 @@ pub fn ui_state(
                 ui.heading("Change Window");
                 if windows.material_change_flag {
 
-                    for (e, transform) in q.iter() {
+                    for (e, transform) in query_materials.iter() {
                         if transform.position_x == windows.material_for_change.position_x && 
                         transform.position_y == windows.material_for_change.position_y  {
                             // remove the `Seen` component from the entity
@@ -408,6 +407,10 @@ pub fn ui_state(
             for fire in &mut query_fire_entity {
                 commands.entity(fire).despawn();
             }
+        }
+
+        for (entity,material)  in &mut query_materials{
+            commands.entity(entity).despawn();
         }
         ui_state.new_fluid = false;
         ui_state.fluid = Fluid::FluidMatrix::new();

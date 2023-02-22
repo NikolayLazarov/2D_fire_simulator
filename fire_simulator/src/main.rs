@@ -36,7 +36,6 @@ pub struct Materials {
     position_x: u32,
     position_y: u32,
     fuel: f32,
-    material_entity: Vec<Entity>,
 }
 
 impl Default for Materials {
@@ -47,7 +46,6 @@ impl Default for Materials {
             position_x: 5,
             position_y: 5,
             fuel: 1000.0,
-            material_entity: vec![],
         }
     }
 }
