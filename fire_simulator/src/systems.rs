@@ -4,8 +4,6 @@ use bevy::ui;
 use bevy::{prelude::*, sprite::collide_aabb::collide};
 use bevy_egui::egui::epaint::RectShape;
 use std::{thread, time};
-// extern crate perlin_noise;
-// use perlin::PerlinNoise;
 
 use bevy_egui::egui::{vec2, Pos2, Rounding, Ui};
 use bevy_egui::{egui, EguiContext, EguiPlugin};
@@ -55,8 +53,7 @@ fn create_fire_in_range(
 
     if create_rect(
         ui, red,
-        //maybe here use only the amount -> see how much green makes orange or yellow
-        yellow, 0, windows, true,
+       yellow, 0, windows, true,
     ) {
         windows.fluid_for_change = fluid.clone();
         windows.fire_change_flag = true;
@@ -121,26 +118,19 @@ fn render_density(
     mut fluids: Query<&mut FluidMatrix>,
     windows: &mut ResMut<ElementChangability::ElementChangebilityContext>,
 ) {
-    //x
     for i in 0..N - 1 {
         ui.horizontal_top(|ui| {
-            //y
             for j in 0..N - 1 {
                 let x: u32 = i;
                 let y: u32 = j;
                 let mut d = density[Fluid::IX(x, y) as usize];
 
-                //flag if current cell is a material
                 let mut material_flag: bool = false;
-                //flag if current cell is a fluid
-                let mut fluid_flag: bool = false;
+                 let mut fluid_flag: bool = false;
 
                 for mut material in query_materials.iter_mut() {
-                    //checks if there is material at the given position
                     if check_if_material_at_position(x, y, material.position_x, material.position_y)
                     {
-                        //if the material has not burned out yet and the simulation has started
-
                         if material.fuel > 0. && frames > 0 {
                             for mut fluid in fluids.iter_mut() {
                                 let [mut left, mut right, mut up, mut down] = [0.; 4];
@@ -162,7 +152,6 @@ fn render_density(
                                 let burn_power = fluid.amount;
                                 let burn_speed_x = fluid.amount_x;
                                 let burn_speed_y = fluid.amount_y;
-                                //not sure if this works
                                 fluid.add_density(
                                     material.position_x,
                                     material.position_y,
@@ -178,42 +167,21 @@ fn render_density(
                             }
                         }
 
-                        //if the material has been burnt
-                        if material.fuel <= 0. {
-                            // let mut entity_ids ={}
+                         if material.fuel <= 0. {
                             let mut cords_flag = false;
                             for mut fluid in fluids.iter_mut() {
-                                //check if material is still in the material list
                                 cords_flag = fluid.materials_coords.contains(&(x, y));
 
-                                //removes the material from the cords list
                                 if cords_flag {
-                                    //here should be a new black rect or one that is goig to be filled with something
                                     fluid.materials_coords.retain(|&f| f == (x, y));
                                 }
                             }
-                            //despawn
-                            //
-                            //false because it changes during the simulation
-                            // create_rect(ui, (255 - d as u8), 0, 0, windows, false);
-                            //should change this to be more efficient at some point
-                            // create_rect(ui, 0, 0, 0, windows, false);
-                            // break;
                         } else {
                             let coeficient = material.fuel / 10.;
-                            // if material.fuel == 1000.{
-                            //     if create_rect(ui, 139,69,19 , windows, true) {
-                            //         windows.material_for_change = material.clone();
-                            //         windows.material_change_flag = true;
-                            //         // commands.entity(material).despawn();
-                            //     }
-                            // }else{
                             if create_rect(ui, 0, 255 - (coeficient as u8), 0, windows, true) {
                                 windows.material_for_change = material.clone();
                                 windows.material_change_flag = true;
-                                // commands.entity(material).despawn();
                             }
-                            // }
                         }
                         material_flag = true;
                     }
@@ -223,15 +191,6 @@ fn render_density(
                 }
 
                 for mut fluid in fluids.iter_mut() {
-                    // if fluid.fluid_x == x && fluid.fluid_y == y && fluid_flag == false {
-                    //     // println!("fluid loop");
-                    //     // create_rect(ui, (255-d as u8), 0,0 );
-                    //     create_rect(ui, (255 as u8), d as u8,0 );
-
-                    //     fluid_flag = true;
-                    // }
-                    //rect // fluid
-
                     if fluid_flag == false {
                         if x == fluid.fire_x && y == fluid.fire_y {
                             if create_rect(
@@ -244,13 +203,9 @@ fn render_density(
                             ) {
                                 windows.fluid_for_change = fluid.clone();
                                 windows.fire_change_flag = true;
-                                // fluid.counter_range = 1;
                             }
-                            // continue;
-                        } else {
+                            } else {
                             if d >  0.4 {
-                                // let perlin = PerlinNoise::new();
-                                // println!("We are here {}", perlin.get(132.2) );
                                 create_fire_in_range(d, windows, ui, fluid);
                             } else if d > 0.01 && d < 0.4 {
                                 let (rect, Response) =
@@ -267,7 +222,6 @@ fn render_density(
                         }
                         fluid_flag = true;
                         continue;
-                        //         //see if this stops others from emiting
                     }
                 }
                 if fluid_flag == true {
@@ -275,7 +229,6 @@ fn render_density(
                 }
 
                 if d > 255.0 || d < 0. {
-                    //black for where there is not density or is over
                     d = 0.0;
                     create_rect(ui, d as u8, 0, 0, windows, false);
                 } else {
@@ -302,7 +255,6 @@ pub fn fluid_sys(
     mut ui_state: ResMut<UiState::UiState>,
     mut windows: ResMut<ElementChangability::ElementChangebilityContext>,
 ) {
-    //let ten_millis = time::Duration::from_millis(1000 / 24);
     let ten_millis = time::Duration::from_millis(200);
 
     let now = time::Instant::now();
@@ -313,8 +265,7 @@ pub fn fluid_sys(
     }
 
     egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
-        // ui.label("Scene");
-
+    
         egui::Area::new("Fluid").show(ui.ctx(), |ui| {
             ui.label("Scene");
 
@@ -347,8 +298,7 @@ pub fn fluid_sys(
                 frames,
                 query_fluid,
                 &mut windows,
-                // ui_state,
-            );
+              );
         });
     });
 }

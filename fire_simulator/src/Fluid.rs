@@ -1,5 +1,3 @@
-// use crate::{iter, N};
-
 use bevy::ecs::system::EntityCommands;
 use bevy::prelude::Component;
 use bevy::prelude::*;
@@ -45,11 +43,6 @@ pub struct FluidMatrix {
 
     pub frames: u32,
 
-    // pub fire_size: u32,
-    // pub fire_range: u32,
-
-    // pub counter_range: u32,
-
     pub materials_coords: Vec<(u32, u32)>,
 }
 
@@ -77,10 +70,6 @@ impl FluidMatrix {
             amount_y: 15.0,
 
             frames: 20,
-            // fire_size: 2,
-            // fire_range: 5,
-            // counter_range: 1,
-
             materials_coords: vec![],
         }
     }
@@ -126,7 +115,6 @@ impl FluidMatrix {
     }
 
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {
-        //here
         let index: u32 = IX(x, y);
         self.density[index as usize] = amount;
     }
@@ -326,7 +314,6 @@ fn advect(
 
             if d[IX(i, j) as usize] > 1. {
                 d[IX(i, j) as usize] = 1.;
-                // println!("cords = {},{} value = {}", i,j, d[IX(i,j)as usize]);
             }
             ifloat += 1.;
         }
@@ -336,7 +323,6 @@ fn advect(
 
     set_bnd(b, d);
 }
-//keeps the sumilation from overflowing
 fn set_bnd(b: u32, mut x: &mut Vec<f32>) {
     for i in 1..N - 1 {
         x[IX(i, 0) as usize] = if b == 2 {

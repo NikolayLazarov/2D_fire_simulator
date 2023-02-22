@@ -1,4 +1,3 @@
-// use crate::Fire;
 use crate::ElementChangability;
 use crate::Fluid;
 use crate::Fluid::N;
@@ -51,22 +50,14 @@ pub fn ui_state(
                 ui.heading("Change Window");
                 if windows.material_change_flag {
 
-                    for (e, transform) in query_materials.iter() {
+                    for (entity, transform) in query_materials.iter() {
                         if transform.position_x == windows.material_for_change.position_x && 
                         transform.position_y == windows.material_for_change.position_y  {
-                            // remove the `Seen` component from the entity
-                            commands.entity(e)
+                            commands.entity(entity)
                                 .remove::<Materials>();
                         }
                     }
-                    // let material = & windows.material_for_change;
-                    // ui.label(format!("Material =  {}",  material.name_type));
-                    // ui.label(format!("Material x =  {}",  material.position_x));
-                    // ui.label(format!("Material y =  {}",  material.position_y));
-                    // ui.label(format!("Material flamability =  {}",  material.flamability));
-
-                    ////
-                    let mut change_material_button = false;
+                            let mut change_material_button = false;
                     ui.heading("Material");
 
                     ui.horizontal(|ui| {
@@ -202,21 +193,14 @@ pub fn ui_state(
                             windows.fire_change_flag = false;
                         }
 
-                        //  ui_state.start_simulation = true;
-                        //  ui_state.new_fluid = true;
-                        //update_fluid_density = false;
                     });
                 }
-                // close_window = ui.button("Change").clicked();
-
                 ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
                     ui.allocate_space(ui.available_size());
                 });
             });
         if close_window {
             windows.side_panel_modify = false;
-            // windows.fire_change_flag = false;
-            // windows.material_change_flag = false;
         }
     }
 
@@ -391,14 +375,8 @@ pub fn ui_state(
         }
 
         ui_state.new_fluid = false;
-        // if ui_state.restart_simulation{
-        //     ui_state.fluid = Fluid::FluidMatrix::new();
-        //     ui_state.created_fire = true;
-        //     ui_state.restart_simulation = false;
-        // }else{
+        
         ui_state.created_fire = true;
-
-        //}
         commands.spawn(ui_state.fluid.clone());
     }
 
@@ -417,6 +395,5 @@ pub fn ui_state(
         ui_state.created_fire = false;
         ui_state.restart_simulation = false;
         ui_state.start_simulation = false;
-        // commands.spawn(ui_state.fluid.clone());
-    }
+        }
 }
