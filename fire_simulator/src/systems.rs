@@ -80,7 +80,7 @@ fn render_density(
             for j in 0..N - 1 {
                 let x: u32 = i;
                 let y: u32 = j;
-                let mut d = density[Fluid::IX(x, y) as usize];
+                let mut d = density[Fluid::ix(x, y) as usize];
 
                 let mut material_flag: bool = false;
                  let mut fluid_flag: bool = false;
@@ -92,19 +92,21 @@ fn render_density(
                             for mut fluid in fluids.iter_mut() {
                                 let [mut left, mut right, mut up, mut down] = [0.; 4];
                                 if x as i32 - 1 > 0 {
-                                    left = density[Fluid::IX(x - 1, y) as usize];
+                                    left = density[Fluid::ix(x - 1, y) as usize];
                                 }
                                 if x + 1 < N - 1 {
-                                    right = density[Fluid::IX(x + 1, y) as usize];
+                                    right = density[Fluid::ix(x + 1, y) as usize];
                                 }
                                 if y as i32 - 1 > 0 {
-                                    up = density[Fluid::IX(x, y - 1) as usize];
+                                    up = density[Fluid::ix(x, y - 1) as usize];
                                 }
                                 if y + 1 < N - 1 {
-                                    down = density[Fluid::IX(x, y + 1) as usize];
+                                    down = density[Fluid::ix(x, y + 1) as usize];
                                 }
-                                let mut material_coeficient = left + right + up + down;
-
+                                let material_coeficient = left + right + up + down;
+                                material.fuel -= material_coeficient
+                                    * fluid.amount
+                                    * (material.flammability as f32 / 100 as f32);
                               
                                 let burn_power = fluid.amount;
                                 let burn_speed_x = fluid.amount_x;
@@ -147,7 +149,7 @@ fn render_density(
                     continue;
                 }
 
-                for mut fluid in fluids.iter_mut() {
+                for fluid in fluids.iter_mut() {
                     if fluid_flag == false {
                         if x == fluid.fire_x && y == fluid.fire_y {
                             if create_rect(
@@ -204,11 +206,11 @@ fn render_density(
 }
 
 pub fn fluid_sys(
-    mut query_fluid: Query<&mut FluidMatrix>,
-    mut query_materials: Query<&mut Materials>,
+    query_fluid: Query<&mut FluidMatrix>,
+    query_materials: Query<&mut Materials>,
 
     mut egui_ctx: ResMut<EguiContext>,
-    mut commands: Commands,
+    commands: Commands,
     mut ui_state: ResMut<UiState::UiState>,
     mut windows: ResMut<ElementChangability::ElementChangebilityContext>,
 ) {
@@ -228,11 +230,11 @@ pub fn fluid_sys(
 
             if frames > 0 {
                 ui_state.new_fluid = false;
-                let mut fluid_x: u32 = ui_state.fluid.fire_x;
-                let mut fluid_y: u32 = ui_state.fluid.fire_y;
-                let mut amount: f32 = ui_state.fluid.amount;
-                let mut amount_x: f32 = ui_state.fluid.amount_x;
-                let mut amount_y: f32 = ui_state.fluid.amount_y;
+                let fluid_x: u32 = ui_state.fluid.fire_x;
+                let fluid_y: u32 = ui_state.fluid.fire_y;
+                let amount: f32 = ui_state.fluid.amount;
+                let amount_x: f32 = ui_state.fluid.amount_x;
+                let amount_y: f32 = ui_state.fluid.amount_y;
 
                 ui_state.fluid.add_density(fluid_x, fluid_y, amount);
                 ui_state
