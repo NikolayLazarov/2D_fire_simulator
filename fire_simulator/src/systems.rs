@@ -158,18 +158,7 @@ fn render_density(
                                 }
                                 let mut material_coeficient = left + right + up + down;
 
-                                println!(
-                                    "d = {}, amount = {}, flamability = {}",
-                                    material_coeficient, fluid.amount, material.flammability as f32
-                                );
-                                material.fuel -= material_coeficient
-                                    * fluid.amount
-                                    * (material.flammability as f32 / 100 as f32);
-                                println!(
-                                    "material fluid = {} and minus = {}",
-                                    material.fuel,
-                                    d * fluid.amount * (material.flammability as f32 / 100 as f32)
-                                );
+                              
                                 let burn_power = fluid.amount;
                                 let burn_speed_x = fluid.amount_x;
                                 let burn_speed_y = fluid.amount_y;
@@ -219,7 +208,7 @@ fn render_density(
                             //         // commands.entity(material).despawn();
                             //     }
                             // }else{
-                            if create_rect(ui, 255, 255 - (coeficient as u8), 0, windows, true) {
+                            if create_rect(ui, 0, 255 - (coeficient as u8), 0, windows, true) {
                                 windows.material_for_change = material.clone();
                                 windows.material_change_flag = true;
                                 // commands.entity(material).despawn();
@@ -259,7 +248,7 @@ fn render_density(
                             }
                             // continue;
                         } else {
-                            if d >  0.2 {
+                            if d >  0.4 {
                                 // let perlin = PerlinNoise::new();
                                 // println!("We are here {}", perlin.get(132.2) );
                                 create_fire_in_range(d, windows, ui, fluid);
@@ -269,8 +258,8 @@ fn render_density(
                     ui.painter().rect(
                         rect,
                         0.0,
-                        egui::Color32::from_gray(255 -(d * 255.0) as u8),
-                        egui::Stroke::new(9.0, egui::Color32::from_gray(255- (d * 255.0) as u8)),
+                        egui::Color32::from_gray((d * 255.0) as u8),
+                        egui::Stroke::new(9.0, egui::Color32::from_gray( (d * 255.0) as u8)),
                     );
                             } else{
                                 continue;
@@ -331,7 +320,6 @@ pub fn fluid_sys(
 
             if frames > 0 {
                 ui_state.new_fluid = false;
-                // ui_state.start_simulation = true;
                 let mut fluid_x: u32 = ui_state.fluid.fire_x;
                 let mut fluid_y: u32 = ui_state.fluid.fire_y;
                 let mut amount: f32 = ui_state.fluid.amount;

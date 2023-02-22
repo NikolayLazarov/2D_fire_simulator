@@ -36,6 +36,8 @@ pub fn ui_state(
     mut windows: ResMut<ElementChangability::ElementChangebilityContext>,
     mut query_fire_entity: Query<Entity, With<Fluid::FluidMatrix>>,
     mut query_fire: Query<&mut Fluid::FluidMatrix>,
+    mut query_material_entity: Query<(Entity, &Transform), With<Materials>>,
+    q: Query<(Entity, &Materials), With<Materials>>,
 ) {
     let mut new_material_button = false;
     let mut material_button = false;
@@ -49,6 +51,15 @@ pub fn ui_state(
             .show(egui_ctx.ctx_mut(), |ui| {
                 ui.heading("Change Window");
                 if windows.material_change_flag {
+
+                    for (e, transform) in q.iter() {
+                        if transform.position_x == windows.material_for_change.position_x && 
+                        transform.position_y == windows.material_for_change.position_y  {
+                            // remove the `Seen` component from the entity
+                            commands.entity(e)
+                                .remove::<Materials>();
+                        }
+                    }
                     // let material = & windows.material_for_change;
                     // ui.label(format!("Material =  {}",  material.name_type));
                     // ui.label(format!("Material x =  {}",  material.position_x));
@@ -61,7 +72,7 @@ pub fn ui_state(
 
                     ui.horizontal(|ui| {
                         ui.label("Your material: ");
-                        ui.text_edit_singleline(&mut windows.material_for_change.name_type);
+                        ui.text_edit_singleline(&mut windows.material_for_change.name_material);
                     });
 
                     ui.add(
@@ -96,19 +107,12 @@ pub fn ui_state(
                     });
 
                     if change_material_button == true {
-                        let mut vector = (
-                            windows.material_for_change.position_x.clone(),
-                            windows.material_for_change.position_y.clone(),
-                        );
-                        // materials_list.push(vector);
+                       
                         commands.spawn(windows.material_for_change.clone());
-                        // windows.materials_entities.push(entity);
-
+                    
                         close_window = true;
                         windows.material_change_flag = false;
                     }
-
-                    ////
                 }
                 if windows.fire_change_flag {
                     ui.heading("Fire");
@@ -159,27 +163,6 @@ pub fn ui_state(
                     if ui.button("Increment").clicked() {
                         windows.fluid_for_change.amount += 1.0;
                     }
-
-                    // ui.add(
-                    //     egui::Slider::new(&mut windows.fluid_for_change.fire_size, 0..=10)
-                    //         .text("Size"),
-                    // );
-                    // if ui.button("Increment").clicked() {
-                    //     windows.fluid_for_change.fire_size += 1;
-                    // }
-
-                    // ui.add(
-                    //     egui::Slider::new(
-                    //         &mut windows.fluid_for_change.fire_range,
-                    //         0..=(N - 1) / 2,
-                    //     )
-                    //     .text("Fire range"),
-                    // );
-                    // if ui.button("Increment").clicked() {
-                    //     windows.fluid_for_change.fire_range += 1;
-                    //     // windows.fluid_for_change.counter_range +=
-                    //     //     windows.fluid_for_change.fire_size * windows.fluid_for_change.fire_size;
-                    // }
 
                     ui.add(
                         egui::Slider::new(&mut windows.fluid_for_change.amount_x, 0.0..=200.0)
@@ -252,7 +235,7 @@ pub fn ui_state(
 
                 ui.horizontal(|ui| {
                     ui.label("Your material: ");
-                    ui.text_edit_singleline(&mut ui_state.material.name_type);
+                    ui.text_edit_singleline(&mut ui_state.material.name_material);
                 });
 
                 ui.add(
@@ -321,21 +304,6 @@ pub fn ui_state(
                     ui_state.fluid.amount += 1.0;
                 }
 
-                // ui.add(egui::Slider::new(&mut ui_state.fluid.fire_size, 0..=10).text("Size"));
-                // if ui.button("Increment").clicked() {
-                //     ui_state.fluid.fire_size += 1;
-                //     // ui_state.fluid.counter_range +=
-                //     //     ui_state.fluid.fire_size * ui_state.fluid.fire_size;
-                // }
-
-                // ui.add(
-                //     egui::Slider::new(&mut ui_state.fluid.fire_range, 0..=(N - 1) / 2)
-                //         .text("Fire range"),
-                // );
-                // if ui.button("Increment").clicked() {
-                //     ui_state.fluid.fire_range += 1;
-                // }
-
                 ui.add(
                     egui::Slider::new(&mut ui_state.fluid.amount_x, -200.0..=200.0)
                         .text("Velocity Y"),
@@ -362,17 +330,7 @@ pub fn ui_state(
                     let mut update_fluid_density = ui.button("New").clicked();
 
                     if update_fluid_density {
-                        for i in 0..N - 1 {
-                            for j in 0..N - 1 {
-                                let x: u32 = i;
-                                let y: u32 = j;
-                                let d = ui_state.fluid.get_density()[Fluid::IX(x, y) as usize];
-                                print!("{} ", d);
-                            }
-                            println!();
-                        }
                         ui_state.new_fluid = true;
-                        // update_fluid_density = false;
                     }
                 });
             }
@@ -392,15 +350,14 @@ pub fn ui_state(
         });
 
     egui::TopBottomPanel::top("top_panel").show(egui_ctx.ctx_mut(), |ui| {
-        // ui.label("Top pannel");
+        
     });
 
     egui::TopBottomPanel::bottom("bottom_panel").show(egui_ctx.ctx_mut(), |ui| {
-        // ui.label("Bottom pannel");
+        
     });
 
     if new_material_button {
-        // ! ui_state.new_material
         ui_state.new_material = true;
     }
 
@@ -420,10 +377,9 @@ pub fn ui_state(
         let y = ui_state.material.position_y;
 
         if !ui_state.fluid.materials_coords.contains(&(x, y)) {
-            commands.spawn(ui_state.material.clone());
+             commands.spawn(ui_state.material.clone());
             ui_state.fluid.materials_coords.push((x, y));
-            // println!("Entitiryes = {:?}", ui_state.fluid.materials_entities);
-        }
+            }
         ui_state.new_material = false;
     }
     if ui_state.new_fluid && !ui_state.created_fire
