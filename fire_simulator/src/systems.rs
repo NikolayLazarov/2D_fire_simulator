@@ -1,18 +1,13 @@
-use bevy::ecs::query;
-use bevy::render::view::window;
-use bevy::ui;
-use bevy::{prelude::*, sprite::collide_aabb::collide};
-use bevy_egui::egui::epaint::RectShape;
+use bevy::prelude::*;
 use std::{thread, time};
-
-use bevy_egui::egui::{vec2, Pos2, Rounding, Ui};
+use bevy_egui::egui::{vec2, Ui};
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 
 use crate::ElementChangability;
 use crate::Fluid::N;
 use crate::Fluid::{self, FluidMatrix};
 use crate::Materials;
-use crate::UiState::{self, ui_state};
+use crate::UiState::{self,};
 
 fn create_rect(
     ui: &mut Ui,
@@ -71,44 +66,6 @@ fn check_if_material_at_position(
     }
     return false;
 }
-fn check_if_in_range(
-    x_cord: i32,
-    y_cord: i32,
-    x_material: i32,
-    y_material: i32,
-    mut range: i32,
-    type_fire: u32,
-) -> bool {
-    let mut flag_x = false;
-    let mut flag_y = false;
-    if type_fire % 2 == 1 {
-        let down_range = -range;
-        if x_material - x_cord <= range && x_material - x_cord >= down_range {
-            flag_x = true;
-        }
-        if y_material - y_cord <= range && y_material - y_cord >= down_range {
-            flag_y = true;
-        }
-
-        flag_y && flag_x
-    } else {
-        range /= 2;
-        if !(x_cord >= x_material - range
-            && x_cord <= x_material + range
-            && y_cord == y_material - range)
-        {
-            flag_x = true;
-        }
-        if !(y_cord >= y_material - range
-            && y_cord <= y_material + range
-            && x_cord == x_material - range)
-        {
-            flag_y = true;
-        }
-        flag_x && flag_y
-    }
-}
-
 fn render_density(
     ui: &mut Ui,
     density: &Vec<f32>,

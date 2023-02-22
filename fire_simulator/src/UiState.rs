@@ -3,11 +3,8 @@ use crate::Fluid;
 use crate::Fluid::N;
 use crate::Materials;
 use bevy::prelude::*;
-use bevy_egui::egui::Ui;
-use bevy_egui::{
-    egui::{self, pos2},
-    EguiContext, EguiPlugin,
-};
+use bevy_egui::{EguiContext};
+use bevy_egui::egui;
 
 use crate::materials_list;
 
@@ -180,7 +177,7 @@ pub fn ui_state(
 
                     ui.horizontal(|ui| {
                         ui.label("Change Fire");
-                        let mut change_fire = ui.button("Change").clicked();
+                        let change_fire = ui.button("Change").clicked();
 
                         if change_fire == true {
                             for fire in query_fire_entity.iter() {
@@ -310,7 +307,7 @@ pub fn ui_state(
 
                 ui.horizontal(|ui| {
                     ui.label("Add Fire");
-                    let mut update_fluid_density = ui.button("New").clicked();
+                    let  update_fluid_density = ui.button("New").clicked();
 
                     if update_fluid_density {
                         ui_state.new_fluid = true;
@@ -332,11 +329,11 @@ pub fn ui_state(
             });
         });
 
-    egui::TopBottomPanel::top("top_panel").show(egui_ctx.ctx_mut(), |ui| {
+    egui::TopBottomPanel::top("top_panel").show(egui_ctx.ctx_mut(), |_ui| {
         
     });
 
-    egui::TopBottomPanel::bottom("bottom_panel").show(egui_ctx.ctx_mut(), |ui| {
+    egui::TopBottomPanel::bottom("bottom_panel").show(egui_ctx.ctx_mut(), |_ui| {
         
     });
 
