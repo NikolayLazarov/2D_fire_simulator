@@ -2,9 +2,10 @@ use bevy::prelude::*;
 use bevy_egui::EguiPlugin;
 mod element_changability;
 mod fluid;
-mod ui_state;
+mod material_window;
 mod startup_systems;
 mod systems;
+mod ui_state;
 
 pub static mut MATERIALS_LIST: Vec<(u32, u32)> = vec![];
 

@@ -1,13 +1,13 @@
 use bevy::prelude::*;
-use std::{thread, time};
 use bevy_egui::egui::{vec2, Ui};
 use bevy_egui::{egui, EguiContext};
+use std::{thread, time};
 
 use crate::element_changability;
 use crate::fluid::N;
 use crate::fluid::{self, FluidMatrix};
+use crate::ui_state::{self};
 use crate::Materials;
-use crate::ui_state::{self,};
 
 fn create_rect(
     ui: &mut Ui,
@@ -46,10 +46,7 @@ fn create_fire_in_range(
         yellow = 255 - (d * 255.) as u8;
     }
 
-    if create_rect(
-        ui, red,
-       yellow, 0, windows, true,
-    ) {
+    if create_rect(ui, red, yellow, 0, windows, true) {
         windows.fluid_for_change = fluid.clone();
         windows.fire_change_flag = true;
     }
@@ -82,7 +79,7 @@ fn render_density(
                 let mut d = density[fluid::ix(x, y) as usize];
 
                 let mut material_flag: bool = false;
-                 let mut fluid_flag: bool = false;
+                let mut fluid_flag: bool = false;
 
                 for mut material in query_materials.iter_mut() {
                     if check_if_material_at_position(x, y, material.position_x, material.position_y)
@@ -106,7 +103,7 @@ fn render_density(
                                 material.fuel -= material_coeficient
                                     * fluid.amount
                                     * (material.flammability as f32 / 100 as f32);
-                              
+
                                 let burn_power = fluid.amount;
                                 let burn_speed_x = fluid.amount_x;
                                 let burn_speed_y = fluid.amount_y;
@@ -125,7 +122,7 @@ fn render_density(
                             }
                         }
 
-                         if material.fuel <= 0. {
+                        if material.fuel <= 0. {
                             // let mut cords_flag = false;
                             for mut fluid in fluids.iter_mut() {
                                 let cords_flag = fluid.materials_coords.contains(&(x, y));
@@ -162,23 +159,26 @@ fn render_density(
                                 windows.fluid_for_change = fluid.clone();
                                 windows.fire_change_flag = true;
                             }
-                            } else {
-                            if d >  0.5 {
+                        } else {
+                            if d > 0.5 {
                                 create_fire_in_range(d, windows, ui, fluid);
                             }
                             // else if d > 0.8 && d <= 1.{
                             //     create_rect(ui, d as u8, 0, 0, windows, false);
                             // }
-                             else if d > 0.01 && d < 0.5 {
+                            else if d > 0.01 && d < 0.5 {
                                 let (rect, _response) =
-                        ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
-                    ui.painter().rect(
-                        rect,
-                        0.0,
-                        egui::Color32::from_gray((d * 255.0) as u8),
-                        egui::Stroke::new(9.0, egui::Color32::from_gray( (d * 255.0) as u8)),
-                    );
-                            } else{
+                                    ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                                ui.painter().rect(
+                                    rect,
+                                    0.0,
+                                    egui::Color32::from_gray((d * 255.0) as u8),
+                                    egui::Stroke::new(
+                                        9.0,
+                                        egui::Color32::from_gray((d * 255.0) as u8),
+                                    ),
+                                );
+                            } else {
                                 continue;
                             }
                         }
@@ -225,7 +225,6 @@ pub fn fluid_sys(
     }
 
     egui::CentralPanel::default().show(egui_ctx.ctx_mut(), |ui| {
-    
         egui::Area::new("Fluid").show(ui.ctx(), |ui| {
             ui.label("Scene");
 
@@ -257,7 +256,7 @@ pub fn fluid_sys(
                 frames,
                 query_fluid,
                 &mut windows,
-              );
+            );
         });
     });
 }

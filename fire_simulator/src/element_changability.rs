@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::fluid;
 use crate::Materials;
 
-#[derive(Default, Resource)]
+#[derive(Default, Resource, Clone)]
 pub struct ElementChangebilityContext {
     pub side_panel_modify: bool,
     pub material_for_change: Materials,

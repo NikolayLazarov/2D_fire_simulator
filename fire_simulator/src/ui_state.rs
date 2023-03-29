@@ -1,10 +1,11 @@
 use crate::element_changability;
 use crate::fluid;
 use crate::fluid::N;
+use crate::material_window;
 use crate::Materials;
 use bevy::prelude::*;
-use bevy_egui::{EguiContext};
 use bevy_egui::egui;
+use bevy_egui::EguiContext;
 
 #[derive(Default, Resource)]
 pub struct UiState {
@@ -43,45 +44,18 @@ pub fn ui_state(
             .show(egui_ctx.ctx_mut(), |ui| {
                 ui.heading("Change Window");
                 if windows.material_change_flag {
-
                     for (entity, transform) in query_materials.iter() {
-                        if transform.position_x == windows.material_for_change.position_x && 
-                        transform.position_y == windows.material_for_change.position_y  {
-                            commands.entity(entity)
-                                .remove::<Materials>();
+                        if transform.position_x == windows.material_for_change.position_x
+                            && transform.position_y == windows.material_for_change.position_y
+                        {
+                            commands.entity(entity).remove::<Materials>();
                         }
                     }
-                            let mut change_material_button = false;
-                    ui.heading("Material");
+                    let mut change_material_button = false;
 
-                    ui.horizontal(|ui| {
-                        ui.label("Your material: ");
-                        ui.text_edit_singleline(&mut windows.material_for_change.name_material);
-                    });
+                    let new_material = windows.material_for_change.clone();
 
-                    ui.add(
-                        egui::Slider::new(&mut windows.material_for_change.position_y, 0..=N - 1)
-                            .text("X axys"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.material_for_change.position_y += 1;
-                    }
-
-                    ui.add(
-                        egui::Slider::new(&mut windows.material_for_change.position_x, 0..=N - 1)
-                            .text("Y axys"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.material_for_change.position_x += 1;
-                    }
-
-                    ui.add(
-                        egui::Slider::new(&mut windows.material_for_change.flammability, 0..=100)
-                            .text("Flammability"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        ui_state.material.flammability += 1;
-                    }
+                    let result = material_window::window(ui, new_material);
 
                     ui.separator();
 
@@ -90,10 +64,12 @@ pub fn ui_state(
                         change_material_button = ui.button("Change").clicked();
                     });
 
+                    if let Some(material) = result {
+                        windows.material_for_change = material;
+                    }
+
                     if change_material_button == true {
-                       
                         commands.spawn(windows.material_for_change.clone());
-                    
                         close_window = true;
                         windows.material_change_flag = false;
                     }
@@ -186,7 +162,6 @@ pub fn ui_state(
                             close_window = true;
                             windows.fire_change_flag = false;
                         }
-
                     });
                 }
                 ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
@@ -304,7 +279,7 @@ pub fn ui_state(
 
                 ui.horizontal(|ui| {
                     ui.label("Add Fire");
-                    let  update_fluid_density = ui.button("New").clicked();
+                    let update_fluid_density = ui.button("New").clicked();
 
                     if update_fluid_density {
                         ui_state.new_fluid = true;
@@ -326,13 +301,9 @@ pub fn ui_state(
             });
         });
 
-    egui::TopBottomPanel::top("top_panel").show(egui_ctx.ctx_mut(), |_ui| {
-        
-    });
+    egui::TopBottomPanel::top("top_panel").show(egui_ctx.ctx_mut(), |_ui| {});
 
-    egui::TopBottomPanel::bottom("bottom_panel").show(egui_ctx.ctx_mut(), |_ui| {
-        
-    });
+    egui::TopBottomPanel::bottom("bottom_panel").show(egui_ctx.ctx_mut(), |_ui| {});
 
     if new_material_button {
         ui_state.new_material = true;
@@ -354,9 +325,9 @@ pub fn ui_state(
         let y = ui_state.material.position_y;
 
         if !ui_state.fluid.materials_coords.contains(&(x, y)) {
-             commands.spawn(ui_state.material.clone());
+            commands.spawn(ui_state.material.clone());
             ui_state.fluid.materials_coords.push((x, y));
-            }
+        }
         ui_state.new_material = false;
     }
     if ui_state.new_fluid && !ui_state.created_fire
@@ -369,7 +340,7 @@ pub fn ui_state(
         }
 
         ui_state.new_fluid = false;
-        
+
         ui_state.created_fire = true;
         commands.spawn(ui_state.fluid.clone());
     }
@@ -381,7 +352,7 @@ pub fn ui_state(
             }
         }
 
-        for (entity,_material)  in &mut query_materials{
+        for (entity, _material) in &mut query_materials {
             commands.entity(entity).despawn();
         }
         ui_state.new_fluid = false;
@@ -389,5 +360,5 @@ pub fn ui_state(
         ui_state.created_fire = false;
         ui_state.restart_simulation = false;
         ui_state.start_simulation = false;
-        }
+    }
 }
