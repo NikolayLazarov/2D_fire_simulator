@@ -1,12 +1,10 @@
-use crate::ElementChangability;
-use crate::Fluid;
-use crate::Fluid::N;
+use crate::element_changability;
+use crate::fluid;
+use crate::fluid::N;
 use crate::Materials;
 use bevy::prelude::*;
 use bevy_egui::{EguiContext};
 use bevy_egui::egui;
-
-use crate::materials_list;
 
 #[derive(Default, Resource)]
 pub struct UiState {
@@ -17,7 +15,7 @@ pub struct UiState {
     pub new_material: bool,
     pub new_fluid: bool,
     pub material: Materials,
-    pub fluid: Fluid::FluidMatrix,
+    pub fluid: fluid::FluidMatrix,
     pub created_fire: bool,
     pub window_change_materials: bool,
     pub start_simulation: bool,
@@ -29,9 +27,8 @@ pub fn ui_state(
     mut egui_ctx: ResMut<EguiContext>,
     mut ui_state: ResMut<UiState>,
     mut commands: Commands,
-    mut windows: ResMut<ElementChangability::ElementChangebilityContext>,
-    mut query_fire_entity: Query<Entity, With<Fluid::FluidMatrix>>,
-    mut query_fire: Query<&mut Fluid::FluidMatrix>,
+    mut windows: ResMut<element_changability::ElementChangebilityContext>,
+    mut query_fire_entity: Query<Entity, With<fluid::FluidMatrix>>,
     mut query_materials: Query<(Entity, &Materials), With<Materials>>,
 ) {
     let mut new_material_button = false;
@@ -384,11 +381,11 @@ pub fn ui_state(
             }
         }
 
-        for (entity,material)  in &mut query_materials{
+        for (entity,_material)  in &mut query_materials{
             commands.entity(entity).despawn();
         }
         ui_state.new_fluid = false;
-        ui_state.fluid = Fluid::FluidMatrix::new();
+        ui_state.fluid = fluid::FluidMatrix::new();
         ui_state.created_fire = false;
         ui_state.restart_simulation = false;
         ui_state.start_simulation = false;

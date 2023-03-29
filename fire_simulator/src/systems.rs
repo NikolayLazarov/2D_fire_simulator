@@ -1,30 +1,30 @@
 use bevy::prelude::*;
 use std::{thread, time};
 use bevy_egui::egui::{vec2, Ui};
-use bevy_egui::{egui, EguiContext, EguiPlugin};
+use bevy_egui::{egui, EguiContext};
 
-use crate::ElementChangability;
-use crate::Fluid::N;
-use crate::Fluid::{self, FluidMatrix};
+use crate::element_changability;
+use crate::fluid::N;
+use crate::fluid::{self, FluidMatrix};
 use crate::Materials;
-use crate::UiState::{self,};
+use crate::ui_state::{self,};
 
 fn create_rect(
     ui: &mut Ui,
     r: u8,
     g: u8,
     b: u8,
-    windows: &mut ResMut<ElementChangability::ElementChangebilityContext>,
+    windows: &mut ResMut<element_changability::ElementChangebilityContext>,
     object_flag: bool,
 ) -> bool {
-    let (rect, Response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::click());
+    let (rect, response) = ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::click());
     ui.painter().rect(
         rect,
         0.0,
         egui::Color32::from_rgb(r, g, b),
         egui::Stroke::new(9.0, egui::Color32::from_rgb(r, g, b)),
     );
-    if Response.clicked() && object_flag {
+    if response.clicked() && object_flag {
         windows.side_panel_modify = true;
         true
     } else {
@@ -34,7 +34,7 @@ fn create_rect(
 
 fn create_fire_in_range(
     d: f32,
-    windows: &mut ResMut<ElementChangability::ElementChangebilityContext>,
+    windows: &mut ResMut<element_changability::ElementChangebilityContext>,
     ui: &mut Ui,
     fluid: Mut<FluidMatrix>,
 ) {
@@ -70,17 +70,16 @@ fn render_density(
     ui: &mut Ui,
     density: &Vec<f32>,
     mut query_materials: Query<&mut Materials>,
-    mut commands: Commands,
     frames: u32,
     mut fluids: Query<&mut FluidMatrix>,
-    windows: &mut ResMut<ElementChangability::ElementChangebilityContext>,
+    windows: &mut ResMut<element_changability::ElementChangebilityContext>,
 ) {
     for i in 0..N - 1 {
         ui.horizontal_top(|ui| {
             for j in 0..N - 1 {
                 let x: u32 = i;
                 let y: u32 = j;
-                let mut d = density[Fluid::ix(x, y) as usize];
+                let mut d = density[fluid::ix(x, y) as usize];
 
                 let mut material_flag: bool = false;
                  let mut fluid_flag: bool = false;
@@ -92,16 +91,16 @@ fn render_density(
                             for mut fluid in fluids.iter_mut() {
                                 let [mut left, mut right, mut up, mut down] = [0.; 4];
                                 if x as i32 - 1 > 0 {
-                                    left = density[Fluid::ix(x - 1, y) as usize];
+                                    left = density[fluid::ix(x - 1, y) as usize];
                                 }
                                 if x + 1 < N - 1 {
-                                    right = density[Fluid::ix(x + 1, y) as usize];
+                                    right = density[fluid::ix(x + 1, y) as usize];
                                 }
                                 if y as i32 - 1 > 0 {
-                                    up = density[Fluid::ix(x, y - 1) as usize];
+                                    up = density[fluid::ix(x, y - 1) as usize];
                                 }
                                 if y + 1 < N - 1 {
-                                    down = density[Fluid::ix(x, y + 1) as usize];
+                                    down = density[fluid::ix(x, y + 1) as usize];
                                 }
                                 let material_coeficient = left + right + up + down;
                                 material.fuel -= material_coeficient
@@ -127,9 +126,9 @@ fn render_density(
                         }
 
                          if material.fuel <= 0. {
-                            let mut cords_flag = false;
+                            // let mut cords_flag = false;
                             for mut fluid in fluids.iter_mut() {
-                                cords_flag = fluid.materials_coords.contains(&(x, y));
+                                let cords_flag = fluid.materials_coords.contains(&(x, y));
 
                                 if cords_flag {
                                     fluid.materials_coords.retain(|&f| f == (x, y));
@@ -164,10 +163,14 @@ fn render_density(
                                 windows.fire_change_flag = true;
                             }
                             } else {
-                            if d >  0.4 {
+                            if d >  0.5 {
                                 create_fire_in_range(d, windows, ui, fluid);
-                            } else if d > 0.01 && d < 0.4 {
-                                let (rect, Response) =
+                            }
+                            // else if d > 0.8 && d <= 1.{
+                            //     create_rect(ui, d as u8, 0, 0, windows, false);
+                            // }
+                             else if d > 0.01 && d < 0.5 {
+                                let (rect, _response) =
                         ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
                     ui.painter().rect(
                         rect,
@@ -191,7 +194,7 @@ fn render_density(
                     d = 0.0;
                     create_rect(ui, d as u8, 0, 0, windows, false);
                 } else {
-                    let (rect, Response) =
+                    let (rect, _response) =
                         ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
                     ui.painter().rect(
                         rect,
@@ -208,11 +211,9 @@ fn render_density(
 pub fn fluid_sys(
     query_fluid: Query<&mut FluidMatrix>,
     query_materials: Query<&mut Materials>,
-
     mut egui_ctx: ResMut<EguiContext>,
-    commands: Commands,
-    mut ui_state: ResMut<UiState::UiState>,
-    mut windows: ResMut<ElementChangability::ElementChangebilityContext>,
+    mut ui_state: ResMut<ui_state::UiState>,
+    mut windows: ResMut<element_changability::ElementChangebilityContext>,
 ) {
     let ten_millis = time::Duration::from_millis(200);
 
@@ -253,7 +254,6 @@ pub fn fluid_sys(
                 ui,
                 ui_state.fluid.get_density(),
                 query_materials,
-                commands,
                 frames,
                 query_fluid,
                 &mut windows,

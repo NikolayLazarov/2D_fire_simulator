@@ -1,30 +1,23 @@
-use bevy::{
-    prelude::*,
-    sprite::{collide_aabb::collide, MaterialMesh2dBundle},
-};
-use bevy_egui::{
-    egui::{self, pos2},
-    EguiPlugin,
-};
-mod ElementChangability;
-mod Fluid;
-mod UiState;
+use bevy::prelude::*;
+use bevy_egui::EguiPlugin;
+mod element_changability;
+mod fluid;
+mod ui_state;
 mod startup_systems;
 mod systems;
 
-pub static mut materials_list: Vec<(u32, u32)> = vec![];
+pub static mut MATERIALS_LIST: Vec<(u32, u32)> = vec![];
 
-use crate::Fluid::N;
 fn main() {
     App::new()
-        .init_resource::<UiState::UiState>()
-        .init_resource::<ElementChangability::ElementChangebilityContext>()
+        .init_resource::<ui_state::UiState>()
+        .init_resource::<element_changability::ElementChangebilityContext>()
         .add_plugins(DefaultPlugins)
         .add_plugin(EguiPlugin)
         .add_startup_system(startup_systems::configure_visuals)
         .add_startup_system(startup_systems::configure_ui_state)
         .add_startup_system(startup_systems::configure_windows)
-        .add_system(UiState::ui_state)
+        .add_system(ui_state::ui_state)
         .add_system(systems::fluid_sys)
         .run();
 }
