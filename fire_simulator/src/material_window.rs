@@ -2,13 +2,7 @@ use bevy_egui::egui::{self, Ui};
 
 use crate::{fluid::N, Materials};
 
-pub fn window(
-    ui: &mut Ui,
-    /*mut name_material: String, mut position_x: u32, mut position_y: u32, mut flammability: u32,*/
-    mut material: Materials,
-) -> Option<Materials> {
-    // let mut change_material_button = false;
-    ui.heading("here we go");
+pub fn window(ui: &mut Ui, mut material: Materials) -> Option<Materials> {
     ui.heading("Material");
 
     ui.horizontal(|ui| {

@@ -183,34 +183,10 @@ pub fn ui_state(
             });
 
             if ui_state.material_window {
-                ui.heading("Material");
+                ui.heading("New material");
 
-                ui.horizontal(|ui| {
-                    ui.label("Your material: ");
-                    ui.text_edit_singleline(&mut ui_state.material.name_material);
-                });
-
-                ui.add(
-                    egui::Slider::new(&mut ui_state.material.position_y, 0..=N - 1).text("X axys"),
-                );
-                if ui.button("Increment").clicked() {
-                    ui_state.material.position_y += 1;
-                }
-
-                ui.add(
-                    egui::Slider::new(&mut ui_state.material.position_x, 0..=N - 1).text("Y axys"),
-                );
-                if ui.button("Increment").clicked() {
-                    ui_state.material.position_x += 1;
-                }
-
-                ui.add(
-                    egui::Slider::new(&mut ui_state.material.flammability, 0..=100)
-                        .text("Flammability"),
-                );
-                if ui.button("Increment").clicked() {
-                    ui_state.material.flammability += 1;
-                }
+                let new_material = ui_state.material.clone();
+                let result = material_window::window(ui, new_material);
 
                 ui.separator();
 
@@ -218,6 +194,9 @@ pub fn ui_state(
                     ui.label("Add Material");
                     new_material_button = ui.button("New").clicked();
                 });
+                if let Some(material) = result {
+                    ui_state.material = material;
+                }
             } else if ui_state.fluid_window {
                 ui.heading("Fire");
 
