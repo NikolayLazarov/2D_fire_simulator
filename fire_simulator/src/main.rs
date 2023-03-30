@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_egui::EguiPlugin;
 mod element_changability;
+mod fire_window;
 mod fluid;
 mod material_window;
 mod startup_systems;

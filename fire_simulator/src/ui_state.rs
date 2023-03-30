@@ -1,4 +1,5 @@
 use crate::element_changability;
+use crate::fire_window;
 use crate::fluid;
 use crate::fluid::N;
 use crate::material_window;
@@ -77,80 +78,87 @@ pub fn ui_state(
                 if windows.fire_change_flag {
                     ui.heading("Fire");
 
-                    ui.separator();
+                    let new_fire = windows.fluid_for_change.clone();
 
-                    ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.delta_time, 0.0..=3.0)
-                            .text("Timestep"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.fluid_for_change.delta_time += 0.1;
-                    }
-                    ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.diffusion, 0.0..=10.0)
-                            .text("Diffusion"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.fluid_for_change.diffusion += 0.001;
-                    }
+                    let result = fire_window::fire_window(ui, new_fire);
+                    // ui.separator();
 
-                    ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.viscosity, 0.0..=1.0)
-                            .text("Viscosity"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.fluid_for_change.viscosity += 0.0000001;
-                    }
+                    // ui.add(
+                    //     egui::Slider::new(&mut windows.fluid_for_change.delta_time, 0.0..=3.0)
+                    //         .text("Timestep"),
+                    // );
+                    // if ui.button("Increment").clicked() {
+                    //     windows.fluid_for_change.delta_time += 0.1;
+                    // }
+                    // ui.add(
+                    //     egui::Slider::new(&mut windows.fluid_for_change.diffusion, 0.0..=10.0)
+                    //         .text("Diffusion"),
+                    // );
+                    // if ui.button("Increment").clicked() {
+                    //     windows.fluid_for_change.diffusion += 0.001;
+                    // }
 
-                    ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.fire_x, 0..=N - 2)
-                            .text("Fire Y"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.fluid_for_change.fire_x += 1;
-                    }
-                    ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.fire_y, 0..=N - 2)
-                            .text("Fire X"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.fluid_for_change.fire_y += 1;
-                    }
-                    ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.amount, 0.0..=255.0)
-                            .text("Power"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.fluid_for_change.amount += 1.0;
-                    }
+                    // ui.add(
+                    //     egui::Slider::new(&mut windows.fluid_for_change.viscosity, 0.0..=1.0)
+                    //         .text("Viscosity"),
+                    // );
+                    // if ui.button("Increment").clicked() {
+                    //     windows.fluid_for_change.viscosity += 0.0000001;
+                    // }
 
-                    ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.amount_x, 0.0..=200.0)
-                            .text("Velocity Y"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.fluid_for_change.amount_x += 1.0;
-                    }
+                    // ui.add(
+                    //     egui::Slider::new(&mut windows.fluid_for_change.fire_x, 0..=N - 2)
+                    //         .text("Fire Y"),
+                    // );
+                    // if ui.button("Increment").clicked() {
+                    //     windows.fluid_for_change.fire_x += 1;
+                    // }
+                    // ui.add(
+                    //     egui::Slider::new(&mut windows.fluid_for_change.fire_y, 0..=N - 2)
+                    //         .text("Fire X"),
+                    // );
+                    // if ui.button("Increment").clicked() {
+                    //     windows.fluid_for_change.fire_y += 1;
+                    // }
+                    // ui.add(
+                    //     egui::Slider::new(&mut windows.fluid_for_change.amount, 0.0..=255.0)
+                    //         .text("Power"),
+                    // );
+                    // if ui.button("Increment").clicked() {
+                    //     windows.fluid_for_change.amount += 1.0;
+                    // }
 
-                    ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.amount_y, 0.0..=200.0)
-                            .text("Velocity X"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.fluid_for_change.amount_y += 1.0;
-                    }
+                    // ui.add(
+                    //     egui::Slider::new(&mut windows.fluid_for_change.amount_x, 0.0..=200.0)
+                    //         .text("Velocity Y"),
+                    // );
+                    // if ui.button("Increment").clicked() {
+                    //     windows.fluid_for_change.amount_x += 1.0;
+                    // }
 
-                    ui.add(
-                        egui::Slider::new(&mut windows.fluid_for_change.frames, 0..=100)
-                            .text("Frames"),
-                    );
-                    if ui.button("Increment").clicked() {
-                        windows.fluid_for_change.frames += 1;
-                    }
+                    // ui.add(
+                    //     egui::Slider::new(&mut windows.fluid_for_change.amount_y, 0.0..=200.0)
+                    //         .text("Velocity X"),
+                    // );
+                    // if ui.button("Increment").clicked() {
+                    //     windows.fluid_for_change.amount_y += 1.0;
+                    // }
+
+                    // ui.add(
+                    //     egui::Slider::new(&mut windows.fluid_for_change.frames, 0..=100)
+                    //         .text("Frames"),
+                    // );
+                    // if ui.button("Increment").clicked() {
+                    //     windows.fluid_for_change.frames += 1;
+                    // }
 
                     ui.horizontal(|ui| {
                         ui.label("Change Fire");
                         let change_fire = ui.button("Change").clicked();
+
+                        if let Some(fire) = result {
+                            windows.fluid_for_change = fire;
+                        }
 
                         if change_fire == true {
                             for fire in query_fire_entity.iter() {
