@@ -1,3 +1,4 @@
+use crate::create_shape;
 use crate::element_changability;
 use crate::fire_window::fire_window;
 use crate::fluid;
@@ -188,18 +189,28 @@ pub fn ui_state(
     }
 
     if ui_state.new_material {
-        let x = ui_state.material.position_x;
-        let y = ui_state.material.position_y;
-
-        if !ui_state.fluid.materials_coords.contains(&(x, y)) {
-            commands.spawn(ui_state.material.clone());
-            ui_state.fluid.materials_coords.push((x, y));
-        }
+       
+        if ui_state.material.size > 1 {
+            for material in create_shape(ui_state.material.clone()){
+                let x = material.position_x;
+                let y = material.position_y;
+                if  !ui_state.fluid.materials_coords.contains(&(x,y)){
+                    commands.spawn(material);
+                     ui_state.fluid.materials_coords.push((x,y));
+                }
+            }  
+        } else if ui_state.material.size == 1{
+            let x = ui_state.material.position_x;
+            let y = ui_state.material.position_y;
+            if !ui_state.fluid.materials_coords.contains(&(x, y)) {
+                commands.spawn(ui_state.material.clone());
+                ui_state.fluid.materials_coords.push((x, y));
+            }
+        } 
+        
         ui_state.new_material = false;
     }
-    if ui_state.new_fluid && !ui_state.created_fire
-    /*||ui_state.restart_simulation*/
-    {
+    if ui_state.new_fluid && !ui_state.created_fire {
         if ui_state.created_fire {
             for fire in &mut query_fire_entity {
                 commands.entity(fire).despawn();

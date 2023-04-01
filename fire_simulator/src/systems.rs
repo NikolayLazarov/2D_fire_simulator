@@ -118,7 +118,7 @@ fn render_density(
                                     burn_speed_x,
                                     burn_speed_y,
                                 );
-                                fluid.step();
+                                // fluid.step();
                             }
                         }
 
@@ -236,10 +236,13 @@ pub fn fluid_sys(
                 let amount_x: f32 = ui_state.fluid.amount_x;
                 let amount_y: f32 = ui_state.fluid.amount_y;
 
+                // if frames == 20 {
                 ui_state.fluid.add_density(fluid_x, fluid_y, amount);
                 ui_state
                     .fluid
                     .add_velocity(fluid_x, fluid_y, amount_x, amount_y);
+
+                // }
                 ui_state.fluid.step();
                 thread::sleep(ten_millis);
                 assert!(now.elapsed() >= ten_millis);

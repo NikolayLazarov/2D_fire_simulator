@@ -32,12 +32,12 @@ pub fn fire_window(ui: &mut Ui, mut fire: FluidMatrix) -> Option<FluidMatrix> {
         fire.amount += 1.0;
     }
 
-    ui.add(egui::Slider::new(&mut fire.amount_x, 0.0..=200.0).text("Velocity Y"));
+    ui.add(egui::Slider::new(&mut fire.amount_x, -200.0..=200.0).text("Velocity Y"));
     if ui.button("Increment").clicked() {
         fire.amount_x += 1.0;
     }
 
-    ui.add(egui::Slider::new(&mut fire.amount_y, 0.0..=200.0).text("Velocity X"));
+    ui.add(egui::Slider::new(&mut fire.amount_y, -200.0..=200.0).text("Velocity X"));
     if ui.button("Increment").clicked() {
         fire.amount_y += 1.0;
     }

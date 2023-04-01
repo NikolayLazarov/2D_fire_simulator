@@ -20,6 +20,11 @@ pub fn window(ui: &mut Ui, mut material: Materials) -> Option<Materials> {
         material.position_x += 1;
     }
 
+    ui.add(egui::Slider::new(&mut material.size, 0..=N - 1).text("Size"));
+    if ui.button("Increment").clicked() {
+        material.size += 1;
+    }
+
     ui.add(egui::Slider::new(&mut material.flammability, 0..=100).text("Flammability"));
     if ui.button("Increment").clicked() {
         material.flammability += 1;
