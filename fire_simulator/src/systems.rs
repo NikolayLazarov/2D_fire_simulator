@@ -82,10 +82,13 @@ fn render_density(
                 let mut fluid_flag: bool = false;
 
                 for mut material in query_materials.iter_mut() {
+                    //checks whether there is a material in the given coords
                     if check_if_material_at_position(x, y, material.position_x, material.position_y)
                     {
+                        //if there are frames and there is fuel to burn 
                         if material.fuel > 0. && frames > 0 {
                             for mut fluid in fluids.iter_mut() {
+                                //gets the values of the cells around it
                                 let [mut left, mut right, mut up, mut down] = [0.; 4];
                                 if x as i32 - 1 > 0 {
                                     left = density[fluid::ix(x - 1, y) as usize];
@@ -99,11 +102,13 @@ fn render_density(
                                 if y + 1 < N - 1 {
                                     down = density[fluid::ix(x, y + 1) as usize];
                                 }
+                                //formula for decreasing fuel in the material
                                 let material_coeficient = left + right + up + down;
                                 material.fuel -= material_coeficient
                                     * fluid.amount
                                     * (material.flammability as f32 / 100 as f32);
-
+                                
+                                //updating state
                                 let burn_power = fluid.amount;
                                 let burn_speed_x = fluid.amount_x;
                                 let burn_speed_y = fluid.amount_y;
@@ -118,7 +123,6 @@ fn render_density(
                                     burn_speed_x,
                                     burn_speed_y,
                                 );
-                                // fluid.step();
                             }
                         }
 
@@ -126,19 +130,25 @@ fn render_density(
                             // let mut cords_flag = false;
                             for mut fluid in fluids.iter_mut() {
                                 let cords_flag = fluid.materials_coords.contains(&(x, y));
-
+                                
                                 if cords_flag {
-                                    fluid.materials_coords.retain(|&f| f == (x, y));
+                                    println!("{:?}",(x,y));
+                                    println!("{:?}",fluid.materials_coords);
+
+                                    fluid.materials_coords.retain(|&f| f != (x, y));
+                                    println!("{:?}",fluid.materials_coords);
                                 }
                             }
+                            material_flag = false;
                         } else {
                             let coeficient = material.fuel / 10.;
                             if create_rect(ui, 0, 255 - (coeficient as u8), 0, windows, true) {
                                 windows.material_for_change = material.clone();
                                 windows.material_change_flag = true;
                             }
+                            material_flag = true;
                         }
-                        material_flag = true;
+                        
                     }
                 }
                 if material_flag == true {

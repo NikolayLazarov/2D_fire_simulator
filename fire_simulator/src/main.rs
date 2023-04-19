@@ -59,9 +59,8 @@ pub fn create_shape(material: Materials) -> Vec<Materials> {
     let range_y_down = y + (size / 2);
 
     let mut material_parts: Vec<Materials> = vec![];
-
-    for i in (range_x_left..=range_x_right) {
-        for j in (range_y_up..=range_y_down) {
+    for i in range_x_left..=range_x_right {
+        for j in range_y_up..=range_y_down {
             //if
             if i <= 0 || j <= 0 || j >= (N - 1) as i32 || i >= (N - 1) as i32 {
                 continue;
