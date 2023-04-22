@@ -3,6 +3,7 @@ use bevy_egui::{egui, EguiContext};
 
 use crate::element_changability;
 use crate::fluid;
+use crate::material_coords;
 use crate::ui_state;
 use crate::Materials;
 
@@ -35,3 +36,7 @@ pub fn configure_windows(mut windows: ResMut<element_changability::ElementChange
     windows.material_for_change = Materials::default();
     windows.materials_entities_id = vec![];
 }
+
+// pub fn configure_material_coords(mut mat_coords: ResMut<material_coords::CoordsList>){
+//     // mat_coords.material_coords =  vec![];
+// }

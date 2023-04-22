@@ -2,8 +2,10 @@ use bevy::prelude::*;
 use bevy_egui::egui::{vec2, Ui};
 use bevy_egui::{egui, EguiContext};
 use std::{thread, time};
+// use crate::mat_coords;
 
-use crate::element_changability;
+use crate::material_coords::Coords;
+use crate::{element_changability, material_coords};
 use crate::fluid::N;
 use crate::fluid::{self, FluidMatrix};
 use crate::ui_state::{self};
@@ -63,6 +65,15 @@ fn check_if_material_at_position(
     }
     return false;
 }
+
+fn remove_material(x:u32, y:u32, materials: Query<(Entity, &Materials), With<Materials>>, commands:Commands){
+    for (entity,material) in materials.iter(){
+        if x == material.position_x && y == material.position_y{
+
+        }
+    }
+}
+
 fn render_density(
     ui: &mut Ui,
     density: &Vec<f32>,
@@ -70,6 +81,9 @@ fn render_density(
     frames: u32,
     mut fluids: Query<&mut FluidMatrix>,
     windows: &mut ResMut<element_changability::ElementChangebilityContext>,
+    mut query_materials_with_eintities: &Query<(Entity, &Materials), Without<Materials>>,
+    mut commands:Commands,
+    materials_coords: &mut ResMut<material_coords::CoordsList>
 ) {
     for i in 0..N - 1 {
         ui.horizontal_top(|ui| {
@@ -80,8 +94,8 @@ fn render_density(
 
                 let mut material_flag: bool = false;
                 let mut fluid_flag: bool = false;
-
                 for mut material in query_materials.iter_mut() {
+                    
                     //checks whether there is a material in the given coords
                     if check_if_material_at_position(x, y, material.position_x, material.position_y)
                     {
@@ -129,26 +143,47 @@ fn render_density(
                         if material.fuel <= 0. {
                             // let mut cords_flag = false;
                             for mut fluid in fluids.iter_mut() {
-                                let cords_flag = fluid.materials_coords.contains(&(x, y));
-                                
-                                if cords_flag {
-                                    println!("{:?}",(x,y));
-                                    println!("{:?}",fluid.materials_coords);
+                                // let cords_flag = fluid.materials_coords.contains(&(x, y));
+                                // println!("in func = {:?}",fluid.materials_coords);
+                                 println!("other func = {:?}",materials_coords );
+                                 let coords = Coords{
+                                    x: x,
+                                    y: y,
+                                    burned:false};
 
-                                    fluid.materials_coords.retain(|&f| f != (x, y));
-                                    println!("{:?}",fluid.materials_coords);
+                                 let coords_flag = materials_coords.material_coords.contains(&coords);
+                                
+                                if coords_flag {
+                                    println!("{}, {}", x,y);
+                                    let index = fluid.materials_coords.iter().position(|coords| *coords == (x, y)).unwrap();
+                                    fluid.materials_coords.remove(index);
+                                    
+                                    // println!("other func = {:?}",materials_coords );
+                                    // fluid.materials_coords.retain(|&f| f != (x, y));
+                                    
+                                    let index = materials_coords.material_coords.iter().position(|f| *f == coords).unwrap();
+                                    materials_coords.material_coords.remove(index);
+
+                                    // materials_coords.material_coords.retain(|&f| f != coords);
+
+                                    for (entity,material) in query_materials_with_eintities.iter(){
+                                        if x == material.position_x && y == material.position_y{
+                                            commands.entity(entity).despawn();
+                                        }
+                                    }
+
                                 }
                             }
-                            material_flag = false;
+                            // material_flag = false;
                         } else {
                             let coeficient = material.fuel / 10.;
                             if create_rect(ui, 0, 255 - (coeficient as u8), 0, windows, true) {
                                 windows.material_for_change = material.clone();
                                 windows.material_change_flag = true;
                             }
-                            material_flag = true;
+                            
                         }
-                        
+                        material_flag = true;
                     }
                 }
                 if material_flag == true {
@@ -224,6 +259,9 @@ pub fn fluid_sys(
     mut egui_ctx: ResMut<EguiContext>,
     mut ui_state: ResMut<ui_state::UiState>,
     mut windows: ResMut<element_changability::ElementChangebilityContext>,
+    mut query_materials_with_eintities: Query<(Entity, &Materials), Without<Materials>>,
+    mut commands: Commands,
+    mut materials_coordinates: ResMut<material_coords::CoordsList>,
 ) {
     let ten_millis = time::Duration::from_millis(200);
 
@@ -253,7 +291,7 @@ pub fn fluid_sys(
                     .add_velocity(fluid_x, fluid_y, amount_x, amount_y);
 
                 // }
-                ui_state.fluid.step();
+                ui_state.fluid.step(&mut materials_coordinates);
                 thread::sleep(ten_millis);
                 assert!(now.elapsed() >= ten_millis);
 
@@ -269,6 +307,9 @@ pub fn fluid_sys(
                 frames,
                 query_fluid,
                 &mut windows,
+                &query_materials_with_eintities,
+                commands,
+                &mut materials_coordinates
             );
         });
     });

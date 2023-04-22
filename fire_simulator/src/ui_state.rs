@@ -2,11 +2,16 @@ use crate::create_shape;
 use crate::element_changability;
 use crate::fire_window::fire_window;
 use crate::fluid;
+use crate::material_coords;
+use crate::material_coords::CoordsList;
 use crate::material_window;
 use crate::Materials;
 use bevy::prelude::*;
 use bevy_egui::egui;
 use bevy_egui::EguiContext;
+
+// use crate::mat_coords;
+
 
 #[derive(Default, Resource)]
 pub struct UiState {
@@ -32,6 +37,7 @@ pub fn ui_state(
     mut windows: ResMut<element_changability::ElementChangebilityContext>,
     mut query_fire_entity: Query<Entity, With<fluid::FluidMatrix>>,
     mut query_materials: Query<(Entity, &Materials), With<Materials>>,
+    mut materials_coordinates: ResMut<CoordsList>,
 ) {
     let mut new_material_button = false;
     let mut material_button = false;
@@ -70,6 +76,7 @@ pub fn ui_state(
                     }
 
                     if change_material_button == true {
+                        // materials_coordinates.add_coords(windows.material_for_change.position_x, windows.material_for_change.position_y);
                         commands.spawn(windows.material_for_change.clone());
                         close_window = true;
                         windows.material_change_flag = false;
@@ -195,8 +202,9 @@ pub fn ui_state(
                 let x = material.position_x;
                 let y = material.position_y;
                 if  !ui_state.fluid.materials_coords.contains(&(x,y)){
+                    materials_coordinates.add_coords(x, y);
                     commands.spawn(material);
-                     ui_state.fluid.materials_coords.push((x,y));
+                    ui_state.fluid.materials_coords.push((x,y));
                 }
             }  
         } else if ui_state.material.size == 1{
@@ -205,6 +213,8 @@ pub fn ui_state(
             if !ui_state.fluid.materials_coords.contains(&(x, y)) {
                 commands.spawn(ui_state.material.clone());
                 ui_state.fluid.materials_coords.push((x, y));
+                materials_coordinates.add_coords(x, y);
+
             }
         } 
         

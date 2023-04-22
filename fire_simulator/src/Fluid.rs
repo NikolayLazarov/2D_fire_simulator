@@ -1,4 +1,28 @@
 use bevy::prelude::Component;
+use bevy::prelude::*;
+
+use crate::material_coords::{self, CoordsList, Coords};
+
+// pub struct CoordsList(Vec<Coords>);
+
+// pub struct Coords{
+//     x: u32,
+//     y: u32,
+//     burned: bool,
+// }
+
+// impl CoordsList{
+//     pub fn add_coords(&mut self) -> &Coords{
+//         let new_coords = Coords{
+//                 x: 5,
+//                 y: 5,
+//                 burned: false
+//         };
+//         self.0.push(new_coords); 
+//         return &self.0[self.0.len()-1];
+
+//     }
+// }
 
 pub static N: u32 = 25 * 4;
 static ITER: u32 = 16;
@@ -66,7 +90,7 @@ impl FluidMatrix {
         }
     }
 
-    pub fn step(&mut self) {
+    pub fn step(&mut self, coords: &mut ResMut<CoordsList>) {
         let visc: f32 = self.viscosity;
         let diff: f32 = self.diffusion;
         let delta_time: f32 = self.delta_time;
@@ -77,15 +101,15 @@ impl FluidMatrix {
         let old_density: &mut Vec<f32> = &mut self.old_density;
         let density: &mut Vec<f32> = &mut self.density;
 
-        diffuse(1, vx0, vx, visc, delta_time, &self.materials_coords);
-        diffuse(2, vy0, vy, visc, delta_time, &self.materials_coords);
+        diffuse(1, vx0, vx, visc, delta_time, &self.materials_coords,coords);
+        diffuse(2, vy0, vy, visc, delta_time, &self.materials_coords,coords);
 
-        project(vx0, vy0, vx, vy, &self.materials_coords);
+        project(vx0, vy0, vx, vy, &self.materials_coords,coords);
 
-        advect(1, vx, vx0, vx0, vy0, delta_time, &self.materials_coords);
-        advect(2, vy, vy0, vx0, vy0, delta_time, &self.materials_coords);
+        advect(1, vx, vx0, vx0, vy0, delta_time, &self.materials_coords,coords);
+        advect(2, vy, vy0, vx0, vy0, delta_time, &self.materials_coords,coords);
 
-        project(vx, vy, vx0, vy0, &self.materials_coords);
+        project(vx, vy, vx0, vy0, &self.materials_coords,coords);
 
         diffuse(
             0,
@@ -93,7 +117,7 @@ impl FluidMatrix {
             density,
             diff,
             delta_time,
-            &self.materials_coords,
+            &self.materials_coords,coords,
         );
         advect(
             0,
@@ -102,7 +126,7 @@ impl FluidMatrix {
             vx,
             vy,
             delta_time,
-            &self.materials_coords,
+            &self.materials_coords,coords,
         );
     }
 
@@ -129,9 +153,10 @@ fn diffuse(
     diffusion: f32,
     delta_time: f32,
     materials_cords: &Vec<(u32, u32)>,
+    coords: &mut ResMut<CoordsList>
 ) {
     let a: f32 = delta_time * diffusion * ((N - 2) * (N - 2)) as f32;
-    lin_solve(b, x, x0, a, (1 as f32) + (4 as f32) * a, materials_cords);
+    lin_solve(b, x, x0, a, (1 as f32) + (4 as f32) * a, materials_cords,coords);
 }
 
 fn lin_solve(
@@ -141,6 +166,7 @@ fn lin_solve(
     a: f32,
     c: f32,
     materials_cords: &Vec<(u32, u32)>,
+    coords: &mut ResMut<CoordsList>
 ) {
     let c_recip: f32 = 1.0 / c;
     for _k in 0..ITER {
@@ -178,6 +204,7 @@ fn project(
     p: &mut Vec<f32>,
     div: &mut Vec<f32>,
     materials_cords: &Vec<(u32, u32)>,
+    coords: &mut ResMut<CoordsList>
 ) {
     for j in 1..N - 1 {
         for i in 1..N - 1 {
@@ -202,15 +229,17 @@ fn project(
                 / N as f32;
         }
     }
+    println!("here = {:?}",coords);
 
     set_bnd(0, div);
     set_bnd(0, p);
-    lin_solve(0, p, div, 1.0, 4.0, materials_cords);
+    lin_solve(0, p, div, 1.0, 4.0, materials_cords,coords);
 
     for j in 1..N - 1 {
         for i in 1..N - 1 {
             let mut material_flag = false;
             for material in materials_cords {
+                
                 if material.0 == i && material.1 == j {
                     material_flag = true;
                     break;
@@ -241,6 +270,7 @@ fn advect(
     veloc_y: &Vec<f32>,
     dt: f32,
     materials_cords: &Vec<(u32, u32)>,
+    coords: &mut ResMut<CoordsList>
 ) {
     let dtx: f32 = dt * (N - 2) as f32;
     let dty: f32 = dt * (N - 2) as f32;

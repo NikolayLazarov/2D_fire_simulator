@@ -9,11 +9,16 @@ mod material_window;
 mod startup_systems;
 mod systems;
 mod ui_state;
+mod material_coords;
+mod Fluid;
 
-pub static mut MATERIALS_LIST: Vec<(u32, u32)> = vec![];
-
+// pub static mut mat_coords: material_coords::CoordsList =  material_coords::CoordsList::new();
 fn main() {
+
+    
+
     App::new()
+        .init_resource::<material_coords::CoordsList>()
         .init_resource::<ui_state::UiState>()
         .init_resource::<element_changability::ElementChangebilityContext>()
         .add_plugins(DefaultPlugins)
