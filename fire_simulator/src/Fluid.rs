@@ -174,12 +174,19 @@ fn lin_solve(
             for i in 1..N - 1 {
                 let mut material_flag = false;
 
-                for material in materials_cords {
-                    if material.0 == i && material.1 == j {
+                for material in coords.material_coords.iter(){
+                    if material.x == i && material.y == j {
                         material_flag = true;
                         break;
                     }
                 }
+
+                // for material in materials_cords {
+                //     if material.0 == i && material.1 == j {
+                //         material_flag = true;
+                //         break;
+                //     }
+                // }
 
                 if material_flag {
                     x[ix(i, j) as usize] = 0.;
@@ -209,12 +216,20 @@ fn project(
     for j in 1..N - 1 {
         for i in 1..N - 1 {
             let mut material_flag = false;
-            for material in materials_cords {
-                if material.0 == i && material.1 == j {
+            
+            for material in coords.material_coords.iter() {
+                if material.x == i && material.y == j {
                     material_flag = true;
                     break;
                 }
             }
+            
+            // for material in materials_cords {
+            //     if material.0 == i && material.1 == j {
+            //         material_flag = true;
+            //         break;
+            //     }
+            // }
             p[ix(i, j) as usize] = 0.;
 
             if material_flag {
@@ -229,7 +244,7 @@ fn project(
                 / N as f32;
         }
     }
-    println!("here = {:?}",coords);
+    // println!("here = {:?}",coords);
 
     set_bnd(0, div);
     set_bnd(0, p);
@@ -238,13 +253,21 @@ fn project(
     for j in 1..N - 1 {
         for i in 1..N - 1 {
             let mut material_flag = false;
-            for material in materials_cords {
-                
-                if material.0 == i && material.1 == j {
+            
+            for material in coords.material_coords.iter() {
+                if material.x == i && material.y == j {
                     material_flag = true;
                     break;
                 }
             }
+
+            // for material in materials_cords {
+                
+            //     if material.0 == i && material.1 == j {
+            //         material_flag = true;
+            //         break;
+            //     }
+            // }
             if material_flag {
                 veloc_x[ix(i, j) as usize] = 0.;
                 veloc_y[ix(i, j) as usize] = 0.;
@@ -282,12 +305,20 @@ fn advect(
     for j in 1..N - 1 {
         for i in 1..N - 1 {
             let mut material_flag = false;
-            for material in materials_cords {
-                if material.0 == i && material.1 == j {
+            
+            for material in coords.material_coords.iter() {
+                if material.x == i && material.y == j {
                     material_flag = true;
                     break;
                 }
             }
+            
+            // for material in materials_cords {
+            //     if material.0 == i && material.1 == j {
+            //         material_flag = true;
+            //         break;
+            //     }
+            // }
             if material_flag {
                 d[ix(i, j) as usize] = 0.;
                 continue;

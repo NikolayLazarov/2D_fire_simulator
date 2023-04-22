@@ -145,7 +145,7 @@ fn render_density(
                             for mut fluid in fluids.iter_mut() {
                                 // let cords_flag = fluid.materials_coords.contains(&(x, y));
                                 // println!("in func = {:?}",fluid.materials_coords);
-                                 println!("other func = {:?}",materials_coords );
+                                //  println!("other func = {:?}",materials_coords );
                                  let coords = Coords{
                                     x: x,
                                     y: y,
@@ -180,6 +180,8 @@ fn render_density(
                             if create_rect(ui, 0, 255 - (coeficient as u8), 0, windows, true) {
                                 windows.material_for_change = material.clone();
                                 windows.material_change_flag = true;
+
+                                 material_flag = true;
                             }
                             
                         }
