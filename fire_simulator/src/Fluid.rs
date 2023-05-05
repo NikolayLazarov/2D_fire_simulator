@@ -129,7 +129,7 @@ impl FluidMatrix {
             &self.materials_coords,coords,
         );
     }
-
+ 
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {
         let index: u32 = ix(x, y);
         self.density[index as usize] = amount;
@@ -144,6 +144,15 @@ impl FluidMatrix {
     pub fn get_density(&mut self) -> &Vec<f32> {
         &self.density
     }
+}
+
+fn material_check(x:u32,y:u32,materials: Vec<Coords>) -> bool{
+    for material in materials.iter() {
+        if material.x == x && material.y == y {
+            return true
+        }
+    }
+    return false
 }
 
 fn diffuse(
@@ -174,19 +183,7 @@ fn lin_solve(
             for i in 1..N - 1 {
                 let mut material_flag = false;
 
-                for material in coords.material_coords.iter(){
-                    if material.x == i && material.y == j {
-                        material_flag = true;
-                        break;
-                    }
-                }
-
-                // for material in materials_cords {
-                //     if material.0 == i && material.1 == j {
-                //         material_flag = true;
-                //         break;
-                //     }
-                // }
+                material_flag = material_check(i, j, coords.material_coords.clone());
 
                 if material_flag {
                     x[ix(i, j) as usize] = 0.;
@@ -217,19 +214,8 @@ fn project(
         for i in 1..N - 1 {
             let mut material_flag = false;
             
-            for material in coords.material_coords.iter() {
-                if material.x == i && material.y == j {
-                    material_flag = true;
-                    break;
-                }
-            }
+            material_flag = material_check(i, j, coords.material_coords.clone());
             
-            // for material in materials_cords {
-            //     if material.0 == i && material.1 == j {
-            //         material_flag = true;
-            //         break;
-            //     }
-            // }
             p[ix(i, j) as usize] = 0.;
 
             if material_flag {
@@ -244,8 +230,6 @@ fn project(
                 / N as f32;
         }
     }
-    // println!("here = {:?}",coords);
-
     set_bnd(0, div);
     set_bnd(0, p);
     lin_solve(0, p, div, 1.0, 4.0, materials_cords,coords);
@@ -254,12 +238,7 @@ fn project(
         for i in 1..N - 1 {
             let mut material_flag = false;
             
-            for material in coords.material_coords.iter() {
-                if material.x == i && material.y == j {
-                    material_flag = true;
-                    break;
-                }
-            }
+            material_flag = material_check(i, j, coords.material_coords.clone());
 
             // for material in materials_cords {
                 
@@ -306,12 +285,7 @@ fn advect(
         for i in 1..N - 1 {
             let mut material_flag = false;
             
-            for material in coords.material_coords.iter() {
-                if material.x == i && material.y == j {
-                    material_flag = true;
-                    break;
-                }
-            }
+            material_flag = material_check(i, j, coords.material_coords.clone());
             
             // for material in materials_cords {
             //     if material.0 == i && material.1 == j {

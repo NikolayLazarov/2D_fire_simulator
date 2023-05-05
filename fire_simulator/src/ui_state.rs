@@ -12,7 +12,6 @@ use bevy_egui::EguiContext;
 
 // use crate::mat_coords;
 
-
 #[derive(Default, Resource)]
 pub struct UiState {
     pub is_window_open: bool,
@@ -196,28 +195,26 @@ pub fn ui_state(
     }
 
     if ui_state.new_material {
-       
         if ui_state.material.size > 1 {
-            for material in create_shape(ui_state.material.clone()){
+            for material in create_shape(ui_state.material.clone()) {
                 let x = material.position_x;
                 let y = material.position_y;
-                if  !ui_state.fluid.materials_coords.contains(&(x,y)){
+                if !ui_state.fluid.materials_coords.contains(&(x, y)) {
                     materials_coordinates.add_coords(x, y);
                     commands.spawn(material);
-                    ui_state.fluid.materials_coords.push((x,y));
+                    ui_state.fluid.materials_coords.push((x, y));
                 }
-            }  
-        } else if ui_state.material.size == 1{
+            }
+        } else if ui_state.material.size == 1 {
             let x = ui_state.material.position_x;
             let y = ui_state.material.position_y;
             if !ui_state.fluid.materials_coords.contains(&(x, y)) {
                 commands.spawn(ui_state.material.clone());
                 ui_state.fluid.materials_coords.push((x, y));
                 materials_coordinates.add_coords(x, y);
-
             }
-        } 
-        
+        }
+
         ui_state.new_material = false;
     }
     if ui_state.new_fluid && !ui_state.created_fire {

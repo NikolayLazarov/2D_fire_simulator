@@ -2,21 +2,18 @@ use bevy::prelude::*;
 use bevy_egui::EguiPlugin;
 
 use crate::fluid::N;
+mod Fluid;
 mod element_changability;
 mod fire_window;
 mod fluid;
+mod material_coords;
 mod material_window;
 mod startup_systems;
 mod systems;
 mod ui_state;
-mod material_coords;
-mod Fluid;
 
 // pub static mut mat_coords: material_coords::CoordsList =  material_coords::CoordsList::new();
 fn main() {
-
-    
-
     App::new()
         .init_resource::<material_coords::CoordsList>()
         .init_resource::<ui_state::UiState>()
@@ -70,9 +67,7 @@ pub fn create_shape(material: Materials) -> Vec<Materials> {
             if i <= 0 || j <= 0 || j >= (N - 1) as i32 || i >= (N - 1) as i32 {
                 continue;
             }
-            if size % 2 == 0
-                && (i == range_x_left || j == range_y_up)
-            {
+            if size % 2 == 0 && (i == range_x_left || j == range_y_up) {
                 continue;
             }
 
@@ -89,4 +84,3 @@ pub fn create_shape(material: Materials) -> Vec<Materials> {
 
     return material_parts;
 }
-

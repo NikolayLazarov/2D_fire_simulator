@@ -4,12 +4,12 @@ use bevy_egui::{egui, EguiContext};
 use std::{thread, time};
 // use crate::mat_coords;
 
-use crate::material_coords::Coords;
-use crate::{element_changability, material_coords};
 use crate::fluid::N;
 use crate::fluid::{self, FluidMatrix};
+use crate::material_coords::Coords;
 use crate::ui_state::{self};
 use crate::Materials;
+use crate::{element_changability, material_coords};
 
 fn create_rect(
     ui: &mut Ui,
@@ -66,11 +66,14 @@ fn check_if_material_at_position(
     return false;
 }
 
-fn remove_material(x:u32, y:u32, materials: Query<(Entity, &Materials), With<Materials>>, commands:Commands){
-    for (entity,material) in materials.iter(){
-        if x == material.position_x && y == material.position_y{
-
-        }
+fn remove_material(
+    x: u32,
+    y: u32,
+    materials: Query<(Entity, &Materials), With<Materials>>,
+    commands: Commands,
+) {
+    for (entity, material) in materials.iter() {
+        if x == material.position_x && y == material.position_y {}
     }
 }
 
@@ -82,8 +85,8 @@ fn render_density(
     mut fluids: Query<&mut FluidMatrix>,
     windows: &mut ResMut<element_changability::ElementChangebilityContext>,
     mut query_materials_with_eintities: &Query<(Entity, &Materials), Without<Materials>>,
-    mut commands:Commands,
-    materials_coords: &mut ResMut<material_coords::CoordsList>
+    mut commands: Commands,
+    materials_coords: &mut ResMut<material_coords::CoordsList>,
 ) {
     for i in 0..N - 1 {
         ui.horizontal_top(|ui| {
@@ -95,11 +98,10 @@ fn render_density(
                 let mut material_flag: bool = false;
                 let mut fluid_flag: bool = false;
                 for mut material in query_materials.iter_mut() {
-                    
                     //checks whether there is a material in the given coords
                     if check_if_material_at_position(x, y, material.position_x, material.position_y)
                     {
-                        //if there are frames and there is fuel to burn 
+                        //if there are frames and there is fuel to burn
                         if material.fuel > 0. && frames > 0 {
                             for mut fluid in fluids.iter_mut() {
                                 //gets the values of the cells around it
@@ -121,7 +123,7 @@ fn render_density(
                                 material.fuel -= material_coeficient
                                     * fluid.amount
                                     * (material.flammability as f32 / 100 as f32);
-                                
+
                                 //updating state
                                 let burn_power = fluid.amount;
                                 let burn_speed_x = fluid.amount_x;
@@ -146,32 +148,42 @@ fn render_density(
                                 // let cords_flag = fluid.materials_coords.contains(&(x, y));
                                 // println!("in func = {:?}",fluid.materials_coords);
                                 //  println!("other func = {:?}",materials_coords );
-                                 let coords = Coords{
+                                let coords = Coords {
                                     x: x,
                                     y: y,
-                                    burned:false};
+                                    burned: false,
+                                };
 
-                                 let coords_flag = materials_coords.material_coords.contains(&coords);
-                                
+                                let coords_flag =
+                                    materials_coords.material_coords.contains(&coords);
+
                                 if coords_flag {
-                                    println!("{}, {}", x,y);
-                                    let index = fluid.materials_coords.iter().position(|coords| *coords == (x, y)).unwrap();
+                                    println!("{}, {}", x, y);
+                                    let index = fluid
+                                        .materials_coords
+                                        .iter()
+                                        .position(|coords| *coords == (x, y))
+                                        .unwrap();
                                     fluid.materials_coords.remove(index);
-                                    
+
                                     // println!("other func = {:?}",materials_coords );
                                     // fluid.materials_coords.retain(|&f| f != (x, y));
-                                    
-                                    let index = materials_coords.material_coords.iter().position(|f| *f == coords).unwrap();
+
+                                    let index = materials_coords
+                                        .material_coords
+                                        .iter()
+                                        .position(|f| *f == coords)
+                                        .unwrap();
                                     materials_coords.material_coords.remove(index);
 
                                     // materials_coords.material_coords.retain(|&f| f != coords);
 
-                                    for (entity,material) in query_materials_with_eintities.iter(){
-                                        if x == material.position_x && y == material.position_y{
+                                    for (entity, material) in query_materials_with_eintities.iter()
+                                    {
+                                        if x == material.position_x && y == material.position_y {
                                             commands.entity(entity).despawn();
                                         }
                                     }
-
                                 }
                             }
                             // material_flag = false;
@@ -180,12 +192,9 @@ fn render_density(
                             if create_rect(ui, 0, 255 - (coeficient as u8), 0, windows, true) {
                                 windows.material_for_change = material.clone();
                                 windows.material_change_flag = true;
-
-                                 material_flag = true;
                             }
-                            
+                            material_flag = true;
                         }
-                        material_flag = true;
                     }
                 }
                 if material_flag == true {
@@ -311,7 +320,7 @@ pub fn fluid_sys(
                 &mut windows,
                 &query_materials_with_eintities,
                 commands,
-                &mut materials_coordinates
+                &mut materials_coordinates,
             );
         });
     });
