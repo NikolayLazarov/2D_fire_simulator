@@ -1,32 +1,16 @@
 use bevy::prelude::Component;
 use bevy::prelude::*;
 
-use crate::material_coords::{self, CoordsList, Coords};
+// link of the original documentation of the simulator
+// https://www.mikeash.com/pyblog/fluid-simulation-for-dummies.html
 
-// pub struct CoordsList(Vec<Coords>);
 
-// pub struct Coords{
-//     x: u32,
-//     y: u32,
-//     burned: bool,
-// }
-
-// impl CoordsList{
-//     pub fn add_coords(&mut self) -> &Coords{
-//         let new_coords = Coords{
-//                 x: 5,
-//                 y: 5,
-//                 burned: false
-//         };
-//         self.0.push(new_coords); 
-//         return &self.0[self.0.len()-1];
-
-//     }
-// }
-
+use crate::material_coords::{Coords, CoordsList};
+//size of the scene
 pub static N: u32 = 25 * 4;
 static ITER: u32 = 16;
 
+//assignment of indexes for the vallues that are put in the vector
 pub fn ix(mut x: u32, mut y: u32) -> u32 {
     if x > N - 1 {
         x = N - 1;
@@ -37,7 +21,7 @@ pub fn ix(mut x: u32, mut y: u32) -> u32 {
     }
     x + y * N
 }
-
+//structure for the fluid information
 #[derive(Default, Component, Clone)]
 pub struct FluidMatrix {
     pub delta_time: f32,
@@ -61,7 +45,7 @@ pub struct FluidMatrix {
 
     pub materials_coords: Vec<(u32, u32)>,
 }
-
+//default values for a matrix
 impl FluidMatrix {
     pub fn new() -> Self {
         Self {
@@ -89,7 +73,7 @@ impl FluidMatrix {
             materials_coords: vec![],
         }
     }
-
+//function for making one frame   
     pub fn step(&mut self, coords: &mut ResMut<CoordsList>) {
         let visc: f32 = self.viscosity;
         let diff: f32 = self.diffusion;
@@ -100,25 +84,48 @@ impl FluidMatrix {
         let vy0: &mut Vec<f32> = &mut self.vy0;
         let old_density: &mut Vec<f32> = &mut self.old_density;
         let density: &mut Vec<f32> = &mut self.density;
+        
+        //diffuse the fluid in x and y axis
+        diffuse(1, vx0, vx, visc, delta_time, &self.materials_coords, coords);
+        diffuse(2, vy0, vy, visc, delta_time, &self.materials_coords, coords);
+        //fix incompresability after diffusion
+        project(vx0, vy0, vx, vy, &self.materials_coords, coords);
 
-        diffuse(1, vx0, vx, visc, delta_time, &self.materials_coords,coords);
-        diffuse(2, vy0, vy, visc, delta_time, &self.materials_coords,coords);
-
-        project(vx0, vy0, vx, vy, &self.materials_coords,coords);
-
-        advect(1, vx, vx0, vx0, vy0, delta_time, &self.materials_coords,coords);
-        advect(2, vy, vy0, vx0, vy0, delta_time, &self.materials_coords,coords);
-
-        project(vx, vy, vx0, vy0, &self.materials_coords,coords);
-
+        //move the velocities of the fluid cells in x and y axis
+        advect(
+            1,
+            vx,
+            vx0,
+            vx0,
+            vy0,
+            delta_time,
+            &self.materials_coords,
+            coords,
+        );
+        advect(
+            2,
+            vy,
+            vy0,
+            vx0,
+            vy0,
+            delta_time,
+            &self.materials_coords,
+            coords,
+        );
+        //fix incompresability after diffusion
+        project(vx, vy, vx0, vy0, &self.materials_coords, coords);
+        
+        //diffucion of the density
         diffuse(
             0,
             old_density,
             density,
             diff,
             delta_time,
-            &self.materials_coords,coords,
+            &self.materials_coords,
+            coords,
         );
+        //moving the densities according to the velocities
         advect(
             0,
             density,
@@ -126,10 +133,11 @@ impl FluidMatrix {
             vx,
             vy,
             delta_time,
-            &self.materials_coords,coords,
+            &self.materials_coords,
+            coords,
         );
     }
- 
+
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {
         let index: u32 = ix(x, y);
         self.density[index as usize] = amount;
@@ -146,15 +154,17 @@ impl FluidMatrix {
     }
 }
 
-fn material_check(x:u32,y:u32,materials: Vec<Coords>) -> bool{
+//checks if there is a material at the given coordinates
+fn material_check(x: u32, y: u32, materials: Vec<Coords>) -> bool {
     for material in materials.iter() {
         if material.x == x && material.y == y {
-            return true
+            return true;
         }
     }
-    return false
+    return false;
 }
-
+//function for diffusing the fluid in the box
+//each cell exchanges density with its direct neigbours 
 fn diffuse(
     b: u32,
     x: &mut Vec<f32>,
@@ -162,12 +172,20 @@ fn diffuse(
     diffusion: f32,
     delta_time: f32,
     materials_cords: &Vec<(u32, u32)>,
-    coords: &mut ResMut<CoordsList>
+    coords: &mut ResMut<CoordsList>,
 ) {
     let a: f32 = delta_time * diffusion * ((N - 2) * (N - 2)) as f32;
-    lin_solve(b, x, x0, a, (1 as f32) + (4 as f32) * a, materials_cords,coords);
+    lin_solve(
+        b,
+        x,
+        x0,
+        a,
+        (1 as f32) + (4 as f32) * a,
+        materials_cords,
+        coords,
+    );
 }
-
+//function for making the algorythm liner
 fn lin_solve(
     b: u32,
     x: &mut Vec<f32>,
@@ -175,7 +193,7 @@ fn lin_solve(
     a: f32,
     c: f32,
     materials_cords: &Vec<(u32, u32)>,
-    coords: &mut ResMut<CoordsList>
+    coords: &mut ResMut<CoordsList>,
 ) {
     let c_recip: f32 = 1.0 / c;
     for _k in 0..ITER {
@@ -189,6 +207,7 @@ fn lin_solve(
                     x[ix(i, j) as usize] = 0.;
                     continue;
                 }
+                //Gauss-Seidel relacsation
                 x[ix(i, j) as usize] = (x0[ix(i, j) as usize]
                     + a * (x[ix(i + 1, j) as usize]
                         + x[ix(i - 1, j) as usize]
@@ -202,20 +221,21 @@ fn lin_solve(
     set_bnd(b, x);
 }
 
+//function that conserves the mass of the fluid 
 fn project(
     veloc_x: &mut Vec<f32>,
     veloc_y: &mut Vec<f32>,
     p: &mut Vec<f32>,
     div: &mut Vec<f32>,
     materials_cords: &Vec<(u32, u32)>,
-    coords: &mut ResMut<CoordsList>
+    coords: &mut ResMut<CoordsList>,
 ) {
     for j in 1..N - 1 {
         for i in 1..N - 1 {
             let mut material_flag = false;
-            
+
             material_flag = material_check(i, j, coords.material_coords.clone());
-            
+
             p[ix(i, j) as usize] = 0.;
 
             if material_flag {
@@ -232,16 +252,16 @@ fn project(
     }
     set_bnd(0, div);
     set_bnd(0, p);
-    lin_solve(0, p, div, 1.0, 4.0, materials_cords,coords);
+    lin_solve(0, p, div, 1.0, 4.0, materials_cords, coords);
 
     for j in 1..N - 1 {
         for i in 1..N - 1 {
             let mut material_flag = false;
-            
+
             material_flag = material_check(i, j, coords.material_coords.clone());
 
             // for material in materials_cords {
-                
+
             //     if material.0 == i && material.1 == j {
             //         material_flag = true;
             //         break;
@@ -264,6 +284,7 @@ fn project(
     set_bnd(2, veloc_y);
 }
 
+//moves the density through the static velocity field 
 fn advect(
     b: u32,
     d: &mut Vec<f32>,
@@ -272,7 +293,7 @@ fn advect(
     veloc_y: &Vec<f32>,
     dt: f32,
     materials_cords: &Vec<(u32, u32)>,
-    coords: &mut ResMut<CoordsList>
+    coords: &mut ResMut<CoordsList>,
 ) {
     let dtx: f32 = dt * (N - 2) as f32;
     let dty: f32 = dt * (N - 2) as f32;
@@ -286,7 +307,7 @@ fn advect(
             let mut material_flag = false;
             
             material_flag = material_check(i, j, coords.material_coords.clone());
-            
+
             // for material in materials_cords {
             //     if material.0 == i && material.1 == j {
             //         material_flag = true;
@@ -345,6 +366,8 @@ fn advect(
 
     set_bnd(b, d);
 }
+
+//function for containing the fluid in the given scene
 fn set_bnd(b: u32, x: &mut Vec<f32>) {
     for i in 1..N - 1 {
         x[ix(i, 0) as usize] = if b == 2 {

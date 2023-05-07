@@ -10,8 +10,6 @@ use bevy::prelude::*;
 use bevy_egui::egui;
 use bevy_egui::EguiContext;
 
-// use crate::mat_coords;
-
 #[derive(Default, Resource)]
 pub struct UiState {
     pub is_window_open: bool,
@@ -238,7 +236,8 @@ pub fn ui_state(
         }
 
         for (entity, _material) in &mut query_materials {
-            commands.entity(entity).despawn();
+            // commands.entity(entity).despawn();
+            commands.entity(entity).remove::<Materials>();
         }
         ui_state.new_fluid = false;
         ui_state.fluid = fluid::FluidMatrix::new();
