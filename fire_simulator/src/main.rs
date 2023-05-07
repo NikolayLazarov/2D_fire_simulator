@@ -2,7 +2,6 @@ use bevy::prelude::*;
 use bevy_egui::EguiPlugin;
 
 use crate::fluid::N;
-mod Fluid;
 mod element_changability;
 mod fire_window;
 mod fluid;

@@ -145,10 +145,7 @@ fn render_density(
                         if material.fuel <= 0. {
                             // let mut cords_flag = false;
                             for mut fluid in fluids.iter_mut() {
-                                // let cords_flag = fluid.materials_coords.contains(&(x, y));
-                                // println!("in func = {:?}",fluid.materials_coords);
-                                //  println!("other func = {:?}",materials_coords );
-                                let coords = Coords {
+                               let coords = Coords {
                                     x: x,
                                     y: y,
                                     burned: false,
@@ -158,16 +155,6 @@ fn render_density(
                                     materials_coords.material_coords.contains(&coords);
 
                                 if coords_flag {
-                                    println!("{}, {}", x, y);
-                                    let index = fluid
-                                        .materials_coords
-                                        .iter()
-                                        .position(|coords| *coords == (x, y))
-                                        .unwrap();
-                                    fluid.materials_coords.remove(index);
-
-                                    // println!("other func = {:?}",materials_coords );
-                                    // fluid.materials_coords.retain(|&f| f != (x, y));
 
                                     let index = materials_coords
                                         .material_coords

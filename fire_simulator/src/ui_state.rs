@@ -3,6 +3,7 @@ use crate::element_changability;
 use crate::fire_window::fire_window;
 use crate::fluid;
 use crate::material_coords;
+use crate::material_coords::Coords;
 use crate::material_coords::CoordsList;
 use crate::material_window;
 use crate::Materials;
@@ -195,20 +196,30 @@ pub fn ui_state(
     if ui_state.new_material {
         if ui_state.material.size > 1 {
             for material in create_shape(ui_state.material.clone()) {
+                
+                let coords = Coords {
+                    x:  material.position_x,
+                    y: material.position_y,
+                    burned: false,
+                };
                 let x = material.position_x;
                 let y = material.position_y;
-                if !ui_state.fluid.materials_coords.contains(&(x, y)) {
-                    materials_coordinates.add_coords(x, y);
+                if !materials_coordinates.material_coords.contains(&coords){
                     commands.spawn(material);
-                    ui_state.fluid.materials_coords.push((x, y));
+                    materials_coordinates.add_coords(x, y);
                 }
             }
         } else if ui_state.material.size == 1 {
+            let coords = Coords {
+                x:  ui_state.material.position_x,
+                y: ui_state.material.position_y,
+                burned: false,
+            };
+
             let x = ui_state.material.position_x;
             let y = ui_state.material.position_y;
-            if !ui_state.fluid.materials_coords.contains(&(x, y)) {
+            if !materials_coordinates.material_coords.contains(&coords){
                 commands.spawn(ui_state.material.clone());
-                ui_state.fluid.materials_coords.push((x, y));
                 materials_coordinates.add_coords(x, y);
             }
         }
