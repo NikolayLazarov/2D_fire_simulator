@@ -196,17 +196,13 @@ pub fn ui_state(
     if ui_state.new_material {
         if ui_state.material.size > 1 {
             for material in create_shape(ui_state.material.clone()) {
-                println!("multiple");
                if materials_coordinates.add_material_to_scene(material.position_x,material.position_y){
                 commands.spawn(material);
-                println!("here ok");
                }
             }
         } else if ui_state.material.size == 1 {
-            println!("one");
             if materials_coordinates.add_material_to_scene(ui_state.material.position_x,ui_state.material.position_y){
                 commands.spawn(ui_state.material.clone());
-                println!("one ok");
                }
         }
 
@@ -233,9 +229,10 @@ pub fn ui_state(
         }
 
         for (entity, _material) in &mut query_materials {
-            // commands.entity(entity).despawn();
             commands.entity(entity).remove::<Materials>();
+            
         }
+        materials_coordinates.reset_coords();
         ui_state.new_fluid = false;
         ui_state.fluid = fluid::FluidMatrix::new();
         ui_state.created_fire = false;
