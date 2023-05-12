@@ -196,32 +196,18 @@ pub fn ui_state(
     if ui_state.new_material {
         if ui_state.material.size > 1 {
             for material in create_shape(ui_state.material.clone()) {
-                
-                let coords = Coords {
-                    x:  material.position_x,
-                    y: material.position_y,
-                    burned: false,
-                };
-                let x = material.position_x;
-                let y = material.position_y;
-                if !materials_coordinates.material_coords.contains(&coords){
-                    commands.spawn(material);
-                    materials_coordinates.add_coords(x, y);
-                }
+                println!("multiple");
+               if materials_coordinates.add_material_to_scene(material.position_x,material.position_y){
+                commands.spawn(material);
+                println!("here ok");
+               }
             }
         } else if ui_state.material.size == 1 {
-            let coords = Coords {
-                x:  ui_state.material.position_x,
-                y: ui_state.material.position_y,
-                burned: false,
-            };
-
-            let x = ui_state.material.position_x;
-            let y = ui_state.material.position_y;
-            if !materials_coordinates.material_coords.contains(&coords){
+            println!("one");
+            if materials_coordinates.add_material_to_scene(ui_state.material.position_x,ui_state.material.position_y){
                 commands.spawn(ui_state.material.clone());
-                materials_coordinates.add_coords(x, y);
-            }
+                println!("one ok");
+               }
         }
 
         ui_state.new_material = false;

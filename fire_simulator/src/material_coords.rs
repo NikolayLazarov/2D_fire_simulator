@@ -13,13 +13,28 @@ pub struct CoordsList {
 }
 
 impl CoordsList {
-    pub fn add_coords(&mut self, position_x: u32, position_y: u32) {
+    pub fn add_coords(&mut self, new_coords: Coords) {
+        self.material_coords.push(new_coords);
+        println!("added material");
+
+    }
+    pub fn add_material_to_scene(&mut self,position_x: u32,position_y: u32)->bool{
         let new_coords = Coords {
             x: position_x,
             y: position_y,
             burned: false,
         };
-        self.material_coords.push(new_coords);
+
+        if self.material_coords.contains(&new_coords){
+            print!("contain");
+            false
+        }
+        else{
+            self.add_coords(new_coords);
+            println!("do not contains");
+            true
+            
+        }
     }
 }
 
