@@ -16,24 +16,22 @@ impl CoordsList {
     pub fn add_coords(&mut self, new_coords: Coords) {
         self.material_coords.push(new_coords);
     }
-    pub fn add_material_to_scene(&mut self,position_x: u32,position_y: u32)->bool{
+    pub fn add_material_to_scene(&mut self, position_x: u32, position_y: u32) -> bool {
         let new_coords = Coords {
             x: position_x,
             y: position_y,
             burned: false,
         };
 
-        if self.material_coords.contains(&new_coords){
+        if self.material_coords.contains(&new_coords) {
             false
-        }
-        else{
+        } else {
             self.add_coords(new_coords);
             true
-            
         }
     }
 
-    pub fn reset_coords(&mut self){
+    pub fn reset_coords(&mut self) {
         self.material_coords.drain(..);
         assert!(self.material_coords.is_empty());
     }

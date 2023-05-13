@@ -41,7 +41,6 @@ pub struct FluidMatrix {
     pub amount_y: f32,
 
     pub frames: u32,
-
 }
 //default values for a matrix
 impl FluidMatrix {
@@ -70,7 +69,7 @@ impl FluidMatrix {
             frames: 20,
         }
     }
-//function for making one frame   
+    //function for making one frame
     pub fn step(&mut self, coords: &mut ResMut<CoordsList>) {
         let visc: f32 = self.viscosity;
         let diff: f32 = self.diffusion;
@@ -81,7 +80,7 @@ impl FluidMatrix {
         let vy0: &mut Vec<f32> = &mut self.vy0;
         let old_density: &mut Vec<f32> = &mut self.old_density;
         let density: &mut Vec<f32> = &mut self.density;
-        
+
         //diffuse the fluid in x and y axis
         diffuse(1, vx0, vx, visc, delta_time, coords);
         diffuse(2, vy0, vy, visc, delta_time, coords);
@@ -89,50 +88,15 @@ impl FluidMatrix {
         project(vx0, vy0, vx, vy, coords);
 
         //move the velocities of the fluid cells in x and y axis
-        advect(
-            1,
-            vx,
-            vx0,
-            vx0,
-            vy0,
-            delta_time,
-        
-            coords,
-        );
-        advect(
-            2,
-            vy,
-            vy0,
-            vx0,
-            vy0,
-            delta_time,
-        
-            coords,
-        );
+        advect(1, vx, vx0, vx0, vy0, delta_time, coords);
+        advect(2, vy, vy0, vx0, vy0, delta_time, coords);
         //fix incompresability after diffusion
         project(vx, vy, vx0, vy0, coords);
-        
+
         //diffucion of the density
-        diffuse(
-            0,
-            old_density,
-            density,
-            diff,
-            delta_time,
-        
-            coords,
-        );
+        diffuse(0, old_density, density, diff, delta_time, coords);
         //moving the densities according to the velocities
-        advect(
-            0,
-            density,
-            old_density,
-            vx,
-            vy,
-            delta_time,
-        
-            coords,
-        );
+        advect(0, density, old_density, vx, vy, delta_time, coords);
     }
 
     pub fn add_density(&mut self, x: u32, y: u32, amount: f32) {
@@ -161,7 +125,7 @@ fn material_check(x: u32, y: u32, materials: Vec<Coords>) -> bool {
     return false;
 }
 //function for diffusing the fluid in the box
-//each cell exchanges density with its direct neigbours 
+//each cell exchanges density with its direct neigbours
 fn diffuse(
     b: u32,
     x: &mut Vec<f32>,
@@ -171,14 +135,7 @@ fn diffuse(
     coords: &mut ResMut<CoordsList>,
 ) {
     let a: f32 = delta_time * diffusion * ((N - 2) * (N - 2)) as f32;
-    lin_solve(
-        b,
-        x,
-        x0,
-        a,
-        (1 as f32) + (4 as f32) * a,
-        coords,
-    );
+    lin_solve(b, x, x0, a, (1 as f32) + (4 as f32) * a, coords);
 }
 //function for making the algorythm liner
 fn lin_solve(
@@ -193,9 +150,7 @@ fn lin_solve(
     for _k in 0..ITER {
         for j in 1..N - 1 {
             for i in 1..N - 1 {
-                let mut material_flag = false;
-
-                material_flag = material_check(i, j, coords.material_coords.clone());
+                let material_flag = material_check(i, j, coords.material_coords.clone());
 
                 if material_flag {
                     x[ix(i, j) as usize] = 0.;
@@ -215,7 +170,7 @@ fn lin_solve(
     set_bnd(b, x);
 }
 
-//function that conserves the mass of the fluid 
+//function that conserves the mass of the fluid
 fn project(
     veloc_x: &mut Vec<f32>,
     veloc_y: &mut Vec<f32>,
@@ -225,9 +180,7 @@ fn project(
 ) {
     for j in 1..N - 1 {
         for i in 1..N - 1 {
-            let mut material_flag = false;
-
-            material_flag = material_check(i, j, coords.material_coords.clone());
+            let material_flag = material_check(i, j, coords.material_coords.clone());
 
             p[ix(i, j) as usize] = 0.;
 
@@ -249,9 +202,7 @@ fn project(
 
     for j in 1..N - 1 {
         for i in 1..N - 1 {
-            let mut material_flag = false;
-
-            material_flag = material_check(i, j, coords.material_coords.clone());
+            let material_flag = material_check(i, j, coords.material_coords.clone());
 
             // for material in materials_cords {
 
@@ -277,7 +228,7 @@ fn project(
     set_bnd(2, veloc_y);
 }
 
-//moves the density through the static velocity field 
+//moves the density through the static velocity field
 fn advect(
     b: u32,
     d: &mut Vec<f32>,
@@ -296,16 +247,8 @@ fn advect(
 
     for j in 1..N - 1 {
         for i in 1..N - 1 {
-            let mut material_flag = false;
+            let  material_flag = material_check(i, j, coords.material_coords.clone());
             
-            material_flag = material_check(i, j, coords.material_coords.clone());
-
-            // for material in materials_cords {
-            //     if material.0 == i && material.1 == j {
-            //         material_flag = true;
-            //         break;
-            //     }
-            // }
             if material_flag {
                 d[ix(i, j) as usize] = 0.;
                 continue;

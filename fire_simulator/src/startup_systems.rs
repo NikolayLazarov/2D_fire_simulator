@@ -3,7 +3,6 @@ use bevy_egui::{egui, EguiContext};
 
 use crate::element_changability;
 use crate::fluid;
-use crate::material_coords;
 use crate::ui_state;
 use crate::Materials;
 

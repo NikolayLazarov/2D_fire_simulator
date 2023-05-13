@@ -2,8 +2,6 @@ use crate::create_shape;
 use crate::element_changability;
 use crate::fire_window::fire_window;
 use crate::fluid;
-use crate::material_coords;
-use crate::material_coords::Coords;
 use crate::material_coords::CoordsList;
 use crate::material_window;
 use crate::Materials;
@@ -196,14 +194,18 @@ pub fn ui_state(
     if ui_state.new_material {
         if ui_state.material.size > 1 {
             for material in create_shape(ui_state.material.clone()) {
-               if materials_coordinates.add_material_to_scene(material.position_x,material.position_y){
-                commands.spawn(material);
-               }
+                if materials_coordinates
+                    .add_material_to_scene(material.position_x, material.position_y)
+                {
+                    commands.spawn(material);
+                }
             }
         } else if ui_state.material.size == 1 {
-            if materials_coordinates.add_material_to_scene(ui_state.material.position_x,ui_state.material.position_y){
+            if materials_coordinates
+                .add_material_to_scene(ui_state.material.position_x, ui_state.material.position_y)
+            {
                 commands.spawn(ui_state.material.clone());
-               }
+            }
         }
 
         ui_state.new_material = false;
@@ -230,7 +232,6 @@ pub fn ui_state(
 
         for (entity, _material) in &mut query_materials {
             commands.entity(entity).remove::<Materials>();
-            
         }
         materials_coordinates.reset_coords();
         ui_state.new_fluid = false;

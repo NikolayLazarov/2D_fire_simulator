@@ -66,15 +66,33 @@ fn check_if_material_at_position(
     return false;
 }
 
-fn remove_material(
-    x: u32,
-    y: u32,
-    materials: Query<(Entity, &Materials), With<Materials>>,
-    commands: Commands,
-) {
-    for (entity, material) in materials.iter() {
-        if x == material.position_x && y == material.position_y {}
+// fn remove_material(
+//     x: u32,
+//     y: u32,
+//     materials: Query<(Entity, &Materials), With<Materials>>,
+//     commands: Commands,
+// ) {
+//     for (entity, material) in materials.iter() {
+//         if x == material.position_x && y == material.position_y {}
+//     }
+// }
+
+fn get_material_coeficient(density: &Vec<f32>, x: u32, y: u32) -> f32 {
+    //gets the values of the cells around it
+    let [mut left, mut right, mut up, mut down] = [0.; 4];
+    if x as i32 - 1 > 0 {
+        left = density[fluid::ix(x - 1, y) as usize];
     }
+    if x + 1 < N - 1 {
+        right = density[fluid::ix(x + 1, y) as usize];
+    }
+    if y as i32 - 1 > 0 {
+        up = density[fluid::ix(x, y - 1) as usize];
+    }
+    if y + 1 < N - 1 {
+        down = density[fluid::ix(x, y + 1) as usize];
+    }
+    left + right + up + down
 }
 
 fn render_density(
@@ -84,7 +102,7 @@ fn render_density(
     frames: u32,
     mut fluids: Query<&mut FluidMatrix>,
     windows: &mut ResMut<element_changability::ElementChangebilityContext>,
-    mut query_materials_with_eintities: &Query<(Entity, &Materials), Without<Materials>>,
+    query_materials_with_eintities: &Query<(Entity, &Materials), Without<Materials>>,
     mut commands: Commands,
     materials_coords: &mut ResMut<material_coords::CoordsList>,
 ) {
@@ -93,10 +111,12 @@ fn render_density(
             for j in 0..N - 1 {
                 let x: u32 = i;
                 let y: u32 = j;
-                let mut d = density[fluid::ix(x, y) as usize];
-
+                let d = density[fluid::ix(x, y) as usize];
+            
                 let mut material_flag: bool = false;
+                // let no_material_flag: bool = false;
                 let mut fluid_flag: bool = false;
+
                 for mut material in query_materials.iter_mut() {
                     //checks whether there is a material in the given coords
                     if check_if_material_at_position(x, y, material.position_x, material.position_y)
@@ -104,22 +124,9 @@ fn render_density(
                         //if there are frames and there is fuel to burn
                         if material.fuel > 0. && frames > 0 {
                             for mut fluid in fluids.iter_mut() {
-                                //gets the values of the cells around it
-                                let [mut left, mut right, mut up, mut down] = [0.; 4];
-                                if x as i32 - 1 > 0 {
-                                    left = density[fluid::ix(x - 1, y) as usize];
-                                }
-                                if x + 1 < N - 1 {
-                                    right = density[fluid::ix(x + 1, y) as usize];
-                                }
-                                if y as i32 - 1 > 0 {
-                                    up = density[fluid::ix(x, y - 1) as usize];
-                                }
-                                if y + 1 < N - 1 {
-                                    down = density[fluid::ix(x, y + 1) as usize];
-                                }
+                                let material_coeficient = get_material_coeficient(density, x, y);
+
                                 //formula for decreasing fuel in the material
-                                let material_coeficient = left + right + up + down;
                                 material.fuel -= material_coeficient
                                     * fluid.amount
                                     * (material.flammability as f32 / 100 as f32);
@@ -144,8 +151,8 @@ fn render_density(
 
                         if material.fuel <= 0. {
                             // let mut cords_flag = false;
-                            for mut fluid in fluids.iter_mut() {
-                               let coords = Coords {
+                            for _fluid in fluids.iter_mut() {
+                                let coords = Coords {
                                     x: x,
                                     y: y,
                                     burned: false,
@@ -155,7 +162,6 @@ fn render_density(
                                     materials_coords.material_coords.contains(&coords);
 
                                 if coords_flag {
-
                                     let index = materials_coords
                                         .material_coords
                                         .iter()
@@ -163,9 +169,7 @@ fn render_density(
                                         .unwrap();
                                     materials_coords.material_coords.remove(index);
 
-                                    // materials_coords.material_coords.retain(|&f| f != coords);
-
-                                    for (entity, material) in query_materials_with_eintities.iter()
+                                      for (entity, material) in query_materials_with_eintities.iter()
                                     {
                                         if x == material.position_x && y == material.position_y {
                                             commands.entity(entity).despawn();
@@ -181,8 +185,12 @@ fn render_density(
                                 windows.material_change_flag = true;
                             }
                             material_flag = true;
+                            break;
                         }
                     }
+                    // else {
+                    //     no_material_flag = true;
+                    // }
                 }
                 if material_flag == true {
                     continue;
@@ -204,21 +212,21 @@ fn render_density(
                             }
                         } else {
                             if d > 0.5 {
+                                //the fire
                                 create_fire_in_range(d, windows, ui, fluid);
                             }
-                            // else if d > 0.8 && d <= 1.{
-                            //     create_rect(ui, d as u8, 0, 0, windows, false);
-                            // }
                             else if d > 0.01 && d < 0.5 {
+                                //smoke
                                 let (rect, _response) =
                                     ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
                                 ui.painter().rect(
                                     rect,
                                     0.0,
                                     egui::Color32::from_gray((d * 255.0) as u8),
+                                    
                                     egui::Stroke::new(
                                         9.0,
-                                        egui::Color32::from_gray((d * 255.0) as u8),
+                                        egui::Color32::from_gray((d * 255.0) as u8), 
                                     ),
                                 );
                             } else {
@@ -232,19 +240,17 @@ fn render_density(
                 if fluid_flag == true {
                     continue;
                 }
-
-                if d > 255.0 || d < 0. {
-                    d = 0.0;
-                    create_rect(ui, d as u8, 0, 0, windows, false);
-                } else {
-                    let (rect, _response) =
-                        ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
-                    ui.painter().rect(
-                        rect,
-                        0.0,
-                        egui::Color32::from_gray(d as u8),
-                        egui::Stroke::new(9.0, egui::Color32::from_gray((d * 100.0) as u8)),
-                    );
+   
+                if !(d > 1.0 || d < 0.) {
+                     //the empty scene before and during simulation
+                     let (rect, _response) =
+                     ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                 ui.painter().rect(
+                     rect,
+                     0.0,
+                     egui::Color32::from_gray(d as u8),
+                     egui::Stroke::new(9.0, egui::Color32::from_gray((d * 100.0) as u8)),
+                 );
                 }
             }
         });
@@ -257,8 +263,8 @@ pub fn fluid_sys(
     mut egui_ctx: ResMut<EguiContext>,
     mut ui_state: ResMut<ui_state::UiState>,
     mut windows: ResMut<element_changability::ElementChangebilityContext>,
-    mut query_materials_with_eintities: Query<(Entity, &Materials), Without<Materials>>,
-    mut commands: Commands,
+    query_materials_with_eintities: Query<(Entity, &Materials), Without<Materials>>,
+    commands: Commands,
     mut materials_coordinates: ResMut<material_coords::CoordsList>,
 ) {
     let ten_millis = time::Duration::from_millis(200);
