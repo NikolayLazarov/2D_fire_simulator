@@ -47,5 +47,5 @@ pub fn fire_window(ui: &mut Ui, mut fire: FluidMatrix) -> Option<FluidMatrix> {
         fire.frames += 1;
     }
 
-    return Some(fire);
+    Some(fire)
 }

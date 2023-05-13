@@ -81,5 +81,5 @@ pub fn create_shape(material: Materials) -> Vec<Materials> {
         }
     }
 
-    return material_parts;
+    material_parts
 }

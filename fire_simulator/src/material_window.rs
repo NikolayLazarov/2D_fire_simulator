@@ -30,5 +30,5 @@ pub fn window(ui: &mut Ui, mut material: Materials) -> Option<Materials> {
         material.flammability += 1;
     }
 
-    return Some(material);
+    Some(material)
 }

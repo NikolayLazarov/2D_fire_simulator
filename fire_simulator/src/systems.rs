@@ -63,7 +63,7 @@ fn check_if_material_at_position(
     if x_cord == x_material && y_cord == y_material {
         return true;
     }
-    return false;
+    false
 }
 
 // fn remove_material(
@@ -77,7 +77,7 @@ fn check_if_material_at_position(
 //     }
 // }
 
-fn get_material_coeficient(density: &Vec<f32>, x: u32, y: u32) -> f32 {
+fn get_material_coeficient(density: &[f32], x: u32, y: u32) -> f32 {
     //gets the values of the cells around it
     let [mut left, mut right, mut up, mut down] = [0.; 4];
     if x as i32 - 1 > 0 {
@@ -97,7 +97,7 @@ fn get_material_coeficient(density: &Vec<f32>, x: u32, y: u32) -> f32 {
 
 fn render_density(
     ui: &mut Ui,
-    density: &Vec<f32>,
+    density: &[f32],
     mut query_materials: Query<&mut Materials>,
     frames: u32,
     mut fluids: Query<&mut FluidMatrix>,
@@ -129,7 +129,7 @@ fn render_density(
                                 //formula for decreasing fuel in the material
                                 material.fuel -= material_coeficient
                                     * fluid.amount
-                                    * (material.flammability as f32 / 100 as f32);
+                                    * (material.flammability as f32 / 100_f32);
 
                                 //updating state
                                 let burn_power = fluid.amount;
@@ -153,8 +153,8 @@ fn render_density(
                             // let mut cords_flag = false;
                             for _fluid in fluids.iter_mut() {
                                 let coords = Coords {
-                                    x: x,
-                                    y: y,
+                                    x,
+                                    y,
                                     burned: false,
                                 };
 
@@ -192,16 +192,16 @@ fn render_density(
                     //     no_material_flag = true;
                     // }
                 }
-                if material_flag == true {
+                if material_flag {
                     continue;
                 }
 
                 for fluid in fluids.iter_mut() {
-                    if fluid_flag == false {
+                    if !fluid_flag{
                         if x == fluid.fire_x && y == fluid.fire_y {
                             if create_rect(
                                 ui,
-                                255 as u8,
+                                255_u8,
                                 255 - (fluid.amount) as u8,
                                 0,
                                 windows,
@@ -210,38 +210,37 @@ fn render_density(
                                 windows.fluid_for_change = fluid.clone();
                                 windows.fire_change_flag = true;
                             }
-                        } else {
-                            if d > 0.5 {
-                                //the fire
-                                create_fire_in_range(d, windows, ui, fluid);
-                            }
-                            else if d > 0.01 && d < 0.5 {
-                                //smoke
-                                let (rect, _response) =
-                                    ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
-                                ui.painter().rect(
-                                    rect,
-                                    0.0,
-                                    egui::Color32::from_gray((d * 255.0) as u8),
-                                    
-                                    egui::Stroke::new(
-                                        9.0,
-                                        egui::Color32::from_gray((d * 255.0) as u8), 
-                                    ),
-                                );
-                            } else {
-                                continue;
-                            }
+                        } else if d > 0.5 {
+                            //the fire
+                            create_fire_in_range(d, windows, ui, fluid);
                         }
+                        else if d > 0.01 && d < 0.5 {
+                            //smoke
+                            let (rect, _response) =
+                                ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());
+                            ui.painter().rect(
+                                rect,
+                                0.0,
+                                egui::Color32::from_gray((d * 255.0) as u8),
+                                
+                                egui::Stroke::new(
+                                    9.0,
+                                    egui::Color32::from_gray((d * 255.0) as u8), 
+                                ),
+                            );
+                        } else {
+                            continue;
+                        }
+                    
                         fluid_flag = true;
-                        continue;
+
                     }
                 }
-                if fluid_flag == true {
+                if fluid_flag {
                     continue;
                 }
    
-                if !(d > 1.0 || d < 0.) {
+                if (0. ..=1.0).contains(&d) {
                      //the empty scene before and during simulation
                      let (rect, _response) =
                      ui.allocate_at_least(vec2(0.5, 3.0), egui::Sense::hover());

@@ -122,26 +122,26 @@ fn material_check(x: u32, y: u32, materials: Vec<Coords>) -> bool {
             return true;
         }
     }
-    return false;
+    false
 }
 //function for diffusing the fluid in the box
 //each cell exchanges density with its direct neigbours
 fn diffuse(
     b: u32,
-    x: &mut Vec<f32>,
-    x0: &mut Vec<f32>,
+    x: &mut [f32],
+    x0: &mut [f32],
     diffusion: f32,
     delta_time: f32,
     coords: &mut ResMut<CoordsList>,
 ) {
     let a: f32 = delta_time * diffusion * ((N - 2) * (N - 2)) as f32;
-    lin_solve(b, x, x0, a, (1 as f32) + (4 as f32) * a, coords);
+    lin_solve(b, x, x0, a, 1_f32 + 4_f32 * a, coords);
 }
 //function for making the algorythm liner
 fn lin_solve(
     b: u32,
-    x: &mut Vec<f32>,
-    x0: &mut Vec<f32>,
+    x: &mut [f32],
+    x0: &mut [f32],
     a: f32,
     c: f32,
     coords: &mut ResMut<CoordsList>,
@@ -172,10 +172,10 @@ fn lin_solve(
 
 //function that conserves the mass of the fluid
 fn project(
-    veloc_x: &mut Vec<f32>,
-    veloc_y: &mut Vec<f32>,
-    p: &mut Vec<f32>,
-    div: &mut Vec<f32>,
+    veloc_x: &mut [f32],
+    veloc_y: &mut [f32],
+    p: &mut [f32],
+    div: &mut [f32],
     coords: &mut ResMut<CoordsList>,
 ) {
     for j in 1..N - 1 {
@@ -231,10 +231,10 @@ fn project(
 //moves the density through the static velocity field
 fn advect(
     b: u32,
-    d: &mut Vec<f32>,
-    d0: &Vec<f32>,
-    veloc_x: &Vec<f32>,
-    veloc_y: &Vec<f32>,
+    d: &mut[f32],
+    d0: &[f32],
+    veloc_x: &[f32],
+    veloc_y: &[f32],
     dt: f32,
     coords: &mut ResMut<CoordsList>,
 ) {
@@ -248,7 +248,7 @@ fn advect(
     for j in 1..N - 1 {
         for i in 1..N - 1 {
             let  material_flag = material_check(i, j, coords.material_coords.clone());
-            
+
             if material_flag {
                 d[ix(i, j) as usize] = 0.;
                 continue;
@@ -303,7 +303,7 @@ fn advect(
 }
 
 //function for containing the fluid in the given scene
-fn set_bnd(b: u32, x: &mut Vec<f32>) {
+fn set_bnd(b: u32, x: &mut [f32]) {
     for i in 1..N - 1 {
         x[ix(i, 0) as usize] = if b == 2 {
             -x[ix(i, 1) as usize]

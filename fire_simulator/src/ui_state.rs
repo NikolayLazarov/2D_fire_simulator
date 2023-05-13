@@ -71,7 +71,7 @@ pub fn ui_state(
                         windows.material_for_change = material;
                     }
 
-                    if change_material_button == true {
+                    if change_material_button{
                         // materials_coordinates.add_coords(windows.material_for_change.position_x, windows.material_for_change.position_y);
                         commands.spawn(windows.material_for_change.clone());
                         close_window = true;
@@ -93,7 +93,7 @@ pub fn ui_state(
                             windows.fluid_for_change = fluid;
                         }
 
-                        if change_fluid == true {
+                        if change_fluid{
                             for fire in query_fire_entity.iter() {
                                 commands.entity(fire).despawn();
                             }
@@ -200,13 +200,12 @@ pub fn ui_state(
                     commands.spawn(material);
                 }
             }
-        } else if ui_state.material.size == 1 {
-            if materials_coordinates
-                .add_material_to_scene(ui_state.material.position_x, ui_state.material.position_y)
+        } else if ui_state.material.size == 1 && materials_coordinates
+                 .add_material_to_scene(ui_state.material.position_x, ui_state.material.position_y)
             {
                 commands.spawn(ui_state.material.clone());
             }
-        }
+        
 
         ui_state.new_material = false;
     }

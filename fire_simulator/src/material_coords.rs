@@ -1,6 +1,6 @@
 use bevy::prelude::Resource;
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct Coords {
     pub x: u32,
     pub y: u32,
