@@ -151,9 +151,10 @@ fn lin_solve(
         for j in 1..N - 1 {
             for i in 1..N - 1 {
                 let material_flag = material_check(i, j, coords.material_coords.clone());
-
+                
                 if material_flag {
-                    x[ix(i, j) as usize] = 0.;
+                    //0.
+                    x[ix(i, j) as usize] = - x[ix(i, j) as usize];
                     continue;
                 }
                 //Gauss-Seidel relacsation
@@ -185,7 +186,8 @@ fn project(
             p[ix(i, j) as usize] = 0.;
 
             if material_flag {
-                div[ix(i, j) as usize] = 0.;
+                //0
+                div[ix(i, j) as usize] = -div[ix(i, j) as usize];
                 continue;
             }
 
@@ -203,17 +205,11 @@ fn project(
     for j in 1..N - 1 {
         for i in 1..N - 1 {
             let material_flag = material_check(i, j, coords.material_coords.clone());
-
-            // for material in materials_cords {
-
-            //     if material.0 == i && material.1 == j {
-            //         material_flag = true;
-            //         break;
-            //     }
-            // }
+            
             if material_flag {
-                veloc_x[ix(i, j) as usize] = 0.;
-                veloc_y[ix(i, j) as usize] = 0.;
+                //0.
+                veloc_x[ix(i, j) as usize] = -veloc_x[ix(i, j) as usize];
+                veloc_y[ix(i, j) as usize] = -veloc_y[ix(i, j) as usize];
                 continue;
             }
 
@@ -250,7 +246,8 @@ fn advect(
             let  material_flag = material_check(i, j, coords.material_coords.clone());
 
             if material_flag {
-                d[ix(i, j) as usize] = 0.;
+                //0.
+                d[ix(i, j) as usize] = -d[ix(i, j) as usize];
                 continue;
             }
             let tmp1 = dtx * veloc_x[ix(i, j) as usize];
